@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}GarminForge — Workout Generator{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+  <!-- ===== LEFT: Generator form ===== -->
+  <div class="col-12 col-lg-5">
+    <div class="card bg-dark-subtle border-secondary h-100">
+      <div class="card-header border-secondary">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>Build Your Workout</h5>
+      </div>
+      <div class="card-body p-4">
+        <form method="post" action="/workout/generate" id="generatorForm">
+
+          <!-- GOAL -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold d-flex align-items-center gap-2 mb-2">
+              <i class="bi bi-bullseye text-info"></i> Workout Goal
+            </label>
+            <div class="row g-2">
+              {% for key, g in goals.items() %}
+              <div class="col-6">
+                <input type="radio" class="btn-check" name="goal" id="goal_{{ key }}"
+                       value="{{ key }}" {% if loop.first %}checked{% endif %} />
+                <label class="btn btn-outline-secondary w-100 text-start goal-card p-2" for="goal_{{ key }}">
+                  <span class="d-block fw-semibold">{{ g.icon }} {{ g.label }}</span>
+                  <span class="d-block text-muted" style="font-size:.75rem;line-height:1.2">{{ g.description }}</span>
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- EQUIPMENT -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold d-flex align-items-center gap-2 mb-2">
+              <i class="bi bi-tools text-success"></i> Available Equipment
+              <span class="badge bg-secondary ms-auto" id="eqCount">0 selected</span>
+            </label>
+            <div class="row g-2">
+              {% for eq in equipment_options %}
+              <div class="col-6">
+                <input type="checkbox" class="btn-check equipment-cb" name="equipment"
+                       id="eq_{{ eq.tag }}" value="{{ eq.tag }}" />
+                <label class="btn btn-outline-secondary w-100 text-start p-2" for="eq_{{ eq.tag }}">
+                  <span class="me-2">{{ eq.icon }}</span>{{ eq.label }}
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+            <div class="form-text mt-1">Select all that apply. If none selected, bodyweight exercises are used.</div>
+          </div>
+
+          <!-- DURATION -->
+          <div class="mb-4">
+            <label for="duration" class="form-label fw-semibold d-flex align-items-center gap-2">
+              <i class="bi bi-clock-fill text-primary"></i>
+              Session Duration: <span id="durationLabel" class="text-white ms-1">45 min</span>
+            </label>
+            <input type="range" class="form-range" id="duration" name="duration"
+                   min="15" max="120" step="5" value="45" />
+            <div class="d-flex justify-content-between text-muted" style="font-size:.75rem">
+              <span>15 min</span>
+              <span>60 min</span>
+              <span>120 min</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-garmin w-100 py-3 fw-bold fs-5" id="generateBtn">
+            <i class="bi bi-magic me-2"></i>Generate Workout
+          </button>
+
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RIGHT: Preview placeholder / result ===== -->
+  <div class="col-12 col-lg-7">
+    <div id="previewContainer" class="h-100">
+      <!-- Placeholder shown before generation -->
+      <div class="card bg-dark-subtle border-secondary h-100 d-flex align-items-center justify-content-center"
+           id="previewPlaceholder">
+        <div class="text-center text-muted p-5">
+          <div class="display-1 mb-3 opacity-25">🏋️</div>
+          <h5>Your workout will appear here</h5>
+          <p class="small">Fill in the options on the left and click <strong>Generate Workout</strong>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /row -->
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Duration slider label
+const durationInput = document.getElementById('duration');
+const durationLabel = document.getElementById('durationLabel');
+durationInput.addEventListener('input', () => {
+  durationLabel.textContent = durationInput.value + ' min';
+});
+
+// Equipment counter badge
+const eqCheckboxes = document.querySelectorAll('.equipment-cb');
+const eqCount = document.getElementById('eqCount');
+function updateEqCount() {
+  const n = document.querySelectorAll('.equipment-cb:checked').length;
+  eqCount.textContent = n === 0 ? '0 selected (bodyweight)' : `${n} selected`;
+}
+eqCheckboxes.forEach(cb => cb.addEventListener('change', updateEqCount));
+
+// Form submit — show spinner, POST form, replace right panel with response HTML
+document.getElementById('generatorForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Generating…';
+
+  const formData = new FormData(this);
+  try {
+    const resp = await fetch('/workout/generate', { method: 'POST', body: formData });
+    const html = await resp.text();
+    // Extract content inside the <main> tag from the response page
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const preview = doc.getElementById('workoutPreviewCard');
+    if (preview) {
+      document.getElementById('previewPlaceholder')?.remove();
+      document.getElementById('previewContainer').innerHTML = '';
+      document.getElementById('previewContainer').appendChild(
+        document.adoptNode(preview)
+      );
+    } else {
+      // Full page redirect (error) — follow it
+      window.location.href = '/';
+    }
+  } catch(err) {
+    console.error(err);
+    alert('Generation failed. Please try again.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-magic me-2"></i>Generate Workout';
+  }
+});
+</script>
+{% endblock %}
