@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "garminforge"
+version = "0.1.0"
+description = "Python toolkit for creating, uploading, and scheduling Garmin Connect workouts"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "garminconnect[workout]>=0.2.40",
+    "garth>=0.4.47,<0.9",
+    "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff>=0.1",
+    "mypy>=1.7",
+]
+
+[project.scripts]
+garminforge = "garminforge.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["garminforge*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
