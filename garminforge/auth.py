@@ -21,10 +21,23 @@ import logging
 from pathlib import Path
 from typing import Callable
 
+import garth as _garth_module
+
 from garminconnect import Garmin, GarminConnectAuthenticationError
 from garth.exc import GarthHTTPError
 
 from garminforge.exceptions import AuthenticationError, TokenNotFoundError
+
+
+def _garth(client: Garmin):
+    """Return the garth client from a Garmin instance.
+
+    Newer garminconnect versions may use the module-level garth client
+    rather than exposing it as ``client.garth``.
+    """
+    if hasattr(client, "garth"):
+        return client.garth
+    return _garth_module.client
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +89,7 @@ class TokenStore:
         """
         try:
             if self._token_string is not None:
-                client.garth.loads(self._token_string)
+                _garth(client).loads(self._token_string)
                 logger.debug("Loaded tokens from base64 string.")
             else:
                 assert self._path is not None
@@ -102,13 +115,13 @@ class TokenStore:
         otherwise writes files to disk and returns ``None``.
         """
         if self._token_string is not None:
-            self._token_string = client.garth.dumps()
+            self._token_string = _garth(client).dumps()
             logger.debug("Updated in-memory token string.")
             return self._token_string
 
         assert self._path is not None
         self._path.mkdir(mode=0o700, parents=True, exist_ok=True)
-        client.garth.dump(str(self._path))
+        _garth(client).dump(str(self._path))
         # Tighten file permissions.
         for f in self._path.glob("*.json"):
             f.chmod(0o600)
