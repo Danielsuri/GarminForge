@@ -32,7 +32,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from garminconnect import Garmin, GarminConnectAuthenticationError
 
 # GarminForge library
-from garminforge.auth import TokenStore, with_backoff
+from garminforge.auth import TokenStore, with_backoff, _garth
 from garminforge.client import GarminForgeClient
 from garminforge.exceptions import (
     AuthenticationError,
@@ -151,7 +151,7 @@ async def auth_login(
         return RedirectResponse("/auth/mfa", status_code=303)
 
     # No MFA — store tokens immediately
-    request.session["token_b64"] = client.garth.dumps()
+    request.session["token_b64"] = _garth(client).dumps()
     request.session["flash_success"] = "Logged in successfully!"
     return RedirectResponse("/", status_code=303)
 
@@ -180,7 +180,7 @@ async def auth_mfa(
     except Exception as exc:
         return _error_redirect(request, f"MFA error: {exc}")
 
-    request.session["token_b64"] = client.garth.dumps()
+    request.session["token_b64"] = _garth(client).dumps()
     request.session["flash_success"] = "Logged in successfully!"
     return RedirectResponse("/", status_code=303)
 
