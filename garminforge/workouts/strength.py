@@ -37,9 +37,29 @@ from garminforge.exceptions import StepLimitExceededError
 from garminforge.workouts import steps as S
 from garminforge.workouts.exercises import validate as validate_exercise
 
+def _estimate_duration(steps: list[S.Step]) -> int:
+    """Recursively sum timed step durations (in seconds) across all steps."""
+    total = 0
+    for step in steps:
+        key = step.get("stepType", {}).get("stepTypeKey")
+        if key == "repeat":
+            iters = step.get("numberOfIterations", 1)
+            total += iters * _estimate_duration(step.get("workoutSteps", []))
+        else:
+            val = step.get("endConditionValue")
+            cond_key = step.get("endCondition", {}).get("conditionTypeKey")
+            if val is not None and cond_key == "time":
+                total += int(val)
+            elif val is not None and cond_key == "reps":
+                # Approximate: 3 seconds per rep
+                total += int(val) * 3
+    return total
+
+
 _STRENGTH_SPORT_TYPE = {
-    "sportTypeId": 4,
+    "sportTypeId": 5,
     "sportTypeKey": "strength_training",
+    "displayOrder": 5,
 }
 
 
@@ -216,6 +236,7 @@ class StrengthWorkout:
         payload: dict[str, Any] = {
             "workoutName": self.name[:80],
             "sportType": _STRENGTH_SPORT_TYPE,
+            "estimatedDurationInSecs": _estimate_duration(renumbered),
             "workoutSegments": [
                 {
                     "segmentOrder": 1,
@@ -236,7 +257,7 @@ class StrengthWorkout:
 
         # Validate exercise names (warn only — Garmin's catalog is larger).
         for step in _iter_exercise_steps(self._top_steps):
-            cat = step.get("exerciseCategory", "")
+            cat = step.get("category", "")
             name = step.get("exerciseName", "")
             if cat and name and not validate_exercise(cat, name):
                 import warnings

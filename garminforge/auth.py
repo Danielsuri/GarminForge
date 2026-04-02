@@ -107,6 +107,11 @@ class TokenStore:
             ) from exc
         except GarthHTTPError as exc:
             raise AuthenticationError(str(exc)) from exc
+        except TypeError as exc:
+            logger.error("Token load TypeError: %s", exc)
+            raise AuthenticationError(
+                f"Token format error: {exc}"
+            ) from exc
 
     def save(self, client: Garmin) -> str | None:
         """Persist tokens from *client*'s garth instance.

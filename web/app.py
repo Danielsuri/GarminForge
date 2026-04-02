@@ -42,6 +42,7 @@ from garminforge.exceptions import (
 
 # Web modules
 from web.workout_generator import GOALS, EQUIPMENT_OPTIONS, generate
+from web.garmin_sso import exchange_ticket, browser_login, make_token_b64
 
 logger = logging.getLogger(__name__)
 
@@ -62,11 +63,49 @@ app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 # ---------------------------------------------------------------------------
-# In-process MFA state store.
-# Maps a random key → (Garmin instance, garth OAuth state).
-# Not suitable for multi-process deployments (use Redis for that).
+# In-process MFA state store (legacy, kept for MFA route).
 # ---------------------------------------------------------------------------
 _MFA_SESSIONS: dict[str, tuple[Garmin, Any]] = {}
+
+# ---------------------------------------------------------------------------
+# Browser login state: login_id → {status, token_b64, error}
+# ---------------------------------------------------------------------------
+_BROWSER_LOGINS: dict[str, dict] = {}
+
+# ---------------------------------------------------------------------------
+# Server-side token store: token_id (short UUID in session) → token_b64
+# Avoids storing the large token in the session cookie.
+# ---------------------------------------------------------------------------
+_TOKEN_STORE: dict[str, str] = {}
+
+_SAVED_TOKEN_PATH = Path.home() / ".garminforge_token"
+_REMEMBERED_TOKEN_ID = "remembered"
+
+
+def _save_token_to_disk(token_b64: str) -> None:
+    try:
+        _SAVED_TOKEN_PATH.write_text(token_b64, encoding="utf-8")
+        _SAVED_TOKEN_PATH.chmod(0o600)
+    except Exception as exc:
+        logger.warning("Could not save token to disk: %s", exc)
+
+
+def _load_remembered_token() -> bool:
+    """Load saved token from disk into the store. Returns True if loaded."""
+    if not _SAVED_TOKEN_PATH.exists():
+        return False
+    try:
+        token_b64 = _SAVED_TOKEN_PATH.read_text(encoding="utf-8").strip()
+        if token_b64:
+            _TOKEN_STORE[_REMEMBERED_TOKEN_ID] = token_b64
+            return True
+    except Exception as exc:
+        logger.warning("Could not load saved token: %s", exc)
+    return False
+
+
+# Load saved token at startup
+_load_remembered_token()
 
 
 # ---------------------------------------------------------------------------
@@ -74,15 +113,33 @@ _MFA_SESSIONS: dict[str, tuple[Garmin, Any]] = {}
 # ---------------------------------------------------------------------------
 
 def _is_authenticated(request: Request) -> bool:
-    return bool(request.session.get("token_b64"))
+    token_id = request.session.get("token_id")
+    if token_id and token_id in _TOKEN_STORE:
+        return True
+    # Auto-attach remembered token if available
+    if _REMEMBERED_TOKEN_ID in _TOKEN_STORE:
+        request.session["token_id"] = _REMEMBERED_TOKEN_ID
+        return True
+    return False
 
 
 def _get_forge_client(request: Request) -> GarminForgeClient:
-    token_b64: str = request.session["token_b64"]
+    token_id: str = request.session["token_id"]
+    token_b64: str = _TOKEN_STORE[token_id]
     return GarminForgeClient(
         TokenStore(token_string=token_b64),
         inter_call_delay=0.5,
     )
+
+
+def _store_token(request: Request, token_b64: str) -> None:
+    """Save token server-side, persist to disk, and put its ID in the session cookie."""
+    old = request.session.pop("token_id", None)
+    if old and old != _REMEMBERED_TOKEN_ID:
+        _TOKEN_STORE.pop(old, None)
+    _TOKEN_STORE[_REMEMBERED_TOKEN_ID] = token_b64
+    request.session["token_id"] = _REMEMBERED_TOKEN_ID
+    _save_token_to_disk(token_b64)
 
 
 def _render(template: str, request: Request, **ctx) -> HTMLResponse:
@@ -103,8 +160,8 @@ def _error_redirect(request: Request, message: str, back: str = "/") -> Redirect
 # ---------------------------------------------------------------------------
 
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
-    flash_error = request.session.pop("flash_error", None)
+async def index(request: Request, error: str = ""):
+    flash_error = request.session.pop("flash_error", None) or (error or None)
     flash_success = request.session.pop("flash_success", None)
 
     if not _is_authenticated(request):
@@ -129,31 +186,53 @@ async def auth_login(
     email: str = Form(...),
     password: str = Form(...),
 ):
-    """Attempt credentials login.  Handles MFA via two-step flow."""
-    try:
-        client = Garmin(email=email, password=password, return_on_mfa=True)
-        result = client.login()
-    except GarminConnectAuthenticationError as exc:
-        return _error_redirect(
-            request,
-            f"Login failed: {exc}.  "
-            "Note: Garmin's SSO has been broken since March 2026 — "
-            "use 'Import Tokens' instead.",
-        )
-    except Exception as exc:
-        return _error_redirect(request, f"Connection error: {exc}")
+    """Start a headed Playwright browser login in the background."""
+    import threading
 
-    if isinstance(result, tuple) and result[0] == "needs_mfa":
-        # Store in-process MFA state
-        mfa_key = str(uuid.uuid4())
-        _MFA_SESSIONS[mfa_key] = (client, result[1])
-        request.session["mfa_key"] = mfa_key
-        return RedirectResponse("/auth/mfa", status_code=303)
+    login_id = str(uuid.uuid4())
+    _BROWSER_LOGINS[login_id] = {"status": "pending"}
+    request.session["login_id"] = login_id
 
-    # No MFA — store tokens immediately
-    request.session["token_b64"] = _garth(client).dumps()
-    request.session["flash_success"] = "Logged in successfully!"
-    return RedirectResponse("/", status_code=303)
+    def _run():
+        try:
+            oauth1, oauth2 = browser_login(email, password)
+            _BROWSER_LOGINS[login_id] = {"status": "success", "token_b64": make_token_b64(oauth1, oauth2)}
+        except Exception as exc:
+            _BROWSER_LOGINS[login_id] = {"status": "error", "error": str(exc)}
+
+    threading.Thread(target=_run, daemon=True).start()
+    return RedirectResponse("/auth/waiting", status_code=303)
+
+
+@app.get("/auth/waiting", response_class=HTMLResponse)
+async def auth_waiting(request: Request):
+    return _render("waiting.html", request)
+
+
+@app.get("/auth/poll")
+async def auth_poll(request: Request):
+    login_id = request.session.get("login_id")
+    if not login_id or login_id not in _BROWSER_LOGINS:
+        return {"status": "error", "error": "No login in progress."}
+    state = _BROWSER_LOGINS[login_id]
+    if state["status"] == "error":
+        logger.error("Browser login failed: %s", state.get("error"))
+    return {"status": state["status"], "error": state.get("error", "")}
+
+
+@app.get("/auth/finalize")
+async def auth_finalize(request: Request):
+    """Called by browser (not fetch) once poll reports success — sets session cookie reliably."""
+    login_id = request.session.get("login_id")
+    if not login_id or login_id not in _BROWSER_LOGINS:
+        return _error_redirect(request, "Login session expired. Please try again.")
+    state = _BROWSER_LOGINS.pop(login_id)
+    request.session.pop("login_id", None)
+    if state["status"] != "success":
+        return _error_redirect(request, state.get("error", "Login failed."))
+    _store_token(request, state["token_b64"])
+    request.session["flash_success"] = "Connected to Garmin successfully!"
+    return HTMLResponse('<html><body><script>window.location.replace("/")</script></body></html>')
 
 
 @app.get("/auth/mfa", response_class=HTMLResponse)
@@ -180,7 +259,7 @@ async def auth_mfa(
     except Exception as exc:
         return _error_redirect(request, f"MFA error: {exc}")
 
-    request.session["token_b64"] = _garth(client).dumps()
+    _store_token(request, _garth(client).dumps())
     request.session["flash_success"] = "Logged in successfully!"
     return RedirectResponse("/", status_code=303)
 
@@ -205,13 +284,81 @@ async def auth_token(
     except Exception as exc:
         return _error_redirect(request, f"Token error: {exc}")
 
-    request.session["token_b64"] = token
+    _store_token(request, token)
     request.session["flash_success"] = "Tokens imported successfully!"
+    return RedirectResponse("/", status_code=303)
+
+
+@app.get("/auth/localtoken")
+async def auth_localtoken(request: Request):
+    """Load tokens from ~/.garminconnect written by garmin_browser_auth.py."""
+    import garth as _garth_module
+    token_dir = Path.home() / ".garminconnect"
+    if not (token_dir / "oauth1_token.json").exists():
+        return _error_redirect(request, "No local tokens found. Run scripts/garmin_browser_auth.py first.")
+    try:
+        _garth_module.client.load(str(token_dir))
+        token_b64 = _garth_module.client.dumps()
+        _store_token(request, token_b64)
+        request.session["flash_success"] = "Loaded tokens from local token store."
+    except Exception as exc:
+        return _error_redirect(request, f"Failed to load local tokens: {exc}")
+    return RedirectResponse("/", status_code=303)
+
+
+@app.get("/auth/sso", response_class=HTMLResponse)
+async def auth_sso(request: Request):
+    """Render the embedded Garmin SSO login page."""
+    return _render("sso.html", request)
+
+
+@app.post("/auth/exchange")
+async def auth_exchange(request: Request, ticket: str = Form(...)):
+    """Receive SSO ticket from browser postMessage, exchange for tokens server-side."""
+    try:
+        oauth1, oauth2 = exchange_ticket(ticket)
+        _store_token(request, make_token_b64(oauth1, oauth2))
+        request.session["flash_success"] = "Connected to Garmin successfully!"
+        return {"ok": True}
+    except Exception as exc:
+        logger.exception("Ticket exchange failed")
+        return {"ok": False, "error": str(exc)}
+
+
+@app.get("/auth/callback", response_class=HTMLResponse)
+async def auth_callback(request: Request, ticket: str = ""):
+    """Garmin redirects the login popup here with ?ticket=ST-..."""
+    import base64 as _b64
+    import json as _json
+    if not ticket:
+        return HTMLResponse("<script>window.opener&&window.opener.location.reload();window.close();</script>")
+    try:
+        oauth1, oauth2 = exchange_ticket(ticket)
+        _store_token(request, make_token_b64(oauth1, oauth2))
+        request.session["flash_success"] = "Connected to Garmin successfully!"
+    except Exception as exc:
+        logger.exception("Ticket exchange failed")
+        request.session["flash_error"] = f"Login failed: {exc}"
+    return HTMLResponse(
+        "<script>if(window.opener){window.opener.location.href='/';window.close();}else{window.location.href='/';}</script>"
+    )
+
+
+@app.get("/auth/cancel")
+async def auth_cancel(request: Request):
+    login_id = request.session.pop("login_id", None)
+    if login_id:
+        _BROWSER_LOGINS.pop(login_id, None)
     return RedirectResponse("/", status_code=303)
 
 
 @app.get("/auth/logout")
 async def logout(request: Request):
+    _TOKEN_STORE.pop(_REMEMBERED_TOKEN_ID, None)
+    try:
+        _SAVED_TOKEN_PATH.unlink(missing_ok=True)
+    except Exception:
+        pass
     request.session.clear()
     return RedirectResponse("/", status_code=303)
 
@@ -219,6 +366,22 @@ async def logout(request: Request):
 # ---------------------------------------------------------------------------
 # Workout generation
 # ---------------------------------------------------------------------------
+
+@app.get("/debug/workouts")
+async def debug_workouts(request: Request):
+    if not _is_authenticated(request):
+        return {"error": "not authenticated"}
+    forge = _get_forge_client(request)
+    return forge.get_workouts(start=0, limit=10)
+
+
+@app.get("/debug/workout/{workout_id}")
+async def debug_workout(request: Request, workout_id: int):
+    if not _is_authenticated(request):
+        return {"error": "not authenticated"}
+    forge = _get_forge_client(request)
+    return forge.get_workout(workout_id)
+
 
 @app.post("/workout/generate", response_class=HTMLResponse)
 async def workout_generate(
@@ -293,7 +456,9 @@ async def workout_upload(
             "Garmin Connect rate limit hit (429). Wait a minute and try again."
         )
     except AuthenticationError:
-        request.session.pop("token_b64", None)
+        token_id = request.session.pop("token_id", None)
+        if token_id:
+            _TOKEN_STORE.pop(token_id, None)
         return _error_redirect(
             request,
             "Authentication failed. Your tokens may have expired. Please log in again."

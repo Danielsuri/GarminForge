@@ -40,7 +40,7 @@ from typing import Any
 
 from garminconnect import Garmin
 
-from garminforge.auth import TokenStore, load_client, with_backoff
+from garminforge.auth import TokenStore, load_client, with_backoff, _garth
 from garminforge.exceptions import AuthenticationError, TooManyRequestsError
 
 logger = logging.getLogger(__name__)
@@ -112,7 +112,7 @@ class GarminForgeClient:
             or ``RunningWorkoutBuilder.build()``.
         """
         return self._call(
-            self.garmin.connectapi,
+            _garth(self.garmin).connectapi,
             _WORKOUT_ENDPOINT,
             method="POST",
             json=payload,
@@ -121,7 +121,7 @@ class GarminForgeClient:
     def get_workout(self, workout_id: int | str) -> dict[str, Any]:
         """Fetch a single workout by ID."""
         return self._call(
-            self.garmin.connectapi,
+            _garth(self.garmin).connectapi,
             f"{_WORKOUT_ENDPOINT}/{workout_id}",
         )
 
@@ -140,7 +140,7 @@ class GarminForgeClient:
             Number of workouts to return (max ~100 per call).
         """
         return self._call(
-            self.garmin.connectapi,
+            _garth(self.garmin).connectapi,
             _WORKOUTS_ENDPOINT,
             params={"start": start, "limit": limit},
         )
@@ -152,7 +152,7 @@ class GarminForgeClient:
         permanently.
         """
         self._call(
-            self.garmin.connectapi,
+            _garth(self.garmin).connectapi,
             f"{_WORKOUT_ENDPOINT}/{workout_id}",
             method="DELETE",
         )
@@ -173,9 +173,10 @@ class GarminForgeClient:
             ISO 8601 date string, e.g. ``"2026-04-10"``.
         """
         return self._call(
-            self.garmin.schedule_workout,
-            workout_id,
-            date,
+            _garth(self.garmin).connectapi,
+            f"/workout-service/schedule/{workout_id}",
+            method="POST",
+            json={"date": date},
         )
 
     def upload_and_schedule(

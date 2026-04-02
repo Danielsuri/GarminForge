@@ -7,11 +7,11 @@ modules (strength.py, running.py) call these builders so the JSON structure
 is defined in one place.
 
 Key constraints from the Garmin Connect API:
-- Time ``endConditionValue`` is in **milliseconds**.
-- Reps ``endConditionValue`` is an integer count.
-- Distance ``endConditionValue`` is in **meters**.
-- A ``repeat`` group wraps ``workoutSteps`` and uses ``iterations`` as its
-  end condition (representing sets).
+- ``endConditionValue`` is a top-level field on the step (seconds for time,
+  reps count for reps, iterations count for repeat groups).
+- ``endCondition`` contains only type metadata (no value).
+- Steps require a ``type`` discriminator field: ``"ExecutableStepDTO"`` or
+  ``"RepeatGroupDTO"``.
 - Maximum 50 steps per workout (enforced by ``GarminForgeClient``).
 """
 
@@ -29,30 +29,34 @@ Step = dict[str, Any]
 
 # ---------------------------------------------------------------------------
 # End-condition helpers
+# (value goes in endConditionValue at step level, not here)
 # ---------------------------------------------------------------------------
 
 
-def _time_condition(seconds: float) -> dict[str, Any]:
+def _time_condition() -> dict[str, Any]:
     return {
         "conditionTypeId": 2,
         "conditionTypeKey": "time",
-        "conditionValue": int(seconds * 1000),
+        "displayOrder": 2,
+        "displayable": True,
     }
 
 
-def _reps_condition(reps: int) -> dict[str, Any]:
+def _reps_condition() -> dict[str, Any]:
     return {
         "conditionTypeId": 7,
         "conditionTypeKey": "reps",
-        "conditionValue": reps,
+        "displayOrder": 7,
+        "displayable": True,
     }
 
 
-def _distance_condition(meters: float) -> dict[str, Any]:
+def _distance_condition() -> dict[str, Any]:
     return {
         "conditionTypeId": 3,
         "conditionTypeKey": "distance",
-        "conditionValue": meters,
+        "displayOrder": 3,
+        "displayable": True,
     }
 
 
@@ -60,14 +64,17 @@ def _lap_button_condition() -> dict[str, Any]:
     return {
         "conditionTypeId": 1,
         "conditionTypeKey": "lap.button",
+        "displayOrder": 1,
+        "displayable": True,
     }
 
 
-def _iterations_condition(count: int) -> dict[str, Any]:
+def _iterations_condition() -> dict[str, Any]:
     return {
-        "conditionTypeId": 11,
+        "conditionTypeId": 7,
         "conditionTypeKey": "iterations",
-        "conditionValue": count,
+        "displayOrder": 7,
+        "displayable": False,
     }
 
 
@@ -77,7 +84,11 @@ def _iterations_condition(count: int) -> dict[str, Any]:
 
 
 def no_target() -> dict[str, Any]:
-    return {"workoutTargetTypeId": 1, "workoutTargetTypeKey": "no.target"}
+    return {
+        "workoutTargetTypeId": 1,
+        "workoutTargetTypeKey": "no.target",
+        "displayOrder": 1,
+    }
 
 
 def heart_rate_zone_target(zone: int) -> dict[str, Any]:
@@ -85,6 +96,7 @@ def heart_rate_zone_target(zone: int) -> dict[str, Any]:
     return {
         "workoutTargetTypeId": 4,
         "workoutTargetTypeKey": "heart.rate.zone",
+        "displayOrder": 4,
         "targetValueOne": zone,
         "targetValueTwo": zone,
     }
@@ -95,6 +107,7 @@ def pace_zone_target(min_pace_sec_per_km: float, max_pace_sec_per_km: float) -> 
     return {
         "workoutTargetTypeId": 6,
         "workoutTargetTypeKey": "pace.zone",
+        "displayOrder": 6,
         "targetValueOne": min_pace_sec_per_km,
         "targetValueTwo": max_pace_sec_per_km,
     }
@@ -115,15 +128,19 @@ def warmup_step(
 
     If *duration_seconds* is ``None`` the step ends on a lap-button press.
     """
-    end_condition = (
-        _time_condition(duration_seconds)
-        if duration_seconds is not None
-        else _lap_button_condition()
-    )
+    if duration_seconds is not None:
+        end_condition = _time_condition()
+        end_condition_value: float | None = duration_seconds
+    else:
+        end_condition = _lap_button_condition()
+        end_condition_value = None
+
     step: Step = {
+        "type": "ExecutableStepDTO",
         "stepOrder": step_order,
-        "stepType": {"stepTypeId": 1, "stepTypeKey": "warmup"},
+        "stepType": {"stepTypeId": 1, "stepTypeKey": "warmup", "displayOrder": 1},
         "endCondition": end_condition,
+        "endConditionValue": end_condition_value,
         "targetType": no_target(),
     }
     if description:
@@ -138,15 +155,19 @@ def cooldown_step(
     step_order: int = 1,
 ) -> Step:
     """Create a cooldown step (lap-button by default)."""
-    end_condition = (
-        _time_condition(duration_seconds)
-        if duration_seconds is not None
-        else _lap_button_condition()
-    )
+    if duration_seconds is not None:
+        end_condition = _time_condition()
+        end_condition_value: float | None = duration_seconds
+    else:
+        end_condition = _lap_button_condition()
+        end_condition_value = None
+
     step: Step = {
+        "type": "ExecutableStepDTO",
         "stepOrder": step_order,
-        "stepType": {"stepTypeId": 2, "stepTypeKey": "cooldown"},
+        "stepType": {"stepTypeId": 2, "stepTypeKey": "cooldown", "displayOrder": 2},
         "endCondition": end_condition,
+        "endConditionValue": end_condition_value,
         "targetType": no_target(),
     }
     if description:
@@ -164,15 +185,19 @@ def rest_step(
 
     If *duration_seconds* is ``None`` the step ends on a lap-button press.
     """
-    end_condition = (
-        _time_condition(duration_seconds)
-        if duration_seconds is not None
-        else _lap_button_condition()
-    )
+    if duration_seconds is not None:
+        end_condition = _time_condition()
+        end_condition_value: float | None = duration_seconds
+    else:
+        end_condition = _lap_button_condition()
+        end_condition_value = None
+
     step: Step = {
+        "type": "ExecutableStepDTO",
         "stepOrder": step_order,
-        "stepType": {"stepTypeId": 4, "stepTypeKey": "rest"},
+        "stepType": {"stepTypeId": 5, "stepTypeKey": "rest", "displayOrder": 5},
         "endCondition": end_condition,
+        "endConditionValue": end_condition_value,
         "targetType": no_target(),
     }
     if description:
@@ -199,18 +224,24 @@ def interval_step(
             "Provide at most one of duration_seconds, distance_meters, or reps."
         )
     if duration_seconds is not None:
-        end_condition = _time_condition(duration_seconds)
+        end_condition = _time_condition()
+        end_condition_value: float | None = duration_seconds
     elif distance_meters is not None:
-        end_condition = _distance_condition(distance_meters)
+        end_condition = _distance_condition()
+        end_condition_value = distance_meters
     elif reps is not None:
-        end_condition = _reps_condition(reps)
+        end_condition = _reps_condition()
+        end_condition_value = float(reps)
     else:
         end_condition = _lap_button_condition()
+        end_condition_value = None
 
     step: Step = {
+        "type": "ExecutableStepDTO",
         "stepOrder": step_order,
-        "stepType": {"stepTypeId": 3, "stepTypeKey": "interval"},
+        "stepType": {"stepTypeId": 3, "stepTypeKey": "interval", "displayOrder": 3},
         "endCondition": end_condition,
+        "endConditionValue": end_condition_value,
         "targetType": target or no_target(),
     }
     if description:
@@ -244,18 +275,23 @@ def exercise_step(
         raise ValueError("Provide either reps or duration_seconds, not both.")
 
     if reps is not None:
-        end_condition = _reps_condition(reps)
+        end_condition = _reps_condition()
+        end_condition_value: float | None = float(reps)
     elif duration_seconds is not None:
-        end_condition = _time_condition(duration_seconds)
+        end_condition = _time_condition()
+        end_condition_value = duration_seconds
     else:
         end_condition = _lap_button_condition()
+        end_condition_value = None
 
     step: Step = {
+        "type": "ExecutableStepDTO",
         "stepOrder": step_order,
-        "stepType": {"stepTypeId": 3, "stepTypeKey": "interval"},
-        "exerciseCategory": category.upper(),
+        "stepType": {"stepTypeId": 3, "stepTypeKey": "interval", "displayOrder": 3},
+        "category": category.upper(),
         "exerciseName": name.upper(),
         "endCondition": end_condition,
+        "endConditionValue": end_condition_value,
         "targetType": no_target(),
     }
     if description:
@@ -288,10 +324,12 @@ def repeat_group(
         {**s, "stepOrder": i + 1} for i, s in enumerate(steps)
     ]
     return {
+        "type": "RepeatGroupDTO",
         "stepOrder": step_order,
-        "stepType": {"stepTypeId": 6, "stepTypeKey": "repeat"},
-        "endCondition": _iterations_condition(sets),
-        "endConditionValue": sets,
+        "stepType": {"stepTypeId": 6, "stepTypeKey": "repeat", "displayOrder": 6},
+        "numberOfIterations": sets,
+        "endCondition": _iterations_condition(),
+        "endConditionValue": float(sets),
         "workoutSteps": renumbered,
     }
 

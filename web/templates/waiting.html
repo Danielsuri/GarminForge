@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}GarminForge — Waiting for login{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-7 col-lg-5 text-center">
+
+    <div class="card bg-dark-subtle border-secondary p-5">
+      <div class="mb-4">
+        <div class="spinner-border text-garmin" style="width:3rem;height:3rem;" role="status"></div>
+      </div>
+      <h4 class="fw-bold mb-2">Waiting for Garmin login…</h4>
+      <p class="text-muted mb-0">
+        Complete the login in the browser window that just opened.<br>
+        This page will update automatically when done.
+      </p>
+    </div>
+
+    <a href="/auth/cancel" class="btn btn-link text-muted mt-3">Cancel</a>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function poll() {
+  fetch("/auth/poll")
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === "success") {
+        window.location.href = "/auth/finalize";
+      } else if (data.status === "error") {
+        window.location.href = "/?error=" + encodeURIComponent(data.error);
+      } else {
+        setTimeout(poll, 2000);
+      }
+    })
+    .catch(() => setTimeout(poll, 2000));
+})();
+</script>
+{% endblock %}

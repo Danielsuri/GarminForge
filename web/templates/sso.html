@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}GarminForge — Connect{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-6">
+
+    <div class="text-center mb-4">
+      <h2 class="fw-bold">Connect to Garmin</h2>
+      <p class="text-muted">Log in with your Garmin credentials below</p>
+    </div>
+
+    <div id="status-box" class="alert alert-info d-none" role="alert">
+      <span class="spinner-border spinner-border-sm me-2"></span>
+      Completing login, please wait…
+    </div>
+
+    <div id="error-box" class="alert alert-danger d-none" role="alert"></div>
+
+    <div class="card border-secondary" id="sso-card">
+      <div class="card-body p-0 overflow-hidden rounded">
+        <!--
+          sandbox without allow-top-navigation prevents the iframe from
+          hijacking the parent window after login.
+          allow-same-origin keeps the garmin.com origin so postMessage works.
+        -->
+        <iframe
+          id="sso-frame"
+          src="https://sso.garmin.com/sso/embed?id=gauth-widget&embedWidget=true&gauthHost=https://sso.garmin.com/sso&clientId=GarminConnect&locale=en_US&redirectAfterAccountLoginUrl=https://sso.garmin.com/sso/embed&service=https://sso.garmin.com/sso/embed"
+          style="width:100%;height:520px;border:none;display:block;"
+          sandbox="allow-scripts allow-forms allow-same-origin allow-popups">
+        </iframe>
+      </div>
+    </div>
+
+    <p class="text-muted small text-center mt-3">
+      <a href="/" class="text-muted">Cancel</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+window.addEventListener("message", async function (event) {
+  // Accept messages from garmin.com or null origin (sandboxed frames)
+  if (event.origin && event.origin !== "null" && !event.origin.endsWith(".garmin.com")) return;
+
+  let data = event.data;
+  if (typeof data === "string") {
+    try { data = JSON.parse(data); } catch (_) { return; }
+  }
+  if (!data || typeof data !== "object") return;
+
+  // Garmin's embed posts { serviceTicket: "ST-..." } or { ticket: "ST-..." }
+  const ticket = data.serviceTicket || data.ticket;
+  if (!ticket || !ticket.startsWith("ST-")) return;
+
+  document.getElementById("sso-card").classList.add("d-none");
+  document.getElementById("status-box").classList.remove("d-none");
+
+  try {
+    const resp = await fetch("/auth/exchange", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "ticket=" + encodeURIComponent(ticket),
+    });
+    const result = await resp.json();
+    if (result.ok) {
+      window.location.href = "/";
+    } else {
+      showError(result.error || "Login failed. Please try again.");
+    }
+  } catch (e) {
+    showError("Network error: " + e.message);
+  }
+});
+
+function showError(msg) {
+  document.getElementById("status-box").classList.add("d-none");
+  document.getElementById("sso-card").classList.remove("d-none");
+  const box = document.getElementById("error-box");
+  box.textContent = msg;
+  box.classList.remove("d-none");
+}
+</script>
+{% endblock %}
