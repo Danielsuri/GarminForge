@@ -1,0 +1,10 @@
+# Core dependencies
+garminconnect[workout]>=0.2.40
+garth>=0.4.47,<0.9
+pydantic>=2.0
+
+# Development
+pytest>=7.4
+pytest-cov>=4.1
+ruff>=0.1
+mypy>=1.7
