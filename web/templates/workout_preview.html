@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% block title %}GarminForge — Workout Preview{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+  <!-- Generator form (left) — preserved so user can tweak and regenerate -->
+  <div class="col-12 col-lg-5">
+    <div class="card bg-dark-subtle border-secondary">
+      <div class="card-header border-secondary">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>Build Your Workout</h5>
+      </div>
+      <div class="card-body p-4">
+        <form method="post" action="/workout/generate" id="generatorForm">
+
+          <!-- GOAL -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold d-flex align-items-center gap-2 mb-2">
+              <i class="bi bi-bullseye text-info"></i> Workout Goal
+            </label>
+            <div class="row g-2">
+              {% for key, g in goals.items() %}
+              <div class="col-6">
+                <input type="radio" class="btn-check" name="goal" id="goal_{{ key }}"
+                       value="{{ key }}" {% if key == selected_goal %}checked{% endif %} />
+                <label class="btn btn-outline-secondary w-100 text-start goal-card p-2" for="goal_{{ key }}">
+                  <span class="d-block fw-semibold">{{ g.icon }} {{ g.label }}</span>
+                  <span class="d-block text-muted" style="font-size:.75rem;line-height:1.2">{{ g.description }}</span>
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- EQUIPMENT -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold d-flex align-items-center gap-2 mb-2">
+              <i class="bi bi-tools text-success"></i> Available Equipment
+              <span class="badge bg-secondary ms-auto" id="eqCount">
+                {{ selected_equipment | length }} selected
+              </span>
+            </label>
+            <div class="row g-2">
+              {% for eq in equipment_options %}
+              <div class="col-6">
+                <input type="checkbox" class="btn-check equipment-cb" name="equipment"
+                       id="eq_{{ eq.tag }}" value="{{ eq.tag }}"
+                       {% if eq.tag in selected_equipment %}checked{% endif %} />
+                <label class="btn btn-outline-secondary w-100 text-start p-2" for="eq_{{ eq.tag }}">
+                  <span class="me-2">{{ eq.icon }}</span>{{ eq.label }}
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- DURATION -->
+          <div class="mb-4">
+            <label for="duration" class="form-label fw-semibold d-flex align-items-center gap-2">
+              <i class="bi bi-clock-fill text-primary"></i>
+              Session Duration: <span id="durationLabel" class="text-white ms-1">{{ selected_duration }} min</span>
+            </label>
+            <input type="range" class="form-range" id="duration" name="duration"
+                   min="15" max="120" step="5" value="{{ selected_duration }}" />
+            <div class="d-flex justify-content-between text-muted" style="font-size:.75rem">
+              <span>15 min</span><span>60 min</span><span>120 min</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-garmin w-100 py-3 fw-bold fs-5" id="generateBtn">
+            <i class="bi bi-arrow-repeat me-2"></i>Regenerate
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Workout preview card (right) -->
+  <div class="col-12 col-lg-7" id="previewContainer">
+    <div id="workoutPreviewCard" class="card bg-dark-subtle border-secondary">
+      <div class="card-header border-secondary d-flex align-items-center justify-content-between">
+        <div>
+          <span class="fs-3 me-2">{{ plan.goal_icon }}</span>
+          <span class="fw-bold fs-5">{{ plan.name }}</span>
+        </div>
+        <span class="badge bg-garmin">
+          <i class="bi bi-clock me-1"></i>{{ plan.duration_minutes }} min
+        </span>
+      </div>
+
+      <div class="card-body p-4">
+        <p class="text-muted small mb-4">{{ plan.description }}</p>
+
+        <!-- Stats row -->
+        <div class="row g-3 mb-4">
+          <div class="col-4">
+            <div class="stat-card text-center p-3 rounded">
+              <div class="stat-value">{{ plan.exercises | length }}</div>
+              <div class="stat-label">Exercises</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="stat-card text-center p-3 rounded">
+              <div class="stat-value">{{ plan.exercises[0].sets if plan.exercises else '—' }}</div>
+              <div class="stat-label">Sets each</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="stat-card text-center p-3 rounded">
+              <div class="stat-value">
+                {% if plan.exercises and plan.exercises[0].reps %}
+                  {{ plan.exercises[0].reps }}
+                {% elif plan.exercises and plan.exercises[0].duration_sec %}
+                  {{ plan.exercises[0].duration_sec | int }}s
+                {% else %}—{% endif %}
+              </div>
+              <div class="stat-label">Reps / set</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exercise list -->
+        <div class="exercise-list mb-4">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <div class="step-badge bg-secondary text-white rounded-pill px-2 py-0" style="font-size:.7rem">WARM-UP</div>
+            <span class="text-muted small">5 min general warm-up</span>
+          </div>
+
+          {% for ex in plan.exercises %}
+          <div class="exercise-item d-flex align-items-start gap-3 py-3 border-top border-secondary">
+            <div class="step-number flex-shrink-0">{{ loop.index }}</div>
+            <div class="flex-grow-1">
+              <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap">
+                <div>
+                  <span class="fw-semibold">{{ ex.label }}</span>
+                  <span class="badge bg-secondary ms-2 text-capitalize" style="font-size:.65rem">
+                    {{ ex.muscle_group.replace('_', ' ') }}
+                  </span>
+                </div>
+                <a href="{{ ex.link }}" target="_blank" rel="noopener noreferrer"
+                   class="btn btn-outline-secondary btn-sm py-0 px-2 flex-shrink-0" title="How to perform">
+                  <i class="bi bi-play-circle me-1"></i>Tutorial
+                </a>
+              </div>
+              <div class="text-muted small mt-1">
+                {% if ex.reps %}
+                  <i class="bi bi-repeat me-1"></i>{{ ex.sets }} sets × {{ ex.reps }} reps
+                {% else %}
+                  <i class="bi bi-stopwatch me-1"></i>{{ ex.sets }} sets × {{ ex.duration_sec | int }}s hold
+                {% endif %}
+                &nbsp;·&nbsp;
+                <i class="bi bi-hourglass-split me-1"></i>{{ ex.rest_seconds | int }}s rest
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+
+          <div class="d-flex align-items-center gap-2 mt-2 pt-2 border-top border-secondary">
+            <div class="step-badge bg-secondary text-white rounded-pill px-2 py-0" style="font-size:.7rem">COOL-DOWN</div>
+            <span class="text-muted small">Cool-down + stretch</span>
+          </div>
+        </div>
+
+        <!-- Upload form -->
+        <form method="post" action="/workout/upload" id="uploadForm">
+          <input type="hidden" name="payload_json" value="{{ payload_json | e }}" />
+
+          <div class="mb-3">
+            <label for="schedule_date" class="form-label fw-semibold">
+              <i class="bi bi-calendar3 me-1"></i>Schedule on Garmin (optional)
+            </label>
+            <input type="date" class="form-control bg-dark border-secondary text-white"
+                   id="schedule_date" name="schedule_date" />
+            <div class="form-text">Leave blank to save as an unscheduled workout.</div>
+          </div>
+
+          <button type="submit" class="btn btn-garmin w-100 py-3 fw-bold fs-5" id="uploadBtn">
+            <i class="bi bi-cloud-arrow-up me-2"></i>Upload to Garmin Connect
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const durationInput = document.getElementById('duration');
+const durationLabel = document.getElementById('durationLabel');
+durationInput.addEventListener('input', () => {
+  durationLabel.textContent = durationInput.value + ' min';
+});
+
+const eqCheckboxes = document.querySelectorAll('.equipment-cb');
+const eqCount = document.getElementById('eqCount');
+function updateEqCount() {
+  const n = document.querySelectorAll('.equipment-cb:checked').length;
+  eqCount.textContent = n === 0 ? '0 selected (bodyweight)' : `${n} selected`;
+}
+eqCheckboxes.forEach(cb => cb.addEventListener('change', updateEqCount));
+
+document.getElementById('uploadBtn')?.addEventListener('click', function() {
+  this.disabled = true;
+  this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading…';
+  document.getElementById('uploadForm').submit();
+});
+
+document.getElementById('generateBtn')?.addEventListener('click', function() {
+  this.disabled = true;
+  this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Generating…';
+});
+</script>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}GarminForge — Connect{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-9 col-lg-7">
+
+    <!-- Hero -->
+    <div class="text-center mb-5">
+      <div class="hero-icon mb-3">⚙️</div>
+      <h1 class="fw-bold display-6">GarminForge</h1>
+      <p class="text-muted">Generate personalised strength workouts and send them directly to Garmin Connect.</p>
+    </div>
+
+    <!-- Auth cards -->
+    <ul class="nav nav-tabs mb-4" id="authTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="login-tab" data-bs-toggle="tab"
+                data-bs-target="#loginPane" type="button" role="tab">
+          <i class="bi bi-person-lock me-1"></i>Login
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="token-tab" data-bs-toggle="tab"
+                data-bs-target="#tokenPane" type="button" role="tab">
+          <i class="bi bi-key-fill me-1"></i>Import Token
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+
+      <!-- Tab 1: Credentials -->
+      <div class="tab-pane fade show active" id="loginPane" role="tabpanel">
+        <div class="card bg-dark-subtle border-secondary mb-3">
+          <div class="card-body p-4">
+            <div class="alert alert-warning d-flex gap-2 align-items-start small mb-4" role="alert">
+              <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+              <div>
+                <strong>March 2026 auth notice:</strong> Garmin changed their SSO endpoints
+                and fresh logins may fail. If login doesn't work, use the
+                <strong>Import Token</strong> tab — generate a token on a local machine
+                with <code>garth.dumps()</code> and paste it here.
+              </div>
+            </div>
+
+            <form method="post" action="/auth/login" id="loginForm">
+              <div class="mb-3">
+                <label for="email" class="form-label fw-semibold">Garmin Connect Email</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-dark border-secondary">
+                    <i class="bi bi-envelope-fill text-muted"></i>
+                  </span>
+                  <input type="email" class="form-control bg-dark border-secondary text-white"
+                         id="email" name="email" placeholder="you@example.com" required autocomplete="email" />
+                </div>
+              </div>
+              <div class="mb-4">
+                <label for="password" class="form-label fw-semibold">Password</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-dark border-secondary">
+                    <i class="bi bi-lock-fill text-muted"></i>
+                  </span>
+                  <input type="password" class="form-control bg-dark border-secondary text-white"
+                         id="password" name="password" placeholder="••••••••" required autocomplete="current-password" />
+                  <button class="btn btn-outline-secondary" type="button" id="togglePwd">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-garmin w-100 py-2 fw-semibold" id="loginBtn">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Sign in to Garmin Connect
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Token import -->
+      <div class="tab-pane fade" id="tokenPane" role="tabpanel">
+        <div class="card bg-dark-subtle border-secondary mb-3">
+          <div class="card-body p-4">
+            <p class="text-muted small mb-3">
+              Run the following on a machine where you can log in interactively:
+            </p>
+            <pre class="bg-dark rounded p-3 small text-success mb-4">python examples/auth_setup.py
+<span class="text-muted"># Then copy the printed base64 token string</span></pre>
+
+            <form method="post" action="/auth/token">
+              <div class="mb-4">
+                <label for="token_b64" class="form-label fw-semibold">Base64 Token String</label>
+                <textarea class="form-control bg-dark border-secondary text-white font-monospace"
+                          id="token_b64" name="token_b64" rows="5"
+                          placeholder="eyJhbGci…" required></textarea>
+                <div class="form-text">This is the output of <code>client.garth.dumps()</code>. Valid for ~1 year.</div>
+              </div>
+              <button type="submit" class="btn btn-garmin w-100 py-2 fw-semibold">
+                <i class="bi bi-key-fill me-2"></i>Import Tokens
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /tab-content -->
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('togglePwd')?.addEventListener('click', function() {
+  const pwd = document.getElementById('password');
+  const icon = this.querySelector('i');
+  if (pwd.type === 'password') {
+    pwd.type = 'text';
+    icon.className = 'bi bi-eye-slash';
+  } else {
+    pwd.type = 'password';
+    icon.className = 'bi bi-eye';
+  }
+});
+
+document.getElementById('loginForm')?.addEventListener('submit', function() {
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Connecting…';
+});
+</script>
+{% endblock %}
