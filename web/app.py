@@ -87,8 +87,9 @@ def _get_forge_client(request: Request) -> GarminForgeClient:
 
 def _render(template: str, request: Request, **ctx) -> HTMLResponse:
     return templates.TemplateResponse(
+        request,
         template,
-        {"request": request, "authenticated": _is_authenticated(request), **ctx},
+        {"authenticated": _is_authenticated(request), **ctx},
     )
 
 
