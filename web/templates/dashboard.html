@@ -34,22 +34,16 @@
 
           <!-- EQUIPMENT -->
           <div class="mb-4">
-            <label class="form-label fw-semibold d-flex align-items-center gap-2 mb-2">
+            <label class="form-label fw-semibold d-flex align-items-center gap-2 mb-2" for="equipmentSelect">
               <i class="bi bi-tools text-success"></i> Available Equipment
-              <span class="badge bg-secondary ms-auto" id="eqCount">0 selected</span>
             </label>
-            <div class="row g-2">
+            <select id="equipmentSelect" name="equipment" multiple
+                    placeholder="Search equipment…">
               {% for eq in equipment_options %}
-              <div class="col-6">
-                <input type="checkbox" class="btn-check equipment-cb" name="equipment"
-                       id="eq_{{ eq.tag }}" value="{{ eq.tag }}" />
-                <label class="btn btn-outline-secondary w-100 text-start p-2" for="eq_{{ eq.tag }}">
-                  <span class="me-2">{{ eq.icon }}</span>{{ eq.label }}
-                </label>
-              </div>
+              <option value="{{ eq.tag }}">{{ eq.icon }} {{ eq.label }}</option>
               {% endfor %}
-            </div>
-            <div class="form-text mt-1">Select all that apply. If none selected, bodyweight exercises are used.</div>
+            </select>
+            <div class="form-text mt-1">Select all you have. Leave empty for bodyweight-only exercises.</div>
           </div>
 
           <!-- DURATION -->
@@ -103,14 +97,34 @@ durationInput.addEventListener('input', () => {
   durationLabel.textContent = durationInput.value + ' min';
 });
 
-// Equipment counter badge
-const eqCheckboxes = document.querySelectorAll('.equipment-cb');
-const eqCount = document.getElementById('eqCount');
-function updateEqCount() {
-  const n = document.querySelectorAll('.equipment-cb:checked').length;
-  eqCount.textContent = n === 0 ? '0 selected (bodyweight)' : `${n} selected`;
-}
-eqCheckboxes.forEach(cb => cb.addEventListener('change', updateEqCount));
+// Equipment — Tom Select with regex search
+new TomSelect('#equipmentSelect', {
+  plugins: ['remove_button', 'clear_button'],
+  maxOptions: null,
+  score: function(search) {
+    let regex;
+    try {
+      regex = new RegExp(search, 'i');
+    } catch(e) {
+      // If the string isn't a valid regex, fall back to literal match
+      regex = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    }
+    return function(item) {
+      return regex.test(item.text) ? 1 : 0;
+    };
+  },
+  render: {
+    option: function(data, escape) {
+      return `<div class="py-1">${escape(data.text)}</div>`;
+    },
+    item: function(data, escape) {
+      return `<div>${escape(data.text)}</div>`;
+    },
+    no_results: function(data, escape) {
+      return `<div class="no-results">No equipment matching <em>${escape(data.input)}</em></div>`;
+    },
+  },
+});
 
 // Form submit — show spinner, POST form, replace right panel with response HTML
 document.getElementById('generatorForm').addEventListener('submit', async function(e) {

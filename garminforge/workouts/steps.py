@@ -44,9 +44,9 @@ def _time_condition() -> dict[str, Any]:
 
 def _reps_condition() -> dict[str, Any]:
     return {
-        "conditionTypeId": 7,
+        "conditionTypeId": 10,
         "conditionTypeKey": "reps",
-        "displayOrder": 7,
+        "displayOrder": 10,
         "displayable": True,
     }
 
@@ -276,7 +276,7 @@ def exercise_step(
 
     if reps is not None:
         end_condition = _reps_condition()
-        end_condition_value: float | None = float(reps)
+        end_condition_value: int | None = int(reps)
     elif duration_seconds is not None:
         end_condition = _time_condition()
         end_condition_value = duration_seconds

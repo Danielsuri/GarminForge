@@ -173,6 +173,57 @@ class StrengthWorkout:
         )
         return self
 
+    def add_circuit(
+        self,
+        blocks: list[ExerciseBlock],
+        rounds: int | None = None,
+    ) -> "StrengthWorkout":
+        """Add all exercises as one circuit that repeats *rounds* times.
+
+        Produces a single RepeatGroupDTO containing every exercise + rest in
+        sequence, matching the Garmin Connect UI pattern of "N Sets" with
+        multiple exercises inside:
+
+            Repeat N ×
+              Exercise 1  →  Rest
+              Exercise 2  →  Rest
+              …
+
+        Parameters
+        ----------
+        blocks:
+            Ordered list of exercise blocks to include in the circuit.
+        rounds:
+            How many times the circuit repeats.  Defaults to the first
+            block's ``sets`` value.
+        """
+        if not blocks:
+            return self
+        actual_rounds = rounds if rounds is not None else blocks[0].sets
+        inner: list[S.Step] = []
+        for block in blocks:
+            inner.append(S.exercise_step(
+                category=block.category,
+                name=block.name,
+                reps=block.reps,
+                duration_seconds=block.duration_seconds,
+                description=block.description,
+                step_order=len(inner) + 1,
+            ))
+            if block.rest_seconds is not None:
+                inner.append(S.rest_step(
+                    duration_seconds=block.rest_seconds,
+                    description=f"Rest {int(block.rest_seconds)}s",
+                    step_order=len(inner) + 2,
+                ))
+        group = S.repeat_group(
+            sets=actual_rounds,
+            steps=inner,
+            step_order=len(self._top_steps) + 1,
+        )
+        self._top_steps.append(group)
+        return self
+
     def add_block(self, block: ExerciseBlock) -> "StrengthWorkout":
         """Append an exercise block (sets × reps wrapped in a repeat group)."""
         exercise = S.exercise_step(

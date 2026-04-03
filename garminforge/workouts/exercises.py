@@ -70,6 +70,7 @@ EXERCISES: dict[str, dict[str, str]] = {
         "INCLINE_PUSH_UP":                       "Incline Push-Up",
         "DIAMOND_PUSH_UP":                       "Diamond Push-Up",
         "PLYOMETRIC_PUSH_UP":                    "Plyometric Push-Up",
+        "SWISS_BALL_PUSH_UP":                    "Swiss Ball Push-up",
     },
 
     # -----------------------------------------------------------------------
@@ -135,6 +136,8 @@ EXERCISES: dict[str, dict[str, str]] = {
         "DUMBBELL_LATERAL_RAISE":                "Dumbbell Lateral Raise",
         "CABLE_LATERAL_RAISE":                   "Cable Lateral Raise",
         "MACHINE_LATERAL_RAISE":                 "Machine Lateral Raise",
+        "ROPE_CLIMB":                            "Rope Climb",
+        "WEIGHTED_ROPE_CLIMB":                   "Weighted Rope Climb",
     },
 
     # -----------------------------------------------------------------------
@@ -202,6 +205,7 @@ EXERCISES: dict[str, dict[str, str]] = {
         "SEATED_LEG_CURL":                       "Seated Leg Curl",
         "NORDIC_HAMSTRING_CURL":                 "Nordic Hamstring Curl",
         "GOOD_MORNING":                          "Good Morning",
+        "SWISS_BALL_HIP_RAISE_AND_LEG_CURL":     "Swiss Ball Hip Raise and Leg Curl",
     },
 
     # -----------------------------------------------------------------------
@@ -223,6 +227,7 @@ EXERCISES: dict[str, dict[str, str]] = {
         "SIDE_PLANK":                            "Side Plank",
         "FOREARM_PLANK":                         "Forearm Plank",
         "PUSH_UP_POSITION_PLANK":                "Push-Up Position Plank",
+        "SWISS_BALL_PLANK":                      "Swiss Ball Plank",
     },
     "CRUNCH": {
         "CRUNCH":                                "Crunch",
@@ -230,6 +235,7 @@ EXERCISES: dict[str, dict[str, str]] = {
         "REVERSE_CRUNCH":                        "Reverse Crunch",
         "DECLINE_CRUNCH":                        "Decline Crunch",
         "CABLE_CRUNCH":                          "Cable Crunch",
+        "SWISS_BALL_CRUNCH":                     "Swiss Ball Crunch",
     },
     "LEG_RAISE": {
         "LYING_LEG_RAISE":                       "Lying Leg Raise",
@@ -240,10 +246,15 @@ EXERCISES: dict[str, dict[str, str]] = {
     "CORE": {
         "DEAD_BUG":                              "Dead Bug",
         "PALLOF_PRESS":                          "Pallof Press",
-        "AB_WHEEL_ROLLOUT":                      "Ab Wheel Rollout",
+        "KNEELING_AB_WHEEL":                     "Kneeling Ab Wheel",
+        "WEIGHTED_KNEELING_AB_WHEEL":            "Weighted Kneeling Ab Wheel",
+        "BARBELL_ROLLOUT":                       "Barbell Roll-out",
+        "SWISS_BALL_ROLLOUT":                    "Swiss Ball Roll-out",
+        "SWISS_BALL_JACKKNIFE":                  "Swiss Ball Jackknife",
         "RUSSIAN_TWIST":                         "Russian Twist",
         "WINDMILL":                              "Windmill",
         "TURKISH_GET_UP":                        "Turkish Get-Up",
+        "SWISS_BALL_PIKE":                       "Swiss Ball Pike",
     },
 
     # -----------------------------------------------------------------------
@@ -261,19 +272,143 @@ EXERCISES: dict[str, dict[str, str]] = {
     },
 
     # -----------------------------------------------------------------------
+    # CARDIO (jump rope, air bike, etc.)
+    # -----------------------------------------------------------------------
+    "CARDIO": {
+        "JUMP_ROPE":                             "Jump Rope",
+        "JUMP_ROPE_CROSSOVER":                   "Jump Rope Crossover",
+        "JUMP_ROPE_JOG":                         "Jump Rope Jog",
+        "WEIGHTED_JUMP_ROPE":                    "Weighted Jump Rope",
+    },
+
+    # -----------------------------------------------------------------------
     # TOTAL BODY / CARDIO
     # -----------------------------------------------------------------------
     "TOTAL_BODY": {
         "BURPEE":                                "Burpee",
         "THRUSTER":                              "Thruster",
         "KETTLEBELL_SWING":                      "Kettlebell Swing",
+    },
+
+    # -----------------------------------------------------------------------
+    # CARRY
+    # -----------------------------------------------------------------------
+    "CARRY": {
         "FARMERS_WALK":                          "Farmer's Walk",
-        "SLED_PUSH":                             "Sled Push",
-        "SLED_DRAG":                             "Sled Drag",
-        "BATTLE_ROPE":                           "Battle Rope",
-        "MEDICINE_BALL_SLAM":                    "Medicine Ball Slam",
+        "FARMERS_CARRY":                         "Farmer's Carry",
+        "FARMERS_WALK_ON_TOES":                  "Farmer's Walk on Toes",
+        "OVERHEAD_CARRY":                        "Overhead Carry",
+        "DUMBBELL_WAITER_CARRY":                 "Dumbbell Waiter Carry",
+    },
+
+    # -----------------------------------------------------------------------
+    # PLYO (plyometric / explosive)
+    # -----------------------------------------------------------------------
+    "PLYO": {
         "BOX_JUMP":                              "Box Jump",
-        "BROAD_JUMP":                            "Broad Jump",
+        "JUMP_SQUAT":                            "Jump Squat",
+        "BODY_WEIGHT_JUMP_SQUAT":                "Body-weight Jump Squat",
+        "ALTERNATING_JUMP_LUNGE":                "Alternating Jump Lunge",
+        "DEPTH_JUMP":                            "Depth Jump",
+        "MEDICINE_BALL_SLAM":                    "Medicine Ball Slam",
+        "MEDICINE_BALL_SIDE_THROW":              "Medicine Ball Side Throw",
+        "MEDICINE_BALL_OVERHEAD_THROWS":         "Medicine Ball Overhead Throws",
+        "LATERAL_PLYO_SQUATS":                   "Lateral Plyo Squats",
+    },
+
+    # -----------------------------------------------------------------------
+    # SANDBAG
+    # -----------------------------------------------------------------------
+    "SANDBAG": {
+        "BACK_SQUAT":                            "Sandbag Back Squat",
+        "FRONT_SQUAT":                           "Sandbag Front Squat",
+        "LUNGE":                                 "Sandbag Lunge",
+        "ROTATIONAL_LUNGE":                      "Sandbag Rotational Lunge",
+        "CLEAN_AND_PRESS":                       "Sandbag Clean and Press",
+        "ROW":                                   "Sandbag Row",
+        "CURL":                                  "Sandbag Curl",
+        "FRONT_CARRY":                           "Sandbag Front Carry",
+        "SHOULDERING":                           "Sandbag Shouldering",
+        "RUSSIAN_TWIST":                         "Sandbag Russian Twist",
+        "ZERCHER_SQUAT":                         "Sandbag Zercher Squat",
+    },
+
+    # -----------------------------------------------------------------------
+    # SUSPENSION (TRX / rings)
+    # -----------------------------------------------------------------------
+    "SUSPENSION": {
+        "ROW":                                   "Suspension Row",
+        "PUSH_UP":                               "Suspension Push-up",
+        "CURL":                                  "Suspension Curl",
+        "DIP":                                   "Suspension Dip",
+        "LUNGE":                                 "Suspension Lunge",
+        "SQUAT":                                 "Suspension Squat",
+        "PIKE":                                  "Suspension Pike",
+        "HAMSTRING_CURL":                        "Suspension Hamstring Curl",
+        "PLANK":                                 "Suspension Plank",
+        "FACE_PULL":                             "Suspension Face Pull",
+        "CHEST_FLY":                             "Suspension Chest Fly",
+        "TRICEP_PRESS":                          "Suspension Tricep Press",
+        "PULL_UP":                               "Suspension Pull-up",
+        "MOUNTAIN_CLIMBER":                      "Suspension Mountain Climber",
+        "SINGLE_LEG_SQUAT":                      "Suspension Single-leg Squat",
+        "Y_FLY":                                 "Suspension Y Fly",
+    },
+
+    # -----------------------------------------------------------------------
+    # BATTLE ROPE
+    # -----------------------------------------------------------------------
+    "BATTLE_ROPE": {
+        "BATTLE_ROPE":                           "Battle Rope",
+        "ALTERNATING_WAVE":                      "Battle Rope Alternating Wave",
+        "DOUBLE_ARM_WAVE":                       "Battle Rope Double-arm Wave",
+        "ALTERNATING_SQUAT_WAVE":                "Battle Rope Alternating Squat Wave",
+        "ALTERNATING_LUNGE_WAVE":                "Battle Rope Alternating Lunge Wave",
+        "DOUBLE_ARM_SLAM":                       "Battle Rope Double-arm Slam",
+    },
+
+    # -----------------------------------------------------------------------
+    # SLED
+    # -----------------------------------------------------------------------
+    "SLED": {
+        "PUSH":                                  "Sled Push",
+        "LOW_PUSH":                              "Sled Low Push",
+        "FORWARD_DRAG":                          "Sled Forward Drag",
+        "BACKWARD_DRAG":                         "Sled Backward Drag",
+        "ROW":                                   "Sled Row",
+    },
+
+    # -----------------------------------------------------------------------
+    # SIT-UP
+    # -----------------------------------------------------------------------
+    "SIT_UP": {
+        "SIT_UP":                                "Sit-up",
+        "BUTTERFLY_SIT_UP":                      "Butterfly Sit-up",
+        "ALTERNATING_SIT_UP":                    "Alternating Sit-up",
+        "BENT_KNEE_V_UP":                        "Bent-knee V-up",
+        "GHD_SIT_UPS":                           "GHD Sit-ups",
+    },
+
+    # -----------------------------------------------------------------------
+    # CHOP (rotational / cable chops)
+    # -----------------------------------------------------------------------
+    "CHOP": {
+        "CABLE_WOODCHOP":                        "Cable Woodchop",
+        "KNEELING_WOODCHOPPER":                  "Kneeling Woodchopper",
+        "HALF_KNEELING_ROTATIONAL_CHOP":         "Half-kneeling Rotational Chop",
+        "CABLE_ROTATIONAL_LIFT":                 "Cable Rotational Lift",
+        "CABLE_PULL_THROUGH":                    "Cable Pull-through",
+        "DUMBBELL_CHOP":                         "Dumbbell Chop",
+    },
+
+    # -----------------------------------------------------------------------
+    # SLIDING DISC
+    # -----------------------------------------------------------------------
+    "SLIDING_DISC": {
+        "SLIDING_DISC_MOUNTAIN_CLIMBER":         "Sliding Disc Mountain Climber",
+        "SLIDING_DISC_LUNGE":                    "Sliding Disc Lunge",
+        "SLIDING_DISC_PIKE":                     "Sliding Disc Pike",
+        "SLIDING_DISC_LEG_CURL":                 "Sliding Disc Leg Curl",
     },
 }
 

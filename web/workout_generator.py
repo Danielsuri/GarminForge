@@ -86,14 +86,39 @@ GOALS: dict[str, dict[str, Any]] = {
 # Equipment definitions (display + tag)
 # ---------------------------------------------------------------------------
 
+# Equipment options shown in the UI.
+# `tag`        — internal key used to match exercises in the pool
+# `garmin_key` — Garmin's official equipmentTypeKey (from exercise_equipments.properties)
+# `label`      — display name shown to the user
 EQUIPMENT_OPTIONS: list[dict[str, str]] = [
-    {"tag": "barbell",    "label": "Barbell",          "icon": "🏋️"},
-    {"tag": "dumbbell",   "label": "Dumbbells",         "icon": "🤸"},
-    {"tag": "cable",      "label": "Cable Machine",     "icon": "🔗"},
-    {"tag": "machine",    "label": "Weight Machines",   "icon": "⚙️"},
-    {"tag": "kettlebell", "label": "Kettlebell",        "icon": "🫙"},
-    {"tag": "bodyweight", "label": "Bodyweight Only",   "icon": "🧘"},
-    {"tag": "band",       "label": "Resistance Bands",  "icon": "🪢"},
+    {"tag": "barbell",       "garmin_key": "BARBELL",       "label": "Barbell",           "icon": "🏋️"},
+    {"tag": "dumbbell",      "garmin_key": "DUMBBELL",      "label": "Dumbbells",          "icon": "🤸"},
+    {"tag": "kettlebell",    "garmin_key": "KETTLEBELL",    "label": "Kettlebell",         "icon": "🫙"},
+    {"tag": "cable",         "garmin_key": "CABLE_MACHINE", "label": "Cable Machine",      "icon": "🔗"},
+    {"tag": "machine",       "garmin_key": "MACHINE",       "label": "Weight Machines",    "icon": "⚙️"},
+    {"tag": "bodyweight",    "garmin_key": None,            "label": "Bodyweight Only",    "icon": "🧘"},
+    {"tag": "band",          "garmin_key": "BAND",          "label": "Resistance Bands",   "icon": "🪢"},
+    {"tag": "pullup_bar",    "garmin_key": "PULLUP_BAR",    "label": "Pull-up Bar",        "icon": "🔝"},
+    {"tag": "bench",         "garmin_key": "BENCH",         "label": "Bench",              "icon": "🪑"},
+    {"tag": "medicine_ball", "garmin_key": "MEDICINE_BALL", "label": "Medicine Ball",      "icon": "⚽"},
+    {"tag": "ez_bar",        "garmin_key": "EZ_BAR",        "label": "EZ Bar",             "icon": "〰️"},
+    {"tag": "plate",         "garmin_key": "PLATE",         "label": "Weight Plate",       "icon": "🔵"},
+    {"tag": "box",           "garmin_key": "BOX",           "label": "Box / Step",         "icon": "📦"},
+    {"tag": "swiss_ball",    "garmin_key": "SWISS_BALL",    "label": "Swiss Ball",         "icon": "🟢"},
+    {"tag": "trx",           "garmin_key": "TRX",           "label": "TRX / Suspension",   "icon": "🪢"},
+    {"tag": "sandbag",       "garmin_key": "SANDBAG",       "label": "Sandbag",            "icon": "🪨"},
+    {"tag": "battle_rope",   "garmin_key": "BATTLE_ROPE",   "label": "Battle Rope",        "icon": "🌊"},
+    {"tag": "sled",          "garmin_key": "SLED",          "label": "Sled",               "icon": "🛷"},
+    {"tag": "rings",         "garmin_key": "RINGS",         "label": "Gymnastic Rings",    "icon": "⭕"},
+    {"tag": "smith_machine", "garmin_key": "SMITH_MACHINE", "label": "Smith Machine",      "icon": "🏗️"},
+    {"tag": "weight_vest",   "garmin_key": "WEIGHT_VEST",   "label": "Weight Vest",        "icon": "🦺"},
+    {"tag": "bosu_ball",     "garmin_key": "BOSU_BALL",     "label": "Bosu Ball",          "icon": "🟤"},
+    {"tag": "ankle_weight",  "garmin_key": "ANKLE_WEIGHT",  "label": "Ankle Weights",      "icon": "🦿"},
+    {"tag": "sliding_disc",  "garmin_key": "SLIDING_DISC",  "label": "Sliding Discs",      "icon": "💿"},
+    {"tag": "ab_wheel",      "garmin_key": None,            "label": "Ab Wheel",            "icon": "⚙️"},
+    {"tag": "rope",          "garmin_key": "ROPE",          "label": "Climbing Rope",       "icon": "🪢"},
+    {"tag": "jump_rope",     "garmin_key": "JUMP_ROPE",     "label": "Jump Rope",           "icon": "🪃"},
+    {"tag": "foam_roller",   "garmin_key": "FOAM_ROLLER",   "label": "Foam Roller",         "icon": "🛞"},
 ]
 
 
@@ -119,23 +144,28 @@ _POOL: list[_ExTemplate] = [
     _ExTemplate("BENCH_PRESS",      "DUMBBELL_BENCH_PRESS",          "Dumbbell Bench Press",          "push",   ["compound"], ["dumbbell"]),
     _ExTemplate("BENCH_PRESS",      "INCLINE_BARBELL_BENCH_PRESS",   "Incline Barbell Bench Press",   "push",   ["compound"], ["barbell"]),
     _ExTemplate("BENCH_PRESS",      "INCLINE_DUMBBELL_BENCH_PRESS",  "Incline Dumbbell Bench Press",  "push",   ["compound"], ["dumbbell"]),
-    _ExTemplate("PUSH_UP",          "PUSH_UP",                       "Push-Up",                       "push",   ["compound"], ["bodyweight"]),
+    _ExTemplate("PUSH_UP",          "PUSH_UP",                       "Push-Up",                       "push",   ["compound"], ["bodyweight", "weight_vest"]),
     _ExTemplate("PUSH_UP",          "DIAMOND_PUSH_UP",               "Diamond Push-Up",               "push",   ["compound"], ["bodyweight"]),
+    _ExTemplate("PUSH_UP",          "INCLINE_PUSH_UP",               "Incline Push-Up",               "push",   ["compound"], ["bench", "bodyweight", "bosu_ball"]),
+    _ExTemplate("PUSH_UP",          "DECLINE_PUSH_UP",               "Decline Push-Up",               "push",   ["compound"], ["bench", "bodyweight"]),
     # PUSH — shoulder compound
-    _ExTemplate("SHOULDER_PRESS",   "BARBELL_SHOULDER_PRESS",        "Barbell Shoulder Press",        "push",   ["compound"], ["barbell"]),
+    _ExTemplate("SHOULDER_PRESS",   "BARBELL_SHOULDER_PRESS",        "Barbell Shoulder Press",        "push",   ["compound"], ["barbell", "smith_machine"]),
     _ExTemplate("SHOULDER_PRESS",   "DUMBBELL_SHOULDER_PRESS",       "Dumbbell Shoulder Press",       "push",   ["compound"], ["dumbbell"]),
     _ExTemplate("SHOULDER_PRESS",   "ARNOLD_PRESS",                  "Arnold Press",                  "push",   ["compound"], ["dumbbell"]),
     # PUSH — isolation
     _ExTemplate("FLYE",             "DUMBBELL_FLYE",                 "Dumbbell Flye",                 "push",   ["isolation"], ["dumbbell"]),
     _ExTemplate("FLYE",             "CABLE_CROSSOVER",               "Cable Crossover",               "push",   ["isolation"], ["cable"]),
-    _ExTemplate("LATERAL_RAISE",    "DUMBBELL_LATERAL_RAISE",        "Dumbbell Lateral Raise",        "shoulders", ["isolation"], ["dumbbell"]),
+    _ExTemplate("LATERAL_RAISE",    "DUMBBELL_LATERAL_RAISE",        "Dumbbell Lateral Raise",        "shoulders", ["isolation"], ["dumbbell", "band"]),
     _ExTemplate("LATERAL_RAISE",    "CABLE_LATERAL_RAISE",           "Cable Lateral Raise",           "shoulders", ["isolation"], ["cable"]),
 
     # -----------------------------------------------------------------------
     # PULL — compound
     # -----------------------------------------------------------------------
-    _ExTemplate("PULL_UP",          "PULL_UP",                       "Pull-Up",                       "pull",   ["compound"], ["bodyweight"]),
-    _ExTemplate("PULL_UP",          "CHIN_UP",                       "Chin-Up",                       "pull",   ["compound"], ["bodyweight"]),
+    _ExTemplate("PULL_UP",          "PULL_UP",                       "Pull-Up",                       "pull",   ["compound"], ["bodyweight", "pullup_bar", "weight_vest"]),
+    _ExTemplate("PULL_UP",          "CHIN_UP",                       "Chin-Up",                       "pull",   ["compound"], ["bodyweight", "pullup_bar"]),
+    _ExTemplate("PULL_UP",          "WIDE_GRIP_PULL_UP",             "Wide-Grip Pull-Up",             "pull",   ["compound"], ["pullup_bar"]),
+    _ExTemplate("PULL_UP",          "NEUTRAL_GRIP_PULL_UP",          "Neutral-Grip Pull-Up",          "pull",   ["compound"], ["pullup_bar"]),
+    _ExTemplate("PULL_UP",          "BANDED_PULL_UP",                "Banded Pull-Up",                "pull",   ["compound"], ["pullup_bar", "band"]),
     _ExTemplate("PULL_UP",          "LAT_PULLDOWN",                  "Lat Pulldown",                  "pull",   ["compound"], ["cable", "machine"]),
     _ExTemplate("ROW",              "BARBELL_ROW",                   "Barbell Row",                   "pull",   ["compound"], ["barbell"]),
     _ExTemplate("ROW",              "DUMBBELL_ROW",                  "Dumbbell Row",                  "pull",   ["compound"], ["dumbbell"]),
@@ -143,40 +173,44 @@ _POOL: list[_ExTemplate] = [
     _ExTemplate("ROW",              "T_BAR_ROW",                     "T-Bar Row",                     "pull",   ["compound"], ["barbell"]),
     _ExTemplate("ROW",              "SEATED_CABLE_ROW",              "Seated Cable Row",              "pull",   ["compound"], ["cable"]),
     _ExTemplate("ROW",              "FACE_PULL",                     "Face Pull",                     "pull",   ["isolation"], ["cable"]),
+    _ExTemplate("ROW",              "INVERTED_ROW",                  "Inverted Row",                  "pull",   ["compound"], ["bodyweight"]),
     _ExTemplate("HYPEREXTENSION",   "BACK_EXTENSION",                "Back Extension",                "pull",   ["isolation"], ["bodyweight", "machine"]),
     # PULL — isolation
     _ExTemplate("CURL",             "BARBELL_CURL",                  "Barbell Curl",                  "arms_bi",["isolation"], ["barbell"]),
     _ExTemplate("CURL",             "DUMBBELL_CURL",                 "Dumbbell Curl",                 "arms_bi",["isolation"], ["dumbbell"]),
     _ExTemplate("CURL",             "HAMMER_CURL",                   "Hammer Curl",                   "arms_bi",["isolation"], ["dumbbell"]),
-    _ExTemplate("CURL",             "PREACHER_CURL",                 "Preacher Curl",                 "arms_bi",["isolation"], ["barbell", "dumbbell"]),
+    _ExTemplate("CURL",             "PREACHER_CURL",                 "Preacher Curl",                 "arms_bi",["isolation"], ["barbell", "dumbbell", "ez_bar"]),
     _ExTemplate("CURL",             "INCLINE_DUMBBELL_CURL",         "Incline Dumbbell Curl",         "arms_bi",["isolation"], ["dumbbell"]),
-    _ExTemplate("CURL",             "EZ_BAR_CURL",                   "EZ-Bar Curl",                   "arms_bi",["isolation"], ["barbell"]),
+    _ExTemplate("CURL",             "EZ_BAR_CURL",                   "EZ-Bar Curl",                   "arms_bi",["isolation"], ["barbell", "ez_bar"]),
 
     # -----------------------------------------------------------------------
     # SQUAT — compound
     # -----------------------------------------------------------------------
-    _ExTemplate("SQUAT",            "BARBELL_BACK_SQUAT",            "Barbell Back Squat",            "squat",  ["compound"], ["barbell"]),
+    _ExTemplate("SQUAT",            "BARBELL_BACK_SQUAT",            "Barbell Back Squat",            "squat",  ["compound"], ["barbell", "smith_machine"]),
     _ExTemplate("SQUAT",            "BARBELL_FRONT_SQUAT",           "Barbell Front Squat",           "squat",  ["compound"], ["barbell"]),
-    _ExTemplate("SQUAT",            "GOBLET_SQUAT",                  "Goblet Squat",                  "squat",  ["compound"], ["dumbbell", "kettlebell"]),
-    _ExTemplate("SQUAT",            "HACK_SQUAT",                    "Hack Squat",                    "squat",  ["compound"], ["machine"]),
+    _ExTemplate("SQUAT",            "GOBLET_SQUAT",                  "Goblet Squat",                  "squat",  ["compound"], ["dumbbell", "kettlebell", "plate"]),
+    _ExTemplate("SQUAT",            "BOX_SQUAT",                     "Box Squat",                     "squat",  ["compound"], ["box", "barbell"]),
+    _ExTemplate("SQUAT",            "HACK_SQUAT",                    "Hack Squat",                    "squat",  ["compound"], ["machine", "smith_machine"]),
     _ExTemplate("SQUAT",            "LEG_PRESS",                     "Leg Press",                     "squat",  ["compound"], ["machine"]),
 
     # LUNGE / SPLIT
     _ExTemplate("LUNGE",            "DUMBBELL_LUNGE",                "Dumbbell Lunge",                "lunge",  ["compound"], ["dumbbell"]),
-    _ExTemplate("LUNGE",            "WALKING_LUNGE",                 "Walking Lunge",                 "lunge",  ["compound"], ["dumbbell", "barbell", "bodyweight"]),
+    _ExTemplate("LUNGE",            "WALKING_LUNGE",                 "Walking Lunge",                 "lunge",  ["compound"], ["dumbbell", "barbell", "bodyweight", "weight_vest"]),
     _ExTemplate("LUNGE",            "REVERSE_LUNGE",                 "Reverse Lunge",                 "lunge",  ["compound"], ["dumbbell", "barbell", "bodyweight"]),
     _ExTemplate("LUNGE",            "BULGARIAN_SPLIT_SQUAT",         "Bulgarian Split Squat",         "lunge",  ["compound"], ["dumbbell", "barbell", "bodyweight"]),
+    _ExTemplate("LUNGE",            "STEP_UP",                       "Step-Up",                       "lunge",  ["compound"], ["bench", "box"]),
 
     # -----------------------------------------------------------------------
     # HINGE — compound
     # -----------------------------------------------------------------------
     _ExTemplate("DEADLIFT",         "BARBELL_DEADLIFT",              "Barbell Deadlift",              "hinge",  ["compound"], ["barbell"]),
     _ExTemplate("DEADLIFT",         "ROMANIAN_DEADLIFT",             "Romanian Deadlift",             "hinge",  ["compound"], ["barbell"]),
+    _ExTemplate("DEADLIFT",         "DUMBBELL_ROMANIAN_DEADLIFT",    "Dumbbell Romanian Deadlift",    "hinge",  ["compound"], ["dumbbell"]),
     _ExTemplate("DEADLIFT",         "SUMO_DEADLIFT",                 "Sumo Deadlift",                 "hinge",  ["compound"], ["barbell"]),
     _ExTemplate("DEADLIFT",         "TRAP_BAR_DEADLIFT",             "Trap Bar Deadlift",             "hinge",  ["compound"], ["barbell"]),
     _ExTemplate("HIP_RAISE",        "BARBELL_HIP_THRUST",            "Barbell Hip Thrust",            "hinge",  ["compound"], ["barbell"]),
     _ExTemplate("HIP_RAISE",        "DUMBBELL_HIP_THRUST",           "Dumbbell Hip Thrust",           "hinge",  ["compound"], ["dumbbell"]),
-    _ExTemplate("HIP_RAISE",        "GLUTE_BRIDGE",                  "Glute Bridge",                  "hinge",  ["compound"], ["bodyweight"]),
+    _ExTemplate("HIP_RAISE",        "GLUTE_BRIDGE",                  "Glute Bridge",                  "hinge",  ["compound"], ["bodyweight", "band", "ankle_weight"]),
     _ExTemplate("LEG_CURL",         "LYING_LEG_CURL",                "Lying Leg Curl",                "hinge",  ["isolation"], ["machine"]),
     _ExTemplate("LEG_CURL",         "SEATED_LEG_CURL",               "Seated Leg Curl",               "hinge",  ["isolation"], ["machine"]),
     _ExTemplate("LEG_CURL",         "GOOD_MORNING",                  "Good Morning",                  "hinge",  ["compound"], ["barbell"]),
@@ -185,9 +219,9 @@ _POOL: list[_ExTemplate] = [
     # TRICEPS isolation
     # -----------------------------------------------------------------------
     _ExTemplate("TRICEPS_EXTENSION","TRICEPS_PUSHDOWN",              "Triceps Pushdown",              "arms_tri",["isolation"], ["cable"]),
-    _ExTemplate("TRICEPS_EXTENSION","SKULL_CRUSHER",                 "Skull Crusher",                 "arms_tri",["isolation"], ["barbell", "dumbbell"]),
+    _ExTemplate("TRICEPS_EXTENSION","SKULL_CRUSHER",                 "Skull Crusher",                 "arms_tri",["isolation"], ["barbell", "dumbbell", "ez_bar"]),
     _ExTemplate("TRICEPS_EXTENSION","OVERHEAD_DUMBBELL_TRICEPS_EXTENSION","Overhead DB Triceps Ext.","arms_tri",["isolation"], ["dumbbell"]),
-    _ExTemplate("TRICEPS_EXTENSION","TRICEPS_DIP",                   "Triceps Dip",                   "arms_tri",["isolation"], ["bodyweight"]),
+    _ExTemplate("TRICEPS_EXTENSION","TRICEPS_DIP",                   "Triceps Dip",                   "arms_tri",["isolation"], ["bodyweight", "bench"]),
 
     # -----------------------------------------------------------------------
     # CORE
@@ -197,19 +231,102 @@ _POOL: list[_ExTemplate] = [
     _ExTemplate("CRUNCH",           "CRUNCH",                        "Crunch",                        "core",   ["core"], ["bodyweight"]),
     _ExTemplate("CRUNCH",           "BICYCLE_CRUNCH",                "Bicycle Crunch",                "core",   ["core"], ["bodyweight"]),
     _ExTemplate("CRUNCH",           "REVERSE_CRUNCH",                "Reverse Crunch",                "core",   ["core"], ["bodyweight"]),
-    _ExTemplate("LEG_RAISE",        "LYING_LEG_RAISE",               "Lying Leg Raise",               "core",   ["core"], ["bodyweight"]),
-    _ExTemplate("LEG_RAISE",        "HANGING_LEG_RAISE",             "Hanging Leg Raise",             "core",   ["core"], ["bodyweight"]),
+    _ExTemplate("LEG_RAISE",        "LYING_LEG_RAISE",               "Lying Leg Raise",               "core",   ["core"], ["bodyweight", "ankle_weight"]),
+    _ExTemplate("LEG_RAISE",        "HANGING_LEG_RAISE",             "Hanging Leg Raise",             "core",   ["core"], ["bodyweight", "pullup_bar", "ankle_weight"]),
+    _ExTemplate("LEG_RAISE",        "KNEE_RAISE",                    "Knee Raise",                    "core",   ["core"], ["pullup_bar"]),
     _ExTemplate("CORE",             "DEAD_BUG",                      "Dead Bug",                      "core",   ["core"], ["bodyweight"]),
-    _ExTemplate("CORE",             "RUSSIAN_TWIST",                 "Russian Twist",                 "core",   ["core"], ["bodyweight", "dumbbell"]),
-    _ExTemplate("CORE",             "AB_WHEEL_ROLLOUT",              "Ab Wheel Rollout",              "core",   ["core"], ["bodyweight"]),
+    _ExTemplate("CORE",             "RUSSIAN_TWIST",                 "Russian Twist",                 "core",   ["core"], ["bodyweight", "dumbbell", "medicine_ball", "plate"]),
+    _ExTemplate("CORE",             "KNEELING_AB_WHEEL",             "Kneeling Ab Wheel",             "core",   ["core"], ["ab_wheel", "bodyweight"]),
+    _ExTemplate("CORE",             "BARBELL_ROLLOUT",               "Barbell Roll-out",              "core",   ["core"], ["ab_wheel", "barbell"]),
 
     # -----------------------------------------------------------------------
     # TOTAL BODY
     # -----------------------------------------------------------------------
     _ExTemplate("TOTAL_BODY",       "BURPEE",                        "Burpee",                        "total_body",["total_body","compound"],["bodyweight"]),
     _ExTemplate("TOTAL_BODY",       "KETTLEBELL_SWING",              "Kettlebell Swing",              "total_body",["total_body","compound"],["kettlebell"]),
-    _ExTemplate("TOTAL_BODY",       "BOX_JUMP",                      "Box Jump",                      "total_body",["total_body","compound"],["bodyweight"]),
-    _ExTemplate("TOTAL_BODY",       "FARMERS_WALK",                  "Farmer's Walk",                 "total_body",["total_body","compound"],["dumbbell","kettlebell"]),
+    # -----------------------------------------------------------------------
+    # CARRY (correct Garmin category for farmer's walk / carries)
+    # -----------------------------------------------------------------------
+    _ExTemplate("CARRY",            "FARMERS_WALK",                  "Farmer's Walk",                 "total_body",["total_body","compound"],["dumbbell","kettlebell","plate","sandbag"]),
+    _ExTemplate("CARRY",            "OVERHEAD_CARRY",                "Overhead Carry",                "shoulders", ["compound"],           ["dumbbell","kettlebell"]),
+    # -----------------------------------------------------------------------
+    # PLYO (correct Garmin category for jumps and med ball slams)
+    # -----------------------------------------------------------------------
+    _ExTemplate("PLYO",             "BOX_JUMP",                      "Box Jump",                      "total_body",["total_body","compound"],["bodyweight","box"]),
+    _ExTemplate("PLYO",             "JUMP_SQUAT",                    "Jump Squat",                    "squat",     ["compound"],           ["bodyweight"]),
+    _ExTemplate("PLYO",             "ALTERNATING_JUMP_LUNGE",        "Alternating Jump Lunge",        "lunge",     ["compound"],           ["bodyweight"]),
+    _ExTemplate("PLYO",             "MEDICINE_BALL_SLAM",            "Medicine Ball Slam",            "total_body",["total_body","compound"],["medicine_ball"]),
+    _ExTemplate("PLYO",             "MEDICINE_BALL_SIDE_THROW",      "Medicine Ball Side Throw",      "core",      ["core","compound"],     ["medicine_ball"]),
+    # -----------------------------------------------------------------------
+    # BATTLE ROPE (correct Garmin category)
+    # -----------------------------------------------------------------------
+    _ExTemplate("BATTLE_ROPE",      "ALTERNATING_WAVE",              "Battle Rope Alternating Wave",  "total_body",["total_body"],         ["battle_rope"]),
+    _ExTemplate("BATTLE_ROPE",      "ALTERNATING_SQUAT_WAVE",        "Battle Rope Squat Wave",        "total_body",["total_body","compound"],["battle_rope"]),
+    # -----------------------------------------------------------------------
+    # SLED (correct Garmin category + correct exercise names)
+    # -----------------------------------------------------------------------
+    _ExTemplate("SLED",             "PUSH",                          "Sled Push",                     "total_body",["total_body","compound"],["sled"]),
+    _ExTemplate("SLED",             "FORWARD_DRAG",                  "Sled Forward Drag",             "total_body",["total_body","compound"],["sled"]),
+    # -----------------------------------------------------------------------
+    # SANDBAG (correct Garmin category)
+    # -----------------------------------------------------------------------
+    _ExTemplate("SANDBAG",          "BACK_SQUAT",                    "Sandbag Back Squat",            "squat",     ["compound"],           ["sandbag"]),
+    _ExTemplate("SANDBAG",          "LUNGE",                         "Sandbag Lunge",                 "lunge",     ["compound"],           ["sandbag"]),
+    _ExTemplate("SANDBAG",          "CLEAN_AND_PRESS",               "Sandbag Clean and Press",       "total_body",["total_body","compound"],["sandbag"]),
+    _ExTemplate("SANDBAG",          "ROW",                           "Sandbag Row",                   "pull",      ["compound"],           ["sandbag"]),
+    _ExTemplate("SANDBAG",          "SHOULDERING",                   "Sandbag Shouldering",           "total_body",["total_body","compound"],["sandbag"]),
+    # -----------------------------------------------------------------------
+    # SUSPENSION (correct Garmin category for TRX and gymnastic rings)
+    # -----------------------------------------------------------------------
+    _ExTemplate("SUSPENSION",       "ROW",                           "Suspension Row",                "pull",      ["compound"],           ["trx","rings"]),
+    _ExTemplate("SUSPENSION",       "PUSH_UP",                       "Suspension Push-up",            "push",      ["compound"],           ["trx","rings"]),
+    _ExTemplate("SUSPENSION",       "CURL",                          "Suspension Curl",               "arms_bi",   ["isolation"],          ["trx","rings"]),
+    _ExTemplate("SUSPENSION",       "DIP",                           "Suspension Dip",                "arms_tri",  ["isolation"],          ["trx","rings"]),
+    _ExTemplate("SUSPENSION",       "LUNGE",                         "Suspension Lunge",              "lunge",     ["compound"],           ["trx","rings"]),
+    _ExTemplate("SUSPENSION",       "SQUAT",                         "Suspension Squat",              "squat",     ["compound"],           ["trx","rings"]),
+    _ExTemplate("SUSPENSION",       "PIKE",                          "Suspension Pike",               "core",      ["core"],               ["trx","rings"]),
+    _ExTemplate("SUSPENSION",       "HAMSTRING_CURL",                "Suspension Hamstring Curl",     "hinge",     ["isolation"],          ["trx"]),
+    _ExTemplate("SUSPENSION",       "PULL_UP",                       "Suspension Pull-up",            "pull",      ["compound"],           ["rings"]),
+    _ExTemplate("SUSPENSION",       "Y_FLY",                         "Suspension Y Fly",              "shoulders", ["isolation"],          ["trx","rings"]),
+    # -----------------------------------------------------------------------
+    # KETTLEBELL — additional
+    # -----------------------------------------------------------------------
+    _ExTemplate("CORE",             "TURKISH_GET_UP",                "Turkish Get-Up",                "total_body",["compound"],           ["kettlebell"]),
+    _ExTemplate("CORE",             "WINDMILL",                      "Windmill",                      "core",      ["core"],               ["kettlebell","dumbbell"]),
+    # -----------------------------------------------------------------------
+    # SWISS BALL
+    # -----------------------------------------------------------------------
+    _ExTemplate("CRUNCH",           "SWISS_BALL_CRUNCH",             "Swiss Ball Crunch",             "core",      ["core"],               ["swiss_ball"]),
+    _ExTemplate("PLANK",            "SWISS_BALL_PLANK",              "Swiss Ball Plank",              "core",      ["core"],               ["swiss_ball"]),
+    _ExTemplate("LEG_CURL",         "SWISS_BALL_HIP_RAISE_AND_LEG_CURL", "Swiss Ball Hip Raise & Leg Curl", "hinge", ["isolation"],       ["swiss_ball"]),
+    _ExTemplate("CORE",             "SWISS_BALL_PIKE",               "Swiss Ball Pike",               "core",      ["core"],               ["swiss_ball"]),
+    _ExTemplate("PUSH_UP",          "SWISS_BALL_PUSH_UP",            "Swiss Ball Push-up",            "push",      ["compound"],           ["swiss_ball"]),
+    # -----------------------------------------------------------------------
+    # BOSU BALL
+    # -----------------------------------------------------------------------
+    _ExTemplate("SQUAT",            "SPLIT_SQUAT",                   "Split Squat",                   "squat",     ["compound"],           ["bosu_ball", "bodyweight"]),
+    _ExTemplate("PLANK",            "PUSH_UP_POSITION_PLANK",        "Push-Up Position Plank",        "core",      ["core"],               ["bosu_ball", "bodyweight"]),
+    # -----------------------------------------------------------------------
+    # ANKLE WEIGHT
+    # -----------------------------------------------------------------------
+    _ExTemplate("HIP_RAISE",        "SINGLE_LEG_GLUTE_BRIDGE",       "Single-Leg Glute Bridge",       "hinge",     ["compound"],           ["ankle_weight", "bodyweight"]),
+    # -----------------------------------------------------------------------
+    # ROPE (climbing rope — LATERAL_RAISE category per Garmin's FIT SDK)
+    # -----------------------------------------------------------------------
+    _ExTemplate("LATERAL_RAISE",    "ROPE_CLIMB",                    "Rope Climb",                    "pull",      ["compound"],           ["rope"]),
+    # -----------------------------------------------------------------------
+    # JUMP ROPE (CARDIO category)
+    # -----------------------------------------------------------------------
+    _ExTemplate("CARDIO",           "JUMP_ROPE",                     "Jump Rope",                     "total_body",["total_body"],         ["jump_rope"]),
+    _ExTemplate("CARDIO",           "JUMP_ROPE_JOG",                 "Jump Rope Jog",                 "total_body",["total_body"],         ["jump_rope"]),
+    # -----------------------------------------------------------------------
+    # FOAM ROLLER
+    # -----------------------------------------------------------------------
+    _ExTemplate("HIP_RAISE",        "SINGLE_LEG_HIP_RAISE_WITH_FOOT_ON_FOAM_ROLLER", "Hip Raise on Foam Roller", "hinge", ["core"], ["foam_roller"]),
+    _ExTemplate("CRUNCH",           "THORACIC_CRUNCHES_ON_FOAM_ROLLER", "Thoracic Crunches on Foam Roller", "core", ["core"],          ["foam_roller"]),
+    # SLIDING_DISC exercises removed pending verification of correct Garmin
+    # category/name via Exercises.json (category "SLIDING_DISC" is rejected
+    # by the Garmin API with "Invalid category").
 ]
 
 
@@ -372,14 +489,25 @@ def generate(
     rest        = goal_cfg["rest_seconds"]
 
     # --- exercise selection -------------------------------------------------
-    available   = _available(equipment) if equipment else _POOL
+    available   = _available(equipment) if equipment else _available(["bodyweight"])
     num         = _num_exercises(duration_minutes, goal)
     templates   = _select_exercises(available, num, goal)
 
     # For timed exercises (plank, etc.), convert reps to duration
     TIMED_EXERCISES = {
-        "PLANK", "SIDE_PLANK", "FOREARM_PLANK",
-        "DEAD_BUG", "FARMERS_WALK", "BATTLE_ROPE",
+        # planks (hold time)
+        "PLANK", "SIDE_PLANK", "FOREARM_PLANK", "SWISS_BALL_PLANK", "PUSH_UP_POSITION_PLANK",
+        "SUSPENSION_PLANK",
+        # carries / drags (timed effort)
+        "DEAD_BUG", "FARMERS_WALK", "OVERHEAD_CARRY",
+        # battle rope (always timed)
+        "ALTERNATING_WAVE", "ALTERNATING_SQUAT_WAVE",
+        # jump rope (timed effort)
+        "JUMP_ROPE", "JUMP_ROPE_JOG",
+        # sled (timed effort) — Garmin names are PUSH, FORWARD_DRAG
+        "PUSH", "FORWARD_DRAG",
+        # suspension
+        "MOUNTAIN_CLIMBER", "PIKE",
     }
 
     # --- build ExerciseInfo list --------------------------------------------
@@ -391,23 +519,29 @@ def generate(
         if is_timed:
             # Convert reps to hold time: 1 "rep" = 3 seconds, capped at 60s
             hold = min(60.0, reps * 3.0)
-            desc = f"{tmpl.label} — {int(hold)}s hold | How to: {link}"
+            actual_reps = None
         else:
             hold = None
-            desc = f"{tmpl.label} — {sets}×{reps} | How to: {link}"
+            actual_reps = reps
 
-        exercises.append(ExerciseInfo(
+        ex = ExerciseInfo(
             category=tmpl.category,
             name=tmpl.name,
             label=tmpl.label,
             muscle_group=tmpl.muscle_group,
             sets=sets,
-            reps=None if is_timed else reps,
+            reps=actual_reps,
             duration_sec=hold,
             rest_seconds=rest,
             link=link,
-            description=desc,
-        ))
+            description="",  # filled below from actual values
+        )
+        # Build description from the same values that go into the Garmin step
+        if ex.duration_sec is not None:
+            ex.description = f"{ex.label} — {int(ex.duration_sec)}s hold | How to: {link}"
+        else:
+            ex.description = f"{ex.label} — {ex.sets}×{ex.reps} | How to: {link}"
+        exercises.append(ex)
 
     # --- build StrengthWorkout payload --------------------------------------
     date_str = datetime.now().strftime("%b %d")
@@ -417,13 +551,8 @@ def generate(
         f"Equipment: {', '.join(equipment) if equipment else 'bodyweight'}."
     )
 
-    builder = (
-        StrengthWorkout(workout_name, description=workout_desc)
-        .add_warmup(description="5 min general warm-up")
-    )
-
-    for ex in exercises:
-        block = ExerciseBlock(
+    blocks = [
+        ExerciseBlock(
             category=ex.category,
             name=ex.name,
             sets=ex.sets,
@@ -432,9 +561,15 @@ def generate(
             rest_seconds=ex.rest_seconds,
             description=ex.description,
         )
-        builder.add_block(block)
+        for ex in exercises
+    ]
 
-    builder.add_cooldown(description="Cool-down + stretch")
+    builder = (
+        StrengthWorkout(workout_name, description=workout_desc)
+        .add_warmup(description="5 min general warm-up")
+        .add_circuit(blocks, rounds=sets)
+        .add_cooldown(description="Cool-down + stretch")
+    )
     payload = builder.build(validate=False)
 
     return WorkoutPlan(

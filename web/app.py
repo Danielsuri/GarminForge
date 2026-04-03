@@ -393,6 +393,36 @@ async def debug_workout(request: Request, workout_id: int):
     return forge.get_workout(workout_id)
 
 
+@app.get("/debug/lookup/{path:path}")
+async def debug_lookup(request: Request, path: str):
+    """Probe arbitrary connectapi paths. E.g. /debug/lookup/workout-service/equipment"""
+    if not _is_authenticated(request):
+        return {"error": "not authenticated"}
+    from garminforge.auth import _garth
+    forge = _get_forge_client(request)
+    garth = _garth(forge.garmin)
+    try:
+        return garth.connectapi(f"/{path}")
+    except Exception as exc:
+        return {"error": str(exc)}
+
+
+@app.get("/debug/webdata/{path:path}")
+async def debug_webdata(request: Request, path: str):
+    """Fetch connect.garmin.com/web-api/web-data/ static files using garth session."""
+    if not _is_authenticated(request):
+        return {"error": "not authenticated"}
+    from garminforge.auth import _garth
+    import json as _json
+    forge = _get_forge_client(request)
+    garth = _garth(forge.garmin)
+    r = garth.request("GET", "connect", f"/web-api/web-data/{path}", api=False)
+    try:
+        return r.json()
+    except Exception:
+        return {"text": r.text[:2000]}
+
+
 @app.post("/workout/generate", response_class=HTMLResponse)
 async def workout_generate(
     request: Request,

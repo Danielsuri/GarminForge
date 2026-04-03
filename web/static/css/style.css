@@ -65,11 +65,59 @@ main { flex: 1; }
 }
 .goal-card:hover { border-color: #555 !important; }
 
-/* ---------- Equipment checkboxes ---------- */
-.btn-check:checked + .btn-outline-secondary {
-  background-color: rgba(0,102,204,.15);
-  border-color: var(--garmin-blue) !important;
+/* ---------- Tom Select — dark theme overrides ---------- */
+.ts-wrapper .ts-control {
+  background-color: #212529;
+  border-color: var(--card-border);
+  color: #dee2e6;
+  min-height: 2.5rem;
+}
+.ts-wrapper.focus .ts-control {
+  border-color: var(--garmin-blue);
+  box-shadow: 0 0 0 .2rem rgba(0,102,204,.25);
+}
+.ts-wrapper .ts-control input {
+  color: #dee2e6;
+}
+.ts-wrapper .ts-control input::placeholder {
+  color: #6c757d;
+}
+.ts-dropdown {
+  background-color: #1e2227;
+  border-color: var(--card-border);
+  color: #dee2e6;
+}
+.ts-dropdown .ts-dropdown-content .option {
+  color: #dee2e6 !important;
+}
+.ts-dropdown .ts-dropdown-content .option:hover,
+.ts-dropdown .ts-dropdown-content .option.active {
+  background-color: rgba(0,102,204,.25);
   color: #fff;
+}
+.ts-dropdown .ts-dropdown-content .option.selected {
+  background-color: rgba(0,102,204,.15);
+}
+.ts-wrapper .ts-control .item {
+  background-color: rgba(0,102,204,.2);
+  border-color: rgba(0,102,204,.4);
+  color: #cce0ff;
+  border-radius: .25rem;
+}
+.ts-wrapper .ts-control .item .remove {
+  color: #cce0ff;
+  border-left-color: rgba(0,102,204,.4);
+}
+.ts-wrapper .ts-control .item .remove:hover {
+  background-color: rgba(220,53,69,.3);
+  color: #fff;
+}
+/* clear button */
+.ts-wrapper .clear-button {
+  color: #6c757d;
+}
+.ts-wrapper .clear-button:hover {
+  color: #dee2e6;
 }
 
 /* ---------- Stat cards ---------- */

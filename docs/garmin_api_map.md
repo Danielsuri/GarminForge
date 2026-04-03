@@ -49,8 +49,8 @@ The actual value goes in `endConditionValue` at the **step level** (not inside `
 | 1               | lap.button       | 1            | true        | null                   |
 | 2               | time             | 2            | true        | seconds (float)        |
 | 3               | distance         | 3            | true        | meters (float)         |
-| 7               | reps             | 7            | true        | rep count (float)      |
-| 7               | iterations       | 7            | false       | set count (float) — used in RepeatGroupDTO |
+| 10              | reps             | 10           | true        | rep count (int) — exercise step end condition |
+| 7               | iterations       | 7            | false       | set count (float) — used in RepeatGroupDTO only |
 
 > **Note**: both `reps` and `iterations` use `conditionTypeId: 7`. `displayable: false`
 > on the iterations condition hides it from the Garmin UI.
