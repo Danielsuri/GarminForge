@@ -173,7 +173,7 @@ _POOL: list[_ExTemplate] = [
     _ExTemplate("ROW",              "T_BAR_ROW",                     "T-Bar Row",                     "pull",   ["compound"], ["barbell"]),
     _ExTemplate("ROW",              "SEATED_CABLE_ROW",              "Seated Cable Row",              "pull",   ["compound"], ["cable"]),
     _ExTemplate("ROW",              "FACE_PULL",                     "Face Pull",                     "pull",   ["isolation"], ["cable"]),
-    _ExTemplate("ROW",              "INVERTED_ROW",                  "Inverted Row",                  "pull",   ["compound"], ["bodyweight"]),
+    _ExTemplate("ROW",              "INVERTED_ROW",                  "Inverted Row",                  "pull",   ["compound"], ["pullup_bar", "barbell", "smith_machine", "trx", "rings"]),
     _ExTemplate("HYPEREXTENSION",   "BACK_EXTENSION",                "Back Extension",                "pull",   ["isolation"], ["bodyweight", "machine"]),
     # PULL — isolation
     _ExTemplate("CURL",             "BARBELL_CURL",                  "Barbell Curl",                  "arms_bi",["isolation"], ["barbell"]),
