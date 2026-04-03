@@ -170,7 +170,8 @@
         </div>
         {% endif %}
 
-        <!-- Upload form -->
+        <!-- Upload form (only shown when Garmin is connected) -->
+        {% if authenticated %}
         <form method="post" action="/workout/upload" id="uploadForm">
           <input type="hidden" name="payload_json" value="{{ payload_json | e }}" />
 
@@ -187,6 +188,14 @@
             <i class="bi bi-cloud-arrow-up me-2"></i>Upload to Garmin Connect
           </button>
         </form>
+        {% else %}
+        <div class="text-center p-3 border border-secondary rounded">
+          <p class="text-muted mb-2">Connect your Garmin account to upload this workout.</p>
+          <a href="/auth/login-forge" class="btn btn-outline-secondary">
+            <i class="bi bi-box-arrow-in-right me-2"></i>Connect Garmin Account
+          </a>
+        </div>
+        {% endif %}
       </div>
     </div>
   </div>

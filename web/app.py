@@ -41,15 +41,14 @@ from garminforge.client import GarminForgeClient
 from garminforge.exceptions import (
     AuthenticationError,
     TooManyRequestsError,
-    TokenNotFoundError,
 )
 
 # Web modules
-from web.auth_utils import get_current_user, logout_session, maybe_migrate_file_token
+from web.auth_utils import logout_session
 from web.db import get_db, init_db
 from web.garmin_sso import browser_login, exchange_ticket, make_token_b64, portal_login
 from web.models import User
-from web.rendering import render_template, templates
+from web.rendering import render_template
 from web.routes_auth import router as forge_auth_router
 from web.routes_my import router as my_router
 from web.workout_generator import EQUIPMENT_OPTIONS, GOALS, generate
@@ -218,32 +217,15 @@ async def index(
     flash_error = request.session.pop("flash_error", None) or (error or None)
     flash_success = request.session.pop("flash_success", None)
 
-    if _is_authenticated(request, db):
-        return _render(
-            "dashboard.html",
-            request,
-            db=db,
-            goals=GOALS,
-            equipment_options=EQUIPMENT_OPTIONS,
-            flash_error=flash_error,
-            flash_success=flash_success,
-        )
-
-    # GarminForge account exists but Garmin not yet connected
-    forge_user = get_current_user(request, db)
-    if forge_user:
-        return _render(
-            "index.html",
-            request,
-            db=db,
-            flash_error=flash_error,
-            flash_success=flash_success,
-        )
-
-    # Not logged in — redirect to GarminForge login
-    if flash_error:
-        request.session["flash_error"] = flash_error
-    return RedirectResponse("/auth/login-forge", status_code=303)
+    return _render(
+        "dashboard.html",
+        request,
+        db=db,
+        goals=GOALS,
+        equipment_options=EQUIPMENT_OPTIONS,
+        flash_error=flash_error,
+        flash_success=flash_success,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -526,9 +508,6 @@ async def workout_generate(
     equipment: list[str] = Form(default=[]),
     db: Session = Depends(get_db),
 ):
-    if not _is_authenticated(request, db):
-        return _error_redirect(request, "Please log in first.")
-
     if goal not in GOALS:
         return _error_redirect(request, f"Unknown goal: {goal!r}")
 
