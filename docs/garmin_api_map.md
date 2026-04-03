@@ -112,8 +112,14 @@ Content-Type: application/json
 
 **Step 3 — extract ticket from redirect URL and exchange for OAuth tokens** (same as current Playwright flow).
 
-> **Potential**: This endpoint may allow a headless `requests`-based login without Playwright,
-> if no CAPTCHA is triggered. Playwright remains the safe fallback when CAPTCHA appears.
+> **CAPTCHA wall (confirmed 2026-04-03)**: Garmin always returns `CAPTCHA_REQUIRED` for new
+> headless sessions even with a correct Chrome TLS fingerprint (curl_cffi). The response body is:
+> `{"responseStatus": {"type": "CAPTCHA_REQUIRED"}, "captchaAlreadyPassed": false, ...}`
+>
+> Headless login works in a real browser because it has prior session cookies/history.
+> **Playwright browser login remains the only reliable login method for new sessions.**
+> The portal API is still useful if Garmin ever relaxes CAPTCHA for trusted IPs.
+>
 > **⚠ WARNING**: Never commit files containing credentials. `examples/` is in `.gitignore`.
 
 ---

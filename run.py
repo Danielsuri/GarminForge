@@ -17,7 +17,13 @@ Quick start:
 """
 
 import argparse
+import logging
 import sys
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s [%(name)s] %(message)s",
+)
 
 
 def main() -> None:

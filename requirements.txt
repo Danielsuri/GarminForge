@@ -13,6 +13,7 @@ itsdangerous>=2.1
 # Auth tooling
 playwright>=1.40
 requests-oauthlib>=1.3
+curl-cffi>=0.7        # Chrome TLS impersonation to bypass Cloudflare on sso.garmin.com
 
 # Development
 pytest>=7.4

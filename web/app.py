@@ -42,7 +42,7 @@ from garminforge.exceptions import (
 
 # Web modules
 from web.workout_generator import GOALS, EQUIPMENT_OPTIONS, generate
-from web.garmin_sso import exchange_ticket, browser_login, make_token_b64
+from web.garmin_sso import exchange_ticket, browser_login, portal_login, make_token_b64
 
 logger = logging.getLogger(__name__)
 
@@ -186,9 +186,19 @@ async def auth_login(
     email: str = Form(...),
     password: str = Form(...),
 ):
-    """Start a headed Playwright browser login in the background."""
+    """Try headless portal login first; fall back to Playwright browser login."""
     import threading
 
+    # Attempt fast headless login (no browser window)
+    try:
+        oauth1, oauth2 = portal_login(email, password)
+        _store_token(request, make_token_b64(oauth1, oauth2))
+        request.session["flash_success"] = "Connected to Garmin successfully!"
+        return RedirectResponse("/", status_code=303)
+    except Exception as exc:
+        logger.info("Portal login failed (%s), falling back to browser login.", exc)
+
+    # Fall back to headed Playwright browser
     login_id = str(uuid.uuid4())
     _BROWSER_LOGINS[login_id] = {"status": "pending"}
     request.session["login_id"] = login_id
