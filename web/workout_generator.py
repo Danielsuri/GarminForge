@@ -161,8 +161,8 @@ _POOL: list[_ExTemplate] = [
     # -----------------------------------------------------------------------
     # PULL — compound
     # -----------------------------------------------------------------------
-    _ExTemplate("PULL_UP",          "PULL_UP",                       "Pull-Up",                       "pull",   ["compound"], ["bodyweight", "pullup_bar", "weight_vest"]),
-    _ExTemplate("PULL_UP",          "CHIN_UP",                       "Chin-Up",                       "pull",   ["compound"], ["bodyweight", "pullup_bar"]),
+    _ExTemplate("PULL_UP",          "PULL_UP",                       "Pull-Up",                       "pull",   ["compound"], ["pullup_bar", "weight_vest"]),
+    _ExTemplate("PULL_UP",          "CHIN_UP",                       "Chin-Up",                       "pull",   ["compound"], ["pullup_bar"]),
     _ExTemplate("PULL_UP",          "WIDE_GRIP_PULL_UP",             "Wide-Grip Pull-Up",             "pull",   ["compound"], ["pullup_bar"]),
     _ExTemplate("PULL_UP",          "NEUTRAL_GRIP_PULL_UP",          "Neutral-Grip Pull-Up",          "pull",   ["compound"], ["pullup_bar"]),
     _ExTemplate("PULL_UP",          "BANDED_PULL_UP",                "Banded Pull-Up",                "pull",   ["compound"], ["pullup_bar", "band"]),
@@ -232,11 +232,11 @@ _POOL: list[_ExTemplate] = [
     _ExTemplate("CRUNCH",           "BICYCLE_CRUNCH",                "Bicycle Crunch",                "core",   ["core"], ["bodyweight"]),
     _ExTemplate("CRUNCH",           "REVERSE_CRUNCH",                "Reverse Crunch",                "core",   ["core"], ["bodyweight"]),
     _ExTemplate("LEG_RAISE",        "LYING_LEG_RAISE",               "Lying Leg Raise",               "core",   ["core"], ["bodyweight", "ankle_weight"]),
-    _ExTemplate("LEG_RAISE",        "HANGING_LEG_RAISE",             "Hanging Leg Raise",             "core",   ["core"], ["bodyweight", "pullup_bar", "ankle_weight"]),
+    _ExTemplate("LEG_RAISE",        "HANGING_LEG_RAISE",             "Hanging Leg Raise",             "core",   ["core"], ["pullup_bar", "ankle_weight"]),
     _ExTemplate("LEG_RAISE",        "KNEE_RAISE",                    "Knee Raise",                    "core",   ["core"], ["pullup_bar"]),
     _ExTemplate("CORE",             "DEAD_BUG",                      "Dead Bug",                      "core",   ["core"], ["bodyweight"]),
     _ExTemplate("CORE",             "RUSSIAN_TWIST",                 "Russian Twist",                 "core",   ["core"], ["bodyweight", "dumbbell", "medicine_ball", "plate"]),
-    _ExTemplate("CORE",             "KNEELING_AB_WHEEL",             "Kneeling Ab Wheel",             "core",   ["core"], ["ab_wheel", "bodyweight"]),
+    _ExTemplate("CORE",             "KNEELING_AB_WHEEL",             "Kneeling Ab Wheel",             "core",   ["core"], ["ab_wheel"]),
     _ExTemplate("CORE",             "BARBELL_ROLLOUT",               "Barbell Roll-out",              "core",   ["core"], ["ab_wheel", "barbell"]),
 
     # -----------------------------------------------------------------------
@@ -252,7 +252,7 @@ _POOL: list[_ExTemplate] = [
     # -----------------------------------------------------------------------
     # PLYO (correct Garmin category for jumps and med ball slams)
     # -----------------------------------------------------------------------
-    _ExTemplate("PLYO",             "BOX_JUMP",                      "Box Jump",                      "total_body",["total_body","compound"],["bodyweight","box"]),
+    _ExTemplate("PLYO",             "BOX_JUMP",                      "Box Jump",                      "total_body",["total_body","compound"],["box"]),
     _ExTemplate("PLYO",             "JUMP_SQUAT",                    "Jump Squat",                    "squat",     ["compound"],           ["bodyweight"]),
     _ExTemplate("PLYO",             "ALTERNATING_JUMP_LUNGE",        "Alternating Jump Lunge",        "lunge",     ["compound"],           ["bodyweight"]),
     _ExTemplate("PLYO",             "MEDICINE_BALL_SLAM",            "Medicine Ball Slam",            "total_body",["total_body","compound"],["medicine_ball"]),
