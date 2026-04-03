@@ -24,6 +24,12 @@ oauth2_token.json
 .env
 .env.*
 
+# Claude Code local settings
+.claude/
+
+# Dev/debug scripts (not part of the app)
+scripts/
+
 # IDE
 .vscode/
 .idea/
