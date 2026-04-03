@@ -8,7 +8,7 @@
   <div class="col-12 col-lg-5">
     <div class="card bg-dark-subtle border-secondary h-100">
       <div class="card-header border-secondary">
-        <h5 class="mb-0 fw-bold"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>Build Your Workout</h5>
+        <h5 class="mb-0 fw-bold"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>{{ t("form_build_workout") }}</h5>
       </div>
       <div class="card-body p-4">
         <form method="post" action="/workout/generate" id="generatorForm">
@@ -16,7 +16,7 @@
           <!-- GOAL -->
           <div class="mb-4">
             <label class="form-label fw-semibold d-flex align-items-center gap-2 mb-2">
-              <i class="bi bi-bullseye text-info"></i> Workout Goal
+              <i class="bi bi-bullseye text-info"></i> {{ t("form_workout_goal") }}
             </label>
             <div class="row g-2">
               {% for key, g in goals.items() %}
@@ -24,8 +24,8 @@
                 <input type="radio" class="btn-check" name="goal" id="goal_{{ key }}"
                        value="{{ key }}" {% if loop.first %}checked{% endif %} />
                 <label class="btn btn-outline-secondary w-100 text-start goal-card p-2" for="goal_{{ key }}">
-                  <span class="d-block fw-semibold">{{ g.icon }} {{ g.label }}</span>
-                  <span class="d-block text-muted" style="font-size:.75rem;line-height:1.2">{{ g.description }}</span>
+                  <span class="d-block fw-semibold">{{ g.icon }} {{ t("goal_label_" ~ key) }}</span>
+                  <span class="d-block text-muted" style="font-size:.75rem;line-height:1.2">{{ t("goal_desc_" ~ key) }}</span>
                 </label>
               </div>
               {% endfor %}
@@ -35,34 +35,34 @@
           <!-- EQUIPMENT -->
           <div class="mb-4">
             <label class="form-label fw-semibold d-flex align-items-center gap-2 mb-2" for="equipmentSelect">
-              <i class="bi bi-tools text-success"></i> Available Equipment
+              <i class="bi bi-tools text-success"></i> {{ t("form_available_equipment") }}
             </label>
             <select id="equipmentSelect" name="equipment" multiple
                     placeholder="Search equipment…">
               {% for eq in equipment_options %}
-              <option value="{{ eq.tag }}">{{ eq.icon }} {{ eq.label }}</option>
+              <option value="{{ eq.tag }}">{{ eq.icon }} {{ t("eq_" ~ eq.tag) }}</option>
               {% endfor %}
             </select>
-            <div class="form-text mt-1">Select all you have. Leave empty for bodyweight-only exercises.</div>
+            <div class="form-text mt-1">{{ t("form_equipment_hint") }}</div>
           </div>
 
           <!-- DURATION -->
           <div class="mb-4">
             <label for="duration" class="form-label fw-semibold d-flex align-items-center gap-2">
               <i class="bi bi-clock-fill text-primary"></i>
-              Session Duration: <span id="durationLabel" class="text-white ms-1">45 min</span>
+              {{ t("form_session_duration") }}: <span id="durationLabel" class="text-white ms-1">45 {{ t("form_min") }}</span>
             </label>
             <input type="range" class="form-range" id="duration" name="duration"
                    min="15" max="120" step="5" value="45" />
             <div class="d-flex justify-content-between text-muted" style="font-size:.75rem">
-              <span>15 min</span>
-              <span>60 min</span>
-              <span>120 min</span>
+              <span>15 {{ t("form_min") }}</span>
+              <span>60 {{ t("form_min") }}</span>
+              <span>120 {{ t("form_min") }}</span>
             </div>
           </div>
 
           <button type="submit" class="btn btn-garmin w-100 py-3 fw-bold fs-5" id="generateBtn">
-            <i class="bi bi-magic me-2"></i>Generate Workout
+            <i class="bi bi-magic me-2"></i>{{ t("form_generate_btn") }}
           </button>
 
         </form>
@@ -78,8 +78,8 @@
            id="previewPlaceholder">
         <div class="text-center text-muted p-5">
           <div class="display-1 mb-3 opacity-25">🏋️</div>
-          <h5>Your workout will appear here</h5>
-          <p class="small">Fill in the options on the left and click <strong>Generate Workout</strong>.</p>
+          <h5>{{ t("form_placeholder_title") }}</h5>
+          <p class="small">{{ t("form_placeholder_body") }}</p>
         </div>
       </div>
     </div>
@@ -90,11 +90,16 @@
 
 {% block scripts %}
 <script>
+const MSG_MIN        = {{ t("form_min") | tojson }};
+const MSG_GENERATING = {{ t("form_generating") | tojson }};
+const MSG_GENERATE   = {{ t("form_generate_btn") | tojson }};
+const MSG_FAILED     = {{ t("form_generate_failed") | tojson }};
+
 // Duration slider label
 const durationInput = document.getElementById('duration');
 const durationLabel = document.getElementById('durationLabel');
 durationInput.addEventListener('input', () => {
-  durationLabel.textContent = durationInput.value + ' min';
+  durationLabel.textContent = durationInput.value + ' ' + MSG_MIN;
 });
 
 // Equipment — Tom Select with regex search
@@ -140,7 +145,7 @@ document.getElementById('generatorForm').addEventListener('submit', async functi
   e.preventDefault();
   const btn = document.getElementById('generateBtn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Generating…';
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>' + MSG_GENERATING;
 
   const formData = new FormData(this);
   try {
@@ -162,10 +167,10 @@ document.getElementById('generatorForm').addEventListener('submit', async functi
     }
   } catch(err) {
     console.error(err);
-    alert('Generation failed. Please try again.');
+    alert(MSG_FAILED);
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<i class="bi bi-magic me-2"></i>Generate Workout';
+    btn.innerHTML = '<i class="bi bi-magic me-2"></i>' + MSG_GENERATE;
   }
 });
 </script>

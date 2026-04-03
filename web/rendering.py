@@ -10,6 +10,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
+from web.translations import SUPPORTED_LANGS, make_t
+
 _BASE_DIR = Path(__file__).parent
 templates = Jinja2Templates(directory=_BASE_DIR / "templates")
 
@@ -22,8 +24,10 @@ def render_template(
     db: Session | None = None,
     **ctx: object,
 ) -> HTMLResponse:
-    """Render a Jinja2 template, injecting `authenticated`, `forge_user`, and flash messages.
+    """Render a Jinja2 template, injecting ``authenticated``, ``forge_user``,
+    flash messages, and language helpers (``lang``, ``t``).
 
+    Language priority: DB user preference > session > default "en".
     Flash messages are auto-popped from the session so they display once even
     when the caller doesn't pull them manually (e.g. after a redirect into a
     route that doesn't know about the flash).  Callers that already popped and
@@ -41,6 +45,15 @@ def render_template(
     if not authenticated and forge_user is not None:
         authenticated = bool(forge_user.garmin_token_b64)
 
+    # Resolve language: DB preference beats session, then fallback to "en".
+    lang: str = "en"
+    if forge_user is not None and forge_user.preferred_lang in SUPPORTED_LANGS:
+        lang = forge_user.preferred_lang  # type: ignore[assignment]
+    else:
+        raw = request.session.get("lang", "en")
+        if raw in SUPPORTED_LANGS:
+            lang = raw
+
     # Auto-pop flash messages unless the caller already passed them
     if "flash_error" not in ctx:
         ctx["flash_error"] = request.session.pop("flash_error", None)
@@ -50,5 +63,5 @@ def render_template(
     return templates.TemplateResponse(
         request,
         template,
-        {"authenticated": authenticated, "forge_user": forge_user, **ctx},
+        {"authenticated": authenticated, "forge_user": forge_user, "lang": lang, "t": make_t(lang), **ctx},
     )

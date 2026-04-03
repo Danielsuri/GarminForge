@@ -51,6 +51,7 @@ from web.models import User
 from web.rendering import render_template
 from web.routes_auth import router as forge_auth_router
 from web.routes_my import router as my_router
+from web.translations import SUPPORTED_LANGS
 from web.workout_generator import EQUIPMENT_OPTIONS, GOALS, generate
 
 logger = logging.getLogger(__name__)
@@ -434,6 +435,27 @@ async def auth_cancel(request: Request):
     if login_id:
         _BROWSER_LOGINS.pop(login_id, None)
     return RedirectResponse("/", status_code=303)
+
+
+@app.get("/set-language")
+async def set_language(
+    request: Request,
+    lang: str = "en",
+    db: Session = Depends(get_db),
+) -> RedirectResponse:
+    """Save the user's preferred language to their account (if logged in) and session."""
+    if lang not in SUPPORTED_LANGS:
+        lang = "en"
+    request.session["lang"] = lang
+    # Persist to DB for logged-in users
+    user_id = request.session.get("user_id")
+    if user_id:
+        user = db.get(User, user_id)
+        if user:
+            user.preferred_lang = lang
+            db.commit()
+    back = request.headers.get("referer", "/")
+    return RedirectResponse(back, status_code=303)
 
 
 @app.get("/auth/logout")

@@ -7,7 +7,7 @@ import os
 from collections.abc import Generator
 from pathlib import Path
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 DB_PATH = Path(os.environ.get("GARMINFORGE_DB_PATH", str(Path.home() / ".garminforge.db")))
@@ -33,7 +33,24 @@ def get_db() -> Generator[Session, None, None]:
 
 
 def init_db() -> None:
-    """Create all tables if they don't exist. Called at startup via lifespan."""
+    """Create all tables if they don't exist. Called at startup via lifespan.
+
+    Also applies additive column migrations (ALTER TABLE ADD COLUMN) that
+    ``create_all`` skips on existing databases.  SQLite silently errors when a
+    column already exists, so we swallow those exceptions.
+    """
     from web.models import SavedPlan, User, WorkoutSession  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
+
+    # Add columns introduced after the initial schema.
+    # Each statement is idempotent: the except swallows "duplicate column" errors.
+    _additive_migrations = [
+        "ALTER TABLE users ADD COLUMN preferred_lang VARCHAR(5)",
+    ]
+    with engine.begin() as conn:
+        for stmt in _additive_migrations:
+            try:
+                conn.execute(text(stmt))
+            except Exception:
+                pass  # column already exists

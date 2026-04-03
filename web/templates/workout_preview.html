@@ -8,7 +8,7 @@
   <div class="col-12 col-lg-5">
     <div class="card bg-dark-subtle border-secondary">
       <div class="card-header border-secondary">
-        <h5 class="mb-0 fw-bold"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>Build Your Workout</h5>
+        <h5 class="mb-0 fw-bold"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>{{ t("form_build_workout") }}</h5>
       </div>
       <div class="card-body p-4">
         <form method="post" action="/workout/generate" id="generatorForm">
@@ -16,7 +16,7 @@
           <!-- GOAL -->
           <div class="mb-4">
             <label class="form-label fw-semibold d-flex align-items-center gap-2 mb-2">
-              <i class="bi bi-bullseye text-info"></i> Workout Goal
+              <i class="bi bi-bullseye text-info"></i> {{ t("form_workout_goal") }}
             </label>
             <div class="row g-2">
               {% for key, g in goals.items() %}
@@ -24,8 +24,8 @@
                 <input type="radio" class="btn-check" name="goal" id="goal_{{ key }}"
                        value="{{ key }}" {% if key == selected_goal %}checked{% endif %} />
                 <label class="btn btn-outline-secondary w-100 text-start goal-card p-2" for="goal_{{ key }}">
-                  <span class="d-block fw-semibold">{{ g.icon }} {{ g.label }}</span>
-                  <span class="d-block text-muted" style="font-size:.75rem;line-height:1.2">{{ g.description }}</span>
+                  <span class="d-block fw-semibold">{{ g.icon }} {{ t("goal_label_" ~ key) }}</span>
+                  <span class="d-block text-muted" style="font-size:.75rem;line-height:1.2">{{ t("goal_desc_" ~ key) }}</span>
                 </label>
               </div>
               {% endfor %}
@@ -35,9 +35,13 @@
           <!-- EQUIPMENT -->
           <div class="mb-4">
             <label class="form-label fw-semibold d-flex align-items-center gap-2 mb-2">
-              <i class="bi bi-tools text-success"></i> Available Equipment
+              <i class="bi bi-tools text-success"></i> {{ t("form_available_equipment") }}
               <span class="badge bg-secondary ms-auto" id="eqCount">
-                {{ selected_equipment | length }} selected
+                {% if selected_equipment | length == 0 or (selected_equipment | length == 1 and selected_equipment[0] == 'bodyweight') %}
+                  {{ t("preview_no_equipment") }}
+                {% else %}
+                  {{ selected_equipment | length }}{{ t("preview_selected_suffix") }}
+                {% endif %}
               </span>
             </label>
             <div class="row g-2">
@@ -47,7 +51,7 @@
                        id="eq_{{ eq.tag }}" value="{{ eq.tag }}"
                        {% if eq.tag in selected_equipment %}checked{% endif %} />
                 <label class="btn btn-outline-secondary w-100 text-start p-2" for="eq_{{ eq.tag }}">
-                  <span class="me-2">{{ eq.icon }}</span>{{ eq.label }}
+                  <span class="me-2">{{ eq.icon }}</span>{{ t("eq_" ~ eq.tag) }}
                 </label>
               </div>
               {% endfor %}
@@ -58,17 +62,17 @@
           <div class="mb-4">
             <label for="duration" class="form-label fw-semibold d-flex align-items-center gap-2">
               <i class="bi bi-clock-fill text-primary"></i>
-              Session Duration: <span id="durationLabel" class="text-white ms-1">{{ selected_duration }} min</span>
+              {{ t("form_session_duration") }}: <span id="durationLabel" class="text-white ms-1">{{ selected_duration }} {{ t("form_min") }}</span>
             </label>
             <input type="range" class="form-range" id="duration" name="duration"
                    min="15" max="120" step="5" value="{{ selected_duration }}" />
             <div class="d-flex justify-content-between text-muted" style="font-size:.75rem">
-              <span>15 min</span><span>60 min</span><span>120 min</span>
+              <span>15 {{ t("form_min") }}</span><span>60 {{ t("form_min") }}</span><span>120 {{ t("form_min") }}</span>
             </div>
           </div>
 
           <button type="submit" class="btn btn-garmin w-100 py-3 fw-bold fs-5" id="generateBtn">
-            <i class="bi bi-arrow-repeat me-2"></i>Regenerate
+            <i class="bi bi-arrow-repeat me-2"></i>{{ t("form_regenerate_btn") }}
           </button>
         </form>
       </div>
@@ -84,7 +88,7 @@
           <span class="fw-bold fs-5">{{ plan.name }}</span>
         </div>
         <span class="badge bg-garmin">
-          <i class="bi bi-clock me-1"></i>{{ plan.duration_minutes }} min
+          <i class="bi bi-clock me-1"></i>{{ plan.duration_minutes }} {{ t("form_min") }}
         </span>
       </div>
 
@@ -96,13 +100,13 @@
           <div class="col-4">
             <div class="stat-card text-center p-3 rounded">
               <div class="stat-value">{{ plan.exercises | length }}</div>
-              <div class="stat-label">Exercises</div>
+              <div class="stat-label">{{ t("preview_exercises") }}</div>
             </div>
           </div>
           <div class="col-4">
             <div class="stat-card text-center p-3 rounded">
               <div class="stat-value">{{ plan.exercises[0].sets if plan.exercises else '—' }}</div>
-              <div class="stat-label">Sets each</div>
+              <div class="stat-label">{{ t("preview_sets_each") }}</div>
             </div>
           </div>
           <div class="col-4">
@@ -114,7 +118,7 @@
                   {{ plan.exercises[0].duration_sec | int }}s
                 {% else %}—{% endif %}
               </div>
-              <div class="stat-label">Reps / set</div>
+              <div class="stat-label">{{ t("preview_reps_per_set") }}</div>
             </div>
           </div>
         </div>
@@ -124,8 +128,8 @@
 
           <!-- Warm-up -->
           <div class="d-flex align-items-center gap-2 mb-3">
-            <div class="step-badge bg-secondary text-white rounded-pill px-2 py-0" style="font-size:.7rem">WARM-UP</div>
-            <span class="text-muted small">5 min general warm-up</span>
+            <div class="step-badge bg-secondary text-white rounded-pill px-2 py-0" style="font-size:.7rem">{{ t("badge_warmup") }}</div>
+            <span class="text-muted small">{{ t("preview_warmup_label") }}</span>
           </div>
 
           <!-- Circuit block -->
@@ -137,11 +141,11 @@
                  style="background: rgba(13,202,240,.12); border-bottom: 1px solid rgba(13,202,240,.3);">
               <div class="d-flex align-items-center gap-2">
                 <i class="bi bi-arrow-repeat text-info fs-5"></i>
-                <span class="fw-bold text-info" style="letter-spacing:.04em">CIRCUIT</span>
-                <span class="text-muted small">— do all {{ plan.exercises | length }} exercises, then repeat</span>
+                <span class="fw-bold text-info" style="letter-spacing:.04em">{{ t("badge_circuit") }}</span>
+                <span class="text-muted small">— {{ t("preview_circuit_desc_pre") }}{{ plan.exercises | length }}{{ t("preview_circuit_desc_post") }}</span>
               </div>
               <span class="badge fs-6 px-3 py-1 fw-bold" style="background: var(--bs-info); color:#000;">
-                × {{ sets_count }} rounds
+                × {{ sets_count }}
               </span>
             </div>
 
@@ -155,28 +159,28 @@
                   <div>
                     <span class="fw-semibold">{{ ex.label }}</span>
                     <span class="badge bg-secondary ms-2 text-capitalize" style="font-size:.65rem">
-                      {{ ex.muscle_group.replace('_', ' ') }}
+                      {{ t("muscle_" ~ ex.muscle_group.replace(" ", "_")) }}
                     </span>
                   </div>
                   <a href="{{ ex.link }}" target="_blank" rel="noopener noreferrer"
-                     class="btn btn-outline-secondary btn-sm py-0 px-2 flex-shrink-0" title="How to perform">
-                    <i class="bi bi-play-circle me-1"></i>Tutorial
+                     class="btn btn-outline-secondary btn-sm py-0 px-2 flex-shrink-0" title="{{ t('preview_tutorial') }}">
+                    <i class="bi bi-play-circle me-1"></i>{{ t("preview_tutorial") }}
                   </a>
                 </div>
                 <div class="text-muted small mt-1">
                   {% if ex.reps %}
-                    <i class="bi bi-repeat me-1"></i>{{ ex.reps }} reps
+                    <i class="bi bi-repeat me-1"></i>{{ ex.reps }} {{ t("preview_reps") }}
                   {% else %}
-                    <i class="bi bi-stopwatch me-1"></i>{{ ex.duration_sec | int }}s hold
+                    <i class="bi bi-stopwatch me-1"></i>{{ ex.duration_sec | int }}{{ t("preview_hold") }}
                   {% endif %}
                   &nbsp;·&nbsp;
-                  <i class="bi bi-hourglass-split me-1"></i>{{ ex.rest_seconds | int }}s rest
+                  <i class="bi bi-hourglass-split me-1"></i>{{ ex.rest_seconds | int }}{{ t("preview_rest") }}
                 </div>
               </div>
               {% if ex.required_equipment_labels %}
               <div class="mt-1" style="font-size:.72rem">
                 <i class="bi bi-tools text-warning me-1"></i>
-                <span class="text-warning">Needs:</span>
+                <span class="text-warning">{{ t("preview_needs") }}</span>
                 <span class="text-muted">{{ ex.required_equipment_labels | join(' / ') }}</span>
               </div>
               {% endif %}
@@ -188,15 +192,15 @@
                  style="background: rgba(13,202,240,.07); border-top: 1px dashed rgba(13,202,240,.3);">
               <i class="bi bi-arrow-counterclockwise text-info"></i>
               <span class="text-info small fw-semibold">
-                Rest 90s, then repeat from exercise 1 — {{ sets_count }} rounds total
+                {{ t("preview_round_footer_pre") }}{{ sets_count }}{{ t("preview_round_footer_post") }}
               </span>
             </div>
           </div>
 
           <!-- Cool-down -->
           <div class="d-flex align-items-center gap-2 pt-1">
-            <div class="step-badge bg-secondary text-white rounded-pill px-2 py-0" style="font-size:.7rem">COOL-DOWN</div>
-            <span class="text-muted small">Cool-down + stretch</span>
+            <div class="step-badge bg-secondary text-white rounded-pill px-2 py-0" style="font-size:.7rem">{{ t("badge_cooldown") }}</div>
+            <span class="text-muted small">{{ t("preview_cooldown_label") }}</span>
           </div>
         </div>
 
@@ -204,7 +208,7 @@
         {% if forge_user %}
         <div class="mb-3">
           <button type="button" class="btn btn-outline-info w-100" id="savePlanBtn">
-            <i class="bi bi-bookmark-plus me-2"></i>Save to My Plans
+            <i class="bi bi-bookmark-plus me-2"></i>{{ t("preview_save_plans") }}
           </button>
         </div>
         {% endif %}
@@ -216,22 +220,22 @@
 
           <div class="mb-3">
             <label for="schedule_date" class="form-label fw-semibold">
-              <i class="bi bi-calendar3 me-1"></i>Schedule on Garmin (optional)
+              <i class="bi bi-calendar3 me-1"></i>{{ t("preview_schedule_label") }}
             </label>
             <input type="date" class="form-control bg-dark border-secondary text-white"
                    id="schedule_date" name="schedule_date" />
-            <div class="form-text">Leave blank to save as an unscheduled workout.</div>
+            <div class="form-text">{{ t("preview_schedule_hint") }}</div>
           </div>
 
           <button type="submit" class="btn btn-garmin w-100 py-3 fw-bold fs-5" id="uploadBtn">
-            <i class="bi bi-cloud-arrow-up me-2"></i>Upload to Garmin Connect
+            <i class="bi bi-cloud-arrow-up me-2"></i>{{ t("preview_upload_garmin") }}
           </button>
         </form>
         {% else %}
         <div class="text-center p-3 border border-secondary rounded">
-          <p class="text-muted mb-2">Connect your Garmin account to upload this workout.</p>
+          <p class="text-muted mb-2">{{ t("preview_connect_prompt") }}</p>
           <a href="/auth/login-forge" class="btn btn-outline-secondary">
-            <i class="bi bi-box-arrow-in-right me-2"></i>Connect Garmin Account
+            <i class="bi bi-box-arrow-in-right me-2"></i>{{ t("preview_connect_btn") }}
           </a>
         </div>
         {% endif %}
@@ -244,10 +248,22 @@
 
 {% block scripts %}
 <script>
+const MSG_MIN              = {{ t("form_min") | tojson }};
+const MSG_REGENERATE       = {{ t("form_regenerate_btn") | tojson }};
+const MSG_REGENERATING     = {{ t("form_generating") | tojson }};
+const MSG_UPLOADING        = {{ t("preview_uploading") | tojson }};
+const MSG_UPLOAD           = {{ t("preview_upload_garmin") | tojson }};
+const MSG_SAVING           = {{ t("preview_saving") | tojson }};
+const MSG_SAVED            = {{ t("preview_saved") | tojson }};
+const MSG_SAVE             = {{ t("preview_save_plans") | tojson }};
+const MSG_SAVE_FAILED      = {{ t("preview_save_failed") | tojson }};
+const MSG_SELECTED_SUFFIX  = {{ t("preview_selected_suffix") | tojson }};
+const MSG_NO_EQUIPMENT     = {{ t("preview_no_equipment") | tojson }};
+
 const durationInput = document.getElementById('duration');
 const durationLabel = document.getElementById('durationLabel');
 durationInput.addEventListener('input', () => {
-  durationLabel.textContent = durationInput.value + ' min';
+  durationLabel.textContent = durationInput.value + ' ' + MSG_MIN;
 });
 
 const eqCheckboxes = document.querySelectorAll('.equipment-cb');
@@ -256,7 +272,7 @@ function updateEqCount() {
   const checked = document.querySelectorAll('.equipment-cb:checked');
   const n = checked.length;
   const onlyBodyweight = n === 1 && checked[0].value === 'bodyweight';
-  eqCount.textContent = (n === 0 || onlyBodyweight) ? 'No equipment' : `${n} selected`;
+  eqCount.textContent = (n === 0 || onlyBodyweight) ? MSG_NO_EQUIPMENT : (n + MSG_SELECTED_SUFFIX);
 }
 eqCheckboxes.forEach(cb => cb.addEventListener('change', function() {
   if (this.checked && this.value === 'bodyweight') {
@@ -270,18 +286,18 @@ eqCheckboxes.forEach(cb => cb.addEventListener('change', function() {
 
 document.getElementById('uploadBtn')?.addEventListener('click', function() {
   this.disabled = true;
-  this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading…';
+  this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>' + MSG_UPLOADING;
   document.getElementById('uploadForm').submit();
 });
 
 document.getElementById('generateBtn')?.addEventListener('click', function() {
   this.disabled = true;
-  this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Generating…';
+  this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>' + MSG_REGENERATING;
 });
 
 document.getElementById('savePlanBtn')?.addEventListener('click', async function() {
   this.disabled = true;
-  this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving…';
+  this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>' + MSG_SAVING;
   try {
     const resp = await fetch('/my/plans', {
       method: 'POST',
@@ -296,15 +312,15 @@ document.getElementById('savePlanBtn')?.addEventListener('click', async function
       })
     });
     if (resp.ok) {
-      this.innerHTML = '<i class="bi bi-bookmark-check-fill me-2"></i>Saved!';
+      this.innerHTML = '<i class="bi bi-bookmark-check-fill me-2"></i>' + MSG_SAVED;
       this.classList.replace('btn-outline-info', 'btn-success');
     } else {
       throw new Error('Server error');
     }
   } catch {
     this.disabled = false;
-    this.innerHTML = '<i class="bi bi-bookmark-plus me-2"></i>Save to My Plans';
-    alert('Save failed. Please try again.');
+    this.innerHTML = '<i class="bi bi-bookmark-plus me-2"></i>' + MSG_SAVE;
+    alert(MSG_SAVE_FAILED);
   }
 });
 </script>

@@ -26,6 +26,7 @@ class User(Base):
     google_sub: Mapped[str | None] = mapped_column(String(128), unique=True, nullable=True, index=True)
     apple_sub: Mapped[str | None] = mapped_column(String(128), unique=True, nullable=True)
     garmin_token_b64: Mapped[str | None] = mapped_column(Text, nullable=True)
+    preferred_lang: Mapped[str | None] = mapped_column(String(5), nullable=True)
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

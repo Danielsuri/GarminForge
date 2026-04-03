@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %}GarminForge — My Plans{% endblock %}
+{% block title %}GarminForge — {{ t("plans_title") }}{% endblock %}
 
 {% block content %}
 <div class="d-flex align-items-center justify-content-between mb-4">
-  <h2 class="fw-bold mb-0"><i class="bi bi-bookmark-fill text-info me-2"></i>My Plans</h2>
+  <h2 class="fw-bold mb-0"><i class="bi bi-bookmark-fill text-info me-2"></i>{{ t("plans_title") }}</h2>
   <a href="/" class="btn btn-outline-secondary btn-sm">
-    <i class="bi bi-plus-lg me-1"></i>Generate New
+    <i class="bi bi-plus-lg me-1"></i>{{ t("plans_generate_new") }}
   </a>
 </div>
 
@@ -19,18 +19,18 @@
           <div class="fw-semibold">
             <span class="me-1">{{ goal_icons.get(plan.goal, '🏋️') }}</span>{{ plan.name }}
           </div>
-          <span class="badge bg-secondary flex-shrink-0">{{ plan.duration_minutes }} min</span>
+          <span class="badge bg-secondary flex-shrink-0">{{ plan.duration_minutes }} {{ t("form_min") }}</span>
         </div>
         <div class="text-muted small mb-3">
           <i class="bi bi-calendar3 me-1"></i>
-          Saved {{ plan.created_at.strftime('%b %d, %Y') }}
+          {{ t("plans_saved") }} {{ plan.created_at.strftime('%d/%m/%Y') if lang == 'he' else plan.created_at.strftime('%b %d, %Y') }}
         </div>
         <div class="d-flex gap-2">
           <a href="/my/plans/{{ plan.id }}/preview" class="btn btn-outline-info btn-sm flex-grow-1">
-            <i class="bi bi-eye me-1"></i>Preview
+            <i class="bi bi-eye me-1"></i>{{ t("plans_preview") }}
           </a>
           <button class="btn btn-outline-danger btn-sm"
-                  onclick="deletePlan('{{ plan.id }}')" title="Delete plan">
+                  onclick="deletePlan('{{ plan.id }}')" title="{{ t('plans_delete_confirm') }}">
             <i class="bi bi-trash"></i>
           </button>
         </div>
@@ -43,10 +43,10 @@
 {% else %}
 <div class="text-center py-5">
   <div class="text-muted mb-3" style="font-size:3rem">📋</div>
-  <h5 class="text-muted">No saved plans yet</h5>
-  <p class="text-muted small">Generate a workout and click <strong>Save to My Plans</strong> to save it here.</p>
+  <h5 class="text-muted">{{ t("plans_no_plans") }}</h5>
+  <p class="text-muted small">{{ t("plans_no_plans_desc") }}</p>
   <a href="/" class="btn btn-garmin">
-    <i class="bi bi-lightning-charge-fill me-2"></i>Generate a Workout
+    <i class="bi bi-lightning-charge-fill me-2"></i>{{ t("plans_generate_btn") }}
   </a>
 </div>
 {% endif %}
@@ -55,8 +55,11 @@
 
 {% block scripts %}
 <script>
+const MSG_DELETE_CONFIRM = {{ t("plans_delete_confirm") | tojson }};
+const MSG_DELETE_ERROR   = {{ t("plans_delete_error") | tojson }};
+
 async function deletePlan(id) {
-  if (!confirm('Delete this plan?')) return;
+  if (!confirm(MSG_DELETE_CONFIRM)) return;
   const resp = await fetch(`/my/plans/${id}`, {method: 'DELETE'});
   if (resp.ok) {
     const card = document.getElementById(`plan-card-${id}`);
@@ -65,7 +68,7 @@ async function deletePlan(id) {
       location.reload();
     }
   } else {
-    alert('Could not delete plan. Please try again.');
+    alert(MSG_DELETE_ERROR);
   }
 }
 </script>
