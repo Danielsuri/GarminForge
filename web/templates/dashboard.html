@@ -101,6 +101,15 @@ durationInput.addEventListener('input', () => {
 new TomSelect('#equipmentSelect', {
   plugins: ['remove_button', 'clear_button'],
   maxOptions: null,
+  onItemAdd: function(value) {
+    if (value === 'bodyweight') {
+      // "No Equipment" selected — clear everything else
+      this.getValue().forEach(v => { if (v !== 'bodyweight') this.removeItem(v, true); });
+    } else {
+      // Any real equipment selected — deselect "No Equipment"
+      this.removeItem('bodyweight', true);
+    }
+  },
   score: function(search) {
     let regex;
     try {

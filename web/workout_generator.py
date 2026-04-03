@@ -91,12 +91,12 @@ GOALS: dict[str, dict[str, Any]] = {
 # `garmin_key` — Garmin's official equipmentTypeKey (from exercise_equipments.properties)
 # `label`      — display name shown to the user
 EQUIPMENT_OPTIONS: list[dict[str, str]] = [
+    {"tag": "bodyweight",    "garmin_key": None,            "label": "No Equipment",       "icon": "🧘"},
     {"tag": "barbell",       "garmin_key": "BARBELL",       "label": "Barbell",           "icon": "🏋️"},
     {"tag": "dumbbell",      "garmin_key": "DUMBBELL",      "label": "Dumbbells",          "icon": "🤸"},
     {"tag": "kettlebell",    "garmin_key": "KETTLEBELL",    "label": "Kettlebell",         "icon": "🫙"},
     {"tag": "cable",         "garmin_key": "CABLE_MACHINE", "label": "Cable Machine",      "icon": "🔗"},
     {"tag": "machine",       "garmin_key": "MACHINE",       "label": "Weight Machines",    "icon": "⚙️"},
-    {"tag": "bodyweight",    "garmin_key": None,            "label": "Bodyweight Only",    "icon": "🧘"},
     {"tag": "band",          "garmin_key": "BAND",          "label": "Resistance Bands",   "icon": "🪢"},
     {"tag": "pullup_bar",    "garmin_key": "PULLUP_BAR",    "label": "Pull-up Bar",        "icon": "🔝"},
     {"tag": "bench",         "garmin_key": "BENCH",         "label": "Bench",              "icon": "🪑"},
@@ -173,8 +173,8 @@ _POOL: list[_ExTemplate] = [
     _ExTemplate("ROW",              "T_BAR_ROW",                     "T-Bar Row",                     "pull",   ["compound"], ["barbell"]),
     _ExTemplate("ROW",              "SEATED_CABLE_ROW",              "Seated Cable Row",              "pull",   ["compound"], ["cable"]),
     _ExTemplate("ROW",              "FACE_PULL",                     "Face Pull",                     "pull",   ["isolation"], ["cable"]),
-    _ExTemplate("ROW",              "INVERTED_ROW",                  "Inverted Row",                  "pull",   ["compound"], ["bodyweight"]),
-    _ExTemplate("HYPEREXTENSION",   "BACK_EXTENSION",                "Back Extension",                "pull",   ["isolation"], ["bodyweight", "machine"]),
+    _ExTemplate("ROW",              "INVERTED_ROW",                  "Inverted Row",                  "pull",   ["compound"], ["pullup_bar", "barbell", "smith_machine", "trx", "rings"]),
+    _ExTemplate("HYPEREXTENSION",   "BACK_EXTENSION",                "Back Extension",                "pull",   ["isolation"], ["bench", "machine"]),
     # PULL — isolation
     _ExTemplate("CURL",             "BARBELL_CURL",                  "Barbell Curl",                  "arms_bi",["isolation"], ["barbell"]),
     _ExTemplate("CURL",             "DUMBBELL_CURL",                 "Dumbbell Curl",                 "arms_bi",["isolation"], ["dumbbell"]),
@@ -221,7 +221,7 @@ _POOL: list[_ExTemplate] = [
     _ExTemplate("TRICEPS_EXTENSION","TRICEPS_PUSHDOWN",              "Triceps Pushdown",              "arms_tri",["isolation"], ["cable"]),
     _ExTemplate("TRICEPS_EXTENSION","SKULL_CRUSHER",                 "Skull Crusher",                 "arms_tri",["isolation"], ["barbell", "dumbbell", "ez_bar"]),
     _ExTemplate("TRICEPS_EXTENSION","OVERHEAD_DUMBBELL_TRICEPS_EXTENSION","Overhead DB Triceps Ext.","arms_tri",["isolation"], ["dumbbell"]),
-    _ExTemplate("TRICEPS_EXTENSION","TRICEPS_DIP",                   "Triceps Dip",                   "arms_tri",["isolation"], ["bodyweight", "bench"]),
+    _ExTemplate("TRICEPS_EXTENSION","TRICEPS_DIP",                   "Triceps Dip",                   "arms_tri",["isolation"], ["bench"]),
 
     # -----------------------------------------------------------------------
     # CORE
@@ -443,6 +443,10 @@ class ExerciseInfo:
     rest_seconds: float
     link:         str
     description:  str   # embedded in Garmin step
+    # Human-readable labels of equipment needed to perform this exercise.
+    # Empty list means the exercise can be done with no apparatus (pure bodyweight).
+    # When non-empty, the user needs at least one of the listed items.
+    required_equipment_labels: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -511,6 +515,8 @@ def generate(
     }
 
     # --- build ExerciseInfo list --------------------------------------------
+    _eq_label: dict[str, str] = {eq["tag"]: f"{eq['icon']} {eq['label']}" for eq in EQUIPMENT_OPTIONS}
+
     exercises: list[ExerciseInfo] = []
     for tmpl in templates:
         is_timed = tmpl.name in TIMED_EXERCISES
@@ -524,6 +530,14 @@ def generate(
             hold = None
             actual_reps = reps
 
+        # If "bodyweight" is among the equipment tags the exercise can be
+        # performed with no apparatus at all; the other tags are optional
+        # enhancements. Otherwise the user needs at least one listed item.
+        if "bodyweight" in tmpl.equipment:
+            req_labels: list[str] = []
+        else:
+            req_labels = [_eq_label[t] for t in tmpl.equipment if t in _eq_label]
+
         ex = ExerciseInfo(
             category=tmpl.category,
             name=tmpl.name,
@@ -535,6 +549,7 @@ def generate(
             rest_seconds=rest,
             link=link,
             description="",  # filled below from actual values
+            required_equipment_labels=req_labels,
         )
         # Build description from the same values that go into the Garmin step
         if ex.duration_sec is not None:
