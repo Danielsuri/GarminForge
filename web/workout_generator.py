@@ -174,7 +174,7 @@ _POOL: list[_ExTemplate] = [
     _ExTemplate("ROW",              "SEATED_CABLE_ROW",              "Seated Cable Row",              "pull",   ["compound"], ["cable"]),
     _ExTemplate("ROW",              "FACE_PULL",                     "Face Pull",                     "pull",   ["isolation"], ["cable"]),
     _ExTemplate("ROW",              "INVERTED_ROW",                  "Inverted Row",                  "pull",   ["compound"], ["pullup_bar", "barbell", "smith_machine", "trx", "rings"]),
-    _ExTemplate("HYPEREXTENSION",   "BACK_EXTENSION",                "Back Extension",                "pull",   ["isolation"], ["bodyweight", "machine"]),
+    _ExTemplate("HYPEREXTENSION",   "BACK_EXTENSION",                "Back Extension",                "pull",   ["isolation"], ["bench", "machine"]),
     # PULL — isolation
     _ExTemplate("CURL",             "BARBELL_CURL",                  "Barbell Curl",                  "arms_bi",["isolation"], ["barbell"]),
     _ExTemplate("CURL",             "DUMBBELL_CURL",                 "Dumbbell Curl",                 "arms_bi",["isolation"], ["dumbbell"]),
@@ -221,7 +221,7 @@ _POOL: list[_ExTemplate] = [
     _ExTemplate("TRICEPS_EXTENSION","TRICEPS_PUSHDOWN",              "Triceps Pushdown",              "arms_tri",["isolation"], ["cable"]),
     _ExTemplate("TRICEPS_EXTENSION","SKULL_CRUSHER",                 "Skull Crusher",                 "arms_tri",["isolation"], ["barbell", "dumbbell", "ez_bar"]),
     _ExTemplate("TRICEPS_EXTENSION","OVERHEAD_DUMBBELL_TRICEPS_EXTENSION","Overhead DB Triceps Ext.","arms_tri",["isolation"], ["dumbbell"]),
-    _ExTemplate("TRICEPS_EXTENSION","TRICEPS_DIP",                   "Triceps Dip",                   "arms_tri",["isolation"], ["bodyweight", "bench"]),
+    _ExTemplate("TRICEPS_EXTENSION","TRICEPS_DIP",                   "Triceps Dip",                   "arms_tri",["isolation"], ["bench"]),
 
     # -----------------------------------------------------------------------
     # CORE
