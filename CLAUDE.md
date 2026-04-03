@@ -87,9 +87,20 @@ Key routes:
 
 `web/exercise_links.py` — maps exercise names to tutorial/reference URLs shown in the workout preview.
 
+## Garmin API reference map
+
+**`docs/garmin_api_map.md`** — read this before touching any workout payload or API call.
+It documents verified (from live API responses) values for:
+- Sport type IDs (`sportTypeId: 5` = strength_training, NOT 4 which is pool swimming)
+- Step schema: `type` discriminator, `stepTypeId`/`stepTypeKey`/`displayOrder` for every step type
+- End condition format: value goes in top-level `endConditionValue`, not inside `endCondition`
+- Exercise field names: `"category"` (not `"exerciseCategory"`), `"exerciseName"`
+- All API endpoints and why calls must bypass `garminconnect.connectapi`
+
 ## Key constraints to keep in mind
 
 - The 50-step limit is a hard Garmin server constraint, not just a local check.
 - Rate limits: 1 s inter-call delay by default in `GarminForgeClient`; login endpoint triggers a 15-min lockout after ~5–10 rapid attempts.
 - `garth` version is pinned to `<0.9` due to API compatibility; `auth.py` has a `_garth()` compatibility shim for garminconnect versions that expose `client.garth` vs. the module-level client.
 - `ruff` line length is 100; `mypy` is set to strict mode.
+- All Garmin Connect API calls use `_garth(client).connectapi(...)` directly — never `garminconnect.connectapi` (hardcodes GET, separate auth state).
