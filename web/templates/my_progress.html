@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}GarminForge — My Progress{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <h2 class="fw-bold mb-0"><i class="bi bi-bar-chart-fill text-success me-2"></i>My Progress</h2>
+</div>
+
+{% set completed = sessions | selectattr('completed_at') | list %}
+{% set total = sessions | length %}
+
+<!-- Summary stats -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="stat-card text-center p-3 rounded">
+      <div class="stat-value">{{ total }}</div>
+      <div class="stat-label">Sessions</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card text-center p-3 rounded">
+      <div class="stat-value">{{ completed | length }}</div>
+      <div class="stat-label">Completed</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card text-center p-3 rounded">
+      <div class="stat-value">
+        {% if total > 0 %}{{ ((completed | length) / total * 100) | int }}%{% else %}—{% endif %}
+      </div>
+      <div class="stat-label">Finish Rate</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card text-center p-3 rounded">
+      <div class="stat-value">
+        {% if completed %}
+          {% set total_min = namespace(v=0) %}
+          {% for s in completed %}
+            {% if s.completed_at %}
+              {% set total_min.v = total_min.v + ((s.completed_at - s.started_at).seconds // 60) %}
+            {% endif %}
+          {% endfor %}
+          {{ total_min.v }}
+        {% else %}0{% endif %}
+      </div>
+      <div class="stat-label">Total Min</div>
+    </div>
+  </div>
+</div>
+
+<!-- Session history -->
+{% if sessions %}
+<div class="card bg-dark-subtle border-secondary">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-dark table-hover mb-0">
+        <thead class="border-secondary">
+          <tr>
+            <th class="ps-4">Workout</th>
+            <th>Date</th>
+            <th>Duration</th>
+            <th>Progress</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in sessions %}
+          <tr>
+            <td class="ps-4 fw-semibold">{{ s.plan_name }}</td>
+            <td class="text-muted small">{{ s.started_at.strftime('%b %d, %Y') }}</td>
+            <td class="text-muted small">
+              {% if s.completed_at %}
+                {{ ((s.completed_at - s.started_at).seconds // 60) }} min
+              {% else %}—{% endif %}
+            </td>
+            <td>
+              {% if s.total_exercises > 0 %}
+              <div class="d-flex align-items-center gap-2">
+                <div class="progress flex-grow-1" style="height:6px;min-width:80px">
+                  <div class="progress-bar bg-success"
+                       style="width:{{ (s.exercises_completed / s.total_exercises * 100) | int }}%">
+                  </div>
+                </div>
+                <span class="text-muted small">{{ s.exercises_completed }}/{{ s.total_exercises }}</span>
+              </div>
+              {% else %}—{% endif %}
+            </td>
+            <td>
+              {% if s.completed_at %}
+                <span class="badge bg-success"><i class="bi bi-check-lg me-1"></i>Done</span>
+              {% else %}
+                <span class="badge bg-secondary">In progress</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% else %}
+<div class="text-center py-5">
+  <div class="text-muted mb-3" style="font-size:3rem">📊</div>
+  <h5 class="text-muted">No sessions logged yet</h5>
+  <p class="text-muted small">Complete a workout in the player and your history will appear here.</p>
+  <a href="/" class="btn btn-garmin">
+    <i class="bi bi-lightning-charge-fill me-2"></i>Generate a Workout
+  </a>
+</div>
+{% endif %}
+
+{% endblock %}

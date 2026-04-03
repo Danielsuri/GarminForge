@@ -25,15 +25,29 @@
       <span>GarminForge</span>
     </a>
     <div class="ms-auto d-flex align-items-center gap-3">
-      {% if authenticated %}
-        <span class="text-success small d-flex align-items-center gap-1">
-          <i class="bi bi-shield-check-fill"></i> Connected
-        </span>
+      {% if forge_user %}
+        {% if authenticated %}
+          <span class="text-success small d-flex align-items-center gap-1">
+            <i class="bi bi-shield-check-fill"></i> Garmin Connected
+          </span>
+        {% else %}
+          <span class="text-warning small d-flex align-items-center gap-1">
+            <i class="bi bi-exclamation-triangle-fill"></i> Garmin not connected
+          </span>
+        {% endif %}
+        <a href="/my/plans" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-bookmark me-1"></i>My Plans
+        </a>
+        <a href="/my/progress" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-bar-chart me-1"></i>Progress
+        </a>
+        <span class="text-muted small">{{ forge_user.display_name or forge_user.email }}</span>
         <a href="/auth/logout" class="btn btn-outline-secondary btn-sm">
           <i class="bi bi-box-arrow-right"></i> Log out
         </a>
       {% else %}
-        <span class="text-muted small">Not connected</span>
+        <a href="/auth/login-forge" class="btn btn-outline-secondary btn-sm">Sign In</a>
+        <a href="/auth/register" class="btn btn-garmin btn-sm">Register</a>
       {% endif %}
     </div>
   </div>

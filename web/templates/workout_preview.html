@@ -161,6 +161,15 @@
           </div>
         </div>
 
+        <!-- Save to My Plans -->
+        {% if forge_user %}
+        <div class="mb-3">
+          <button type="button" class="btn btn-outline-info w-100" id="savePlanBtn">
+            <i class="bi bi-bookmark-plus me-2"></i>Save to My Plans
+          </button>
+        </div>
+        {% endif %}
+
         <!-- Upload form -->
         <form method="post" action="/workout/upload" id="uploadForm">
           <input type="hidden" name="payload_json" value="{{ payload_json | e }}" />
@@ -210,6 +219,35 @@ document.getElementById('uploadBtn')?.addEventListener('click', function() {
 document.getElementById('generateBtn')?.addEventListener('click', function() {
   this.disabled = true;
   this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Generating…';
+});
+
+document.getElementById('savePlanBtn')?.addEventListener('click', async function() {
+  this.disabled = true;
+  this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving…';
+  try {
+    const resp = await fetch('/my/plans', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        name: {{ plan.name | tojson }},
+        goal: {{ selected_goal | tojson }},
+        equipment: {{ selected_equipment | tojson }},
+        duration_minutes: {{ selected_duration }},
+        exercises: {{ exercises_json | safe }},
+        garmin_payload: {{ payload_json | safe }},
+      })
+    });
+    if (resp.ok) {
+      this.innerHTML = '<i class="bi bi-bookmark-check-fill me-2"></i>Saved!';
+      this.classList.replace('btn-outline-info', 'btn-success');
+    } else {
+      throw new Error('Server error');
+    }
+  } catch {
+    this.disabled = false;
+    this.innerHTML = '<i class="bi bi-bookmark-plus me-2"></i>Save to My Plans';
+    alert('Save failed. Please try again.');
+  }
 });
 </script>
 {% endblock %}
