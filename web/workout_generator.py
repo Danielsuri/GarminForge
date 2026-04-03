@@ -443,6 +443,10 @@ class ExerciseInfo:
     rest_seconds: float
     link:         str
     description:  str   # embedded in Garmin step
+    # Human-readable labels of equipment needed to perform this exercise.
+    # Empty list means the exercise can be done with no apparatus (pure bodyweight).
+    # When non-empty, the user needs at least one of the listed items.
+    required_equipment_labels: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -511,6 +515,8 @@ def generate(
     }
 
     # --- build ExerciseInfo list --------------------------------------------
+    _eq_label: dict[str, str] = {eq["tag"]: f"{eq['icon']} {eq['label']}" for eq in EQUIPMENT_OPTIONS}
+
     exercises: list[ExerciseInfo] = []
     for tmpl in templates:
         is_timed = tmpl.name in TIMED_EXERCISES
@@ -524,6 +530,14 @@ def generate(
             hold = None
             actual_reps = reps
 
+        # If "bodyweight" is among the equipment tags the exercise can be
+        # performed with no apparatus at all; the other tags are optional
+        # enhancements. Otherwise the user needs at least one listed item.
+        if "bodyweight" in tmpl.equipment:
+            req_labels: list[str] = []
+        else:
+            req_labels = [_eq_label[t] for t in tmpl.equipment if t in _eq_label]
+
         ex = ExerciseInfo(
             category=tmpl.category,
             name=tmpl.name,
@@ -535,6 +549,7 @@ def generate(
             rest_seconds=rest,
             link=link,
             description="",  # filled below from actual values
+            required_equipment_labels=req_labels,
         )
         # Build description from the same values that go into the Garmin step
         if ex.duration_sec is not None:
