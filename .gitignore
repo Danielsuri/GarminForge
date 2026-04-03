@@ -30,6 +30,9 @@ oauth2_token.json
 # Dev/debug scripts (not part of the app)
 scripts/
 
+# Example captures may contain credentials
+examples/
+
 # IDE
 .vscode/
 .idea/

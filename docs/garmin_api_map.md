@@ -89,6 +89,35 @@ e.g. `"category": "SQUAT"`, `"exerciseName": "GOBLET_SQUAT"`.
 
 ---
 
+## SSO login flow (new portal, verified from browser capture)
+
+The new Garmin SSO portal (live as of 2026) uses a different API than the old `/mobile/api/login` (blocked) and the embed page we use with Playwright.
+
+**Step 1 — load portal page (sets session cookies):**
+```
+GET https://sso.garmin.com/portal/sso/en-US/sign-in
+    ?clientId=GarminConnect&service=https://connect.garmin.com/app
+```
+
+**Step 2 — submit credentials:**
+```
+POST https://sso.garmin.com/portal/api/login
+     ?clientId=GarminConnect&locale=en-US&service=https://connect.garmin.com/app
+Content-Type: application/json
+
+{"username": "...", "password": "...", "rememberMe": true, "captchaToken": ""}
+```
+- `captchaToken` is empty string when no CAPTCHA is shown (typical for trusted IPs)
+- Response redirects to `https://connect.garmin.com/app?ticket=ST-...`
+
+**Step 3 — extract ticket from redirect URL and exchange for OAuth tokens** (same as current Playwright flow).
+
+> **Potential**: This endpoint may allow a headless `requests`-based login without Playwright,
+> if no CAPTCHA is triggered. Playwright remains the safe fallback when CAPTCHA appears.
+> **⚠ WARNING**: Never commit files containing credentials. `examples/` is in `.gitignore`.
+
+---
+
 ## API call notes
 
 - **All** API calls must use `_garth(client).connectapi(path, method=..., json=...)` directly.
