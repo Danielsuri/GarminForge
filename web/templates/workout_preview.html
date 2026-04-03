@@ -221,10 +221,20 @@ durationInput.addEventListener('input', () => {
 const eqCheckboxes = document.querySelectorAll('.equipment-cb');
 const eqCount = document.getElementById('eqCount');
 function updateEqCount() {
-  const n = document.querySelectorAll('.equipment-cb:checked').length;
-  eqCount.textContent = n === 0 ? '0 selected (bodyweight)' : `${n} selected`;
+  const checked = document.querySelectorAll('.equipment-cb:checked');
+  const n = checked.length;
+  const onlyBodyweight = n === 1 && checked[0].value === 'bodyweight';
+  eqCount.textContent = (n === 0 || onlyBodyweight) ? 'No equipment' : `${n} selected`;
 }
-eqCheckboxes.forEach(cb => cb.addEventListener('change', updateEqCount));
+eqCheckboxes.forEach(cb => cb.addEventListener('change', function() {
+  if (this.checked && this.value === 'bodyweight') {
+    eqCheckboxes.forEach(other => { if (other !== this) other.checked = false; });
+  } else if (this.checked) {
+    const bwCb = document.getElementById('eq_bodyweight');
+    if (bwCb) bwCb.checked = false;
+  }
+  updateEqCount();
+}));
 
 document.getElementById('uploadBtn')?.addEventListener('click', function() {
   this.disabled = true;

@@ -91,12 +91,12 @@ GOALS: dict[str, dict[str, Any]] = {
 # `garmin_key` — Garmin's official equipmentTypeKey (from exercise_equipments.properties)
 # `label`      — display name shown to the user
 EQUIPMENT_OPTIONS: list[dict[str, str]] = [
+    {"tag": "bodyweight",    "garmin_key": None,            "label": "No Equipment",       "icon": "🧘"},
     {"tag": "barbell",       "garmin_key": "BARBELL",       "label": "Barbell",           "icon": "🏋️"},
     {"tag": "dumbbell",      "garmin_key": "DUMBBELL",      "label": "Dumbbells",          "icon": "🤸"},
     {"tag": "kettlebell",    "garmin_key": "KETTLEBELL",    "label": "Kettlebell",         "icon": "🫙"},
     {"tag": "cable",         "garmin_key": "CABLE_MACHINE", "label": "Cable Machine",      "icon": "🔗"},
     {"tag": "machine",       "garmin_key": "MACHINE",       "label": "Weight Machines",    "icon": "⚙️"},
-    {"tag": "bodyweight",    "garmin_key": None,            "label": "Bodyweight Only",    "icon": "🧘"},
     {"tag": "band",          "garmin_key": "BAND",          "label": "Resistance Bands",   "icon": "🪢"},
     {"tag": "pullup_bar",    "garmin_key": "PULLUP_BAR",    "label": "Pull-up Bar",        "icon": "🔝"},
     {"tag": "bench",         "garmin_key": "BENCH",         "label": "Bench",              "icon": "🪑"},
