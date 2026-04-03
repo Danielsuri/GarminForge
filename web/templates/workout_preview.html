@@ -121,35 +121,57 @@
 
         <!-- Exercise list -->
         <div class="exercise-list mb-4">
-          <div class="d-flex align-items-center gap-2 mb-2">
+
+          <!-- Warm-up -->
+          <div class="d-flex align-items-center gap-2 mb-3">
             <div class="step-badge bg-secondary text-white rounded-pill px-2 py-0" style="font-size:.7rem">WARM-UP</div>
             <span class="text-muted small">5 min general warm-up</span>
           </div>
 
-          {% for ex in plan.exercises %}
-          <div class="exercise-item d-flex align-items-start gap-3 py-3 border-top border-secondary">
-            <div class="step-number flex-shrink-0">{{ loop.index }}</div>
-            <div class="flex-grow-1">
-              <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap">
-                <div>
-                  <span class="fw-semibold">{{ ex.label }}</span>
-                  <span class="badge bg-secondary ms-2 text-capitalize" style="font-size:.65rem">
-                    {{ ex.muscle_group.replace('_', ' ') }}
-                  </span>
-                </div>
-                <a href="{{ ex.link }}" target="_blank" rel="noopener noreferrer"
-                   class="btn btn-outline-secondary btn-sm py-0 px-2 flex-shrink-0" title="How to perform">
-                  <i class="bi bi-play-circle me-1"></i>Tutorial
-                </a>
+          <!-- Circuit block -->
+          {% set sets_count = plan.exercises[0].sets if plan.exercises else 3 %}
+          <div class="circuit-block rounded-3 mb-3" style="border: 2px solid var(--bs-info); overflow: hidden;">
+
+            <!-- Circuit header -->
+            <div class="circuit-header d-flex align-items-center justify-content-between px-3 py-2"
+                 style="background: rgba(13,202,240,.12); border-bottom: 1px solid rgba(13,202,240,.3);">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-arrow-repeat text-info fs-5"></i>
+                <span class="fw-bold text-info" style="letter-spacing:.04em">CIRCUIT</span>
+                <span class="text-muted small">— do all {{ plan.exercises | length }} exercises, then repeat</span>
               </div>
-              <div class="text-muted small mt-1">
-                {% if ex.reps %}
-                  <i class="bi bi-repeat me-1"></i>{{ ex.sets }} sets × {{ ex.reps }} reps
-                {% else %}
-                  <i class="bi bi-stopwatch me-1"></i>{{ ex.sets }} sets × {{ ex.duration_sec | int }}s hold
-                {% endif %}
-                &nbsp;·&nbsp;
-                <i class="bi bi-hourglass-split me-1"></i>{{ ex.rest_seconds | int }}s rest
+              <span class="badge fs-6 px-3 py-1 fw-bold" style="background: var(--bs-info); color:#000;">
+                × {{ sets_count }} rounds
+              </span>
+            </div>
+
+            <!-- Exercises -->
+            {% for ex in plan.exercises %}
+            <div class="exercise-item d-flex align-items-start gap-3 px-3 py-3
+                         {% if not loop.last %}border-bottom border-secondary{% endif %}">
+              <div class="step-number flex-shrink-0">{{ loop.index }}</div>
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap">
+                  <div>
+                    <span class="fw-semibold">{{ ex.label }}</span>
+                    <span class="badge bg-secondary ms-2 text-capitalize" style="font-size:.65rem">
+                      {{ ex.muscle_group.replace('_', ' ') }}
+                    </span>
+                  </div>
+                  <a href="{{ ex.link }}" target="_blank" rel="noopener noreferrer"
+                     class="btn btn-outline-secondary btn-sm py-0 px-2 flex-shrink-0" title="How to perform">
+                    <i class="bi bi-play-circle me-1"></i>Tutorial
+                  </a>
+                </div>
+                <div class="text-muted small mt-1">
+                  {% if ex.reps %}
+                    <i class="bi bi-repeat me-1"></i>{{ ex.reps }} reps
+                  {% else %}
+                    <i class="bi bi-stopwatch me-1"></i>{{ ex.duration_sec | int }}s hold
+                  {% endif %}
+                  &nbsp;·&nbsp;
+                  <i class="bi bi-hourglass-split me-1"></i>{{ ex.rest_seconds | int }}s rest
+                </div>
               </div>
               {% if ex.required_equipment_labels %}
               <div class="mt-1" style="font-size:.72rem">
@@ -159,10 +181,20 @@
               </div>
               {% endif %}
             </div>
-          </div>
-          {% endfor %}
+            {% endfor %}
 
-          <div class="d-flex align-items-center gap-2 mt-2 pt-2 border-top border-secondary">
+            <!-- Round repeat footer -->
+            <div class="d-flex align-items-center gap-2 px-3 py-2"
+                 style="background: rgba(13,202,240,.07); border-top: 1px dashed rgba(13,202,240,.3);">
+              <i class="bi bi-arrow-counterclockwise text-info"></i>
+              <span class="text-info small fw-semibold">
+                Rest 90s, then repeat from exercise 1 — {{ sets_count }} rounds total
+              </span>
+            </div>
+          </div>
+
+          <!-- Cool-down -->
+          <div class="d-flex align-items-center gap-2 pt-1">
             <div class="step-badge bg-secondary text-white rounded-pill px-2 py-0" style="font-size:.7rem">COOL-DOWN</div>
             <span class="text-muted small">Cool-down + stretch</span>
           </div>
