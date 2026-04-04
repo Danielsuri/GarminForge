@@ -77,6 +77,17 @@
         </form>
       </div>
     </div>
+
+    <!-- Muscle map -->
+    <div id="muscle-map-container" class="card bg-dark-subtle border-secondary mt-3 p-3">
+      <h6 class="text-muted mb-2 text-center" style="font-size:.75rem;letter-spacing:.05em;text-transform:uppercase">{{ t("muscle_map_title") }}</h6>
+      {% include "partials/muscle_map.svg" %}
+      <div class="muscle-legend">
+        <span class="legend-dot primary-dot"></span><span>{{ t("muscle_map_primary") }}</span>
+        <span class="legend-dot secondary-dot"></span><span>{{ t("muscle_map_secondary") }}</span>
+        <span class="legend-dot untargeted-dot"></span><span>{{ t("muscle_map_untargeted") }}</span>
+      </div>
+    </div>
   </div>
 
   <!-- Workout preview card (right) -->
@@ -154,7 +165,9 @@
               {% for ex in plan.exercises %}
               <div class="exercise-item d-flex align-items-start gap-2 px-3 py-3
                            {% if not loop.last %}border-bottom border-secondary{% endif %}"
-                   data-index="{{ loop.index0 }}">
+                   data-index="{{ loop.index0 }}"
+                   data-primary='{{ ex.primary_muscles | tojson }}'
+                   data-secondary='{{ ex.secondary_muscles | tojson }}'>
                 <div class="drag-handle flex-shrink-0 pt-1" title="{{ t('edit_drag_to_reorder') }}">
                   <i class="bi bi-grip-vertical fs-5"></i>
                 </div>
@@ -429,9 +442,13 @@ function exerciseRowHTML(ex, idx, isLast) {
     : '';
   const muscleLabel = ex.muscle_group ? ex.muscle_group.replace(/_/g, ' ') : '';
 
+  const primaryJson  = JSON.stringify(ex.primary_muscles   || []);
+  const secondaryJson = JSON.stringify(ex.secondary_muscles || []);
   return `
     <div class="exercise-item d-flex align-items-start gap-2 px-3 py-3 ${borderCls}"
-         data-index="${idx}">
+         data-index="${idx}"
+         data-primary="${esc(primaryJson)}"
+         data-secondary="${esc(secondaryJson)}">
       <div class="drag-handle flex-shrink-0 pt-1" title="${MSG_DRAG}">
         <i class="bi bi-grip-vertical fs-5"></i>
       </div>
@@ -494,6 +511,9 @@ function renderExercises() {
 
   // Re-init Sortable
   initSortable();
+
+  // Update muscle map
+  updateMuscleMap();
 }
 
 /* -----------------------------------------------------------------------
@@ -613,6 +633,8 @@ function selectReplacement(newEx) {
     link:                    newEx.link || '',
     description:             newEx.label,
     required_equipment_labels: newEx.equipment_labels || [],
+    primary_muscles:         newEx.primary_muscles   || [],
+    secondary_muscles:       newEx.secondary_muscles || [],
   };
   renderExercises();
   getReplaceModal().hide();
@@ -703,6 +725,8 @@ function addExercise(newEx) {
     link:                    newEx.link || '',
     description:             newEx.label,
     required_equipment_labels: newEx.equipment_labels || [],
+    primary_muscles:         newEx.primary_muscles   || [],
+    secondary_muscles:       newEx.secondary_muscles || [],
   });
   renderExercises();
   getAddModal().hide();
@@ -854,7 +878,68 @@ window.openAddModal      = openAddModal;
 window.filterAddModal    = filterAddModal;
 window.addExercise       = addExercise;
 
+/* -----------------------------------------------------------------------
+   Muscle map
+   --------------------------------------------------------------------- */
+const MUSCLE_SVG_CLASSES = {
+  chest:       ['FrontChestRight',    'FrontChestLeft'],
+  triceps:     ['BackTricepsLeft',    'BackTricepsRight'],
+  front_delt:  ['FrontShouldersRight','FrontShouldersLeft'],
+  rear_delt:   ['BackShouldersLeft',  'BackShouldersRight'],
+  biceps:      ['FrontBicepsRight',   'FrontBicepsLeft'],
+  forearms:    ['FrontForearmsRight', 'FrontForearmsLeft', 'BackForearmsRight', 'BackForearmsLeft'],
+  lats:        ['BackLatsLeft',       'BackLatsRight'],
+  traps:       ['BackTrapsLeft',      'BackTrapsRight'],
+  abs:         ['FrontAbsRight',      'FrontAbsLeft'],
+  obliques:    ['FrontObliquesRight', 'FrontObliquesLeft'],
+  lower_back:  ['BackLowerBackLeft',  'BackLowerBackRight'],
+  quads:       ['FrontQuadsRight',    'FrontQuadsLeft'],
+  hamstrings:  ['BackHamstringsLeft', 'BackHamstringsRight'],
+  glutes:      ['BackGlutesLeft',     'BackGlutesRight'],
+  hip_flexors: ['FrontHipsRight',     'FrontHipsLeft'],
+  adductors:   ['BackAdductorsRight', 'BackAdductorsLeft'],
+  abductors:   ['BackAbductorsRight', 'BackAbductorsLeft'],
+  calves:      ['BackCalvesLeft',     'BackCalvesRight'],
+  neck:        ['BackNeckRight',      'BackNeckLeft'],
+};
+
+function updateMuscleMap() {
+  const PRIMARY_COLOR    = 'rgb(194, 21, 21)';
+  const SECONDARY_COLOR  = 'rgb(245, 191, 42)';
+  const UNTARGETED_COLOR = 'rgb(216, 216, 216)';
+
+  const primarySet   = new Set();
+  const secondarySet = new Set();
+
+  document.querySelectorAll('.exercise-item').forEach(row => {
+    try {
+      const p = JSON.parse(row.dataset.primary   || '[]');
+      const s = JSON.parse(row.dataset.secondary || '[]');
+      p.forEach(m => primarySet.add(m));
+      s.forEach(m => secondarySet.add(m));
+    } catch (_) { /* ignore malformed data */ }
+  });
+
+  // Reset all muscle paths to untargeted
+  Object.values(MUSCLE_SVG_CLASSES).flat().forEach(cls => {
+    document.querySelectorAll('.' + cls).forEach(el => { el.style.fill = UNTARGETED_COLOR; });
+  });
+
+  // Apply secondary first (primary wins on overlap)
+  secondarySet.forEach(muscle => {
+    (MUSCLE_SVG_CLASSES[muscle] || []).forEach(cls => {
+      document.querySelectorAll('.' + cls).forEach(el => { el.style.fill = SECONDARY_COLOR; });
+    });
+  });
+  primarySet.forEach(muscle => {
+    (MUSCLE_SVG_CLASSES[muscle] || []).forEach(cls => {
+      document.querySelectorAll('.' + cls).forEach(el => { el.style.fill = PRIMARY_COLOR; });
+    });
+  });
+}
+
 initSortable();
+updateMuscleMap();
 })(); // end IIFE
 </script>
 {% endblock %}

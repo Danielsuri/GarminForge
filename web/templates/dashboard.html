@@ -6,7 +6,7 @@
 
   <!-- ===== LEFT: Generator form ===== -->
   <div class="col-12 col-lg-5">
-    <div class="card bg-dark-subtle border-secondary h-100">
+    <div class="card bg-dark-subtle border-secondary">
       <div class="card-header border-secondary">
         <h5 class="mb-0 fw-bold"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>{{ t("form_build_workout") }}</h5>
       </div>
@@ -68,6 +68,9 @@
         </form>
       </div>
     </div>
+
+    <!-- Muscle map — populated by JS after workout generation -->
+    <div id="muscle-map-container" class="card bg-dark-subtle border-secondary mt-3 p-3 d-none"></div>
   </div>
 
   <!-- ===== RIGHT: Preview placeholder / result ===== -->
@@ -180,6 +183,17 @@ document.getElementById('generatorForm').addEventListener('submit', async functi
         const el = doc.getElementById(id);
         if (el) document.body.appendChild(document.adoptNode(el));
       });
+
+      // Inject muscle map from response into dashboard placeholder
+      const respMuscleMap = doc.getElementById('muscle-map-container');
+      const dashMuscleMap = document.getElementById('muscle-map-container');
+      if (respMuscleMap && dashMuscleMap) {
+        while (dashMuscleMap.firstChild) dashMuscleMap.removeChild(dashMuscleMap.firstChild);
+        while (respMuscleMap.firstChild) {
+          dashMuscleMap.appendChild(document.adoptNode(respMuscleMap.firstChild));
+        }
+        dashMuscleMap.classList.remove('d-none');
+      }
 
       // Scripts injected via DOM adoption don't execute automatically.
       // Load externals (SortableJS etc.) first, then run inline IIFE scripts.
