@@ -157,7 +157,8 @@ MUSCLE_SVG_CLASSES: dict[str, list[str]] = {
     "quads":       ["FrontQuadsRight",    "FrontQuadsLeft"],
     "hamstrings":  ["BackHamstringsLeft", "BackHamstringsRight"],
     "glutes":      ["BackGlutesLeft",     "BackGlutesRight"],
-    "hip_flexors": ["FrontHipsRight",     "FrontHipsLeft"],
+    # hip_flexors omitted: FrontHipsRight/Left paths bleed between the legs visually
+
     "adductors":   ["BackAdductorsRight", "BackAdductorsLeft"],
     "abductors":   ["BackAbductorsRight", "BackAbductorsLeft"],
     "calves":      ["BackCalvesLeft",     "BackCalvesRight"],
