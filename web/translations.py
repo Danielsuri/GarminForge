@@ -179,6 +179,18 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "auth_have_account":    "Already have an account?",
         "auth_sign_in_link":    "Sign in",
 
+        # --- Workout editor ---
+        "edit_drag_to_reorder":   "Drag to reorder",
+        "edit_replace":           "Replace",
+        "edit_remove":            "Remove",
+        "edit_add_exercise":      "Add Exercise",
+        "edit_replace_title":     "Replace Exercise",
+        "edit_add_title":         "Add Exercise",
+        "edit_all_muscles":       "All",
+        "edit_no_alternatives":   "No alternatives available for current equipment.",
+        "edit_rebuilding":        "Saving changes\u2026",
+        "edit_rebuild_failed":    "Failed to update workout. Please try again.",
+
         # --- Footer ---
         "footer_text": "unofficial Garmin Connect workout tool",
     },
@@ -348,6 +360,18 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "auth_create_free":     "\u05e6\u05d5\u05e8 \u05d7\u05e9\u05d1\u05d5\u05df \u05d7\u05d9\u05e0\u05dd",
         "auth_have_account":    "\u05db\u05d1\u05e8 \u05d9\u05e9 \u05dc\u05da \u05d7\u05e9\u05d1\u05d5\u05df?",
         "auth_sign_in_link":    "\u05db\u05e0\u05d9\u05e1\u05d4",
+
+        # --- Workout editor ---
+        "edit_drag_to_reorder":   "\u05d2\u05e8\u05d5\u05e8 \u05dc\u05e1\u05d9\u05d3\u05d5\u05e8 \u05de\u05d7\u05d3\u05e9",
+        "edit_replace":           "\u05d4\u05d7\u05dc\u05e4\u05d4",
+        "edit_remove":            "\u05d4\u05e1\u05e8\u05d4",
+        "edit_add_exercise":      "\u05d4\u05d5\u05e1\u05e3 \u05ea\u05e8\u05d2\u05d9\u05dc",
+        "edit_replace_title":     "\u05d4\u05d7\u05dc\u05e4\u05ea \u05ea\u05e8\u05d2\u05d9\u05dc",
+        "edit_add_title":         "\u05d4\u05d5\u05e1\u05e3 \u05ea\u05e8\u05d2\u05d9\u05dc",
+        "edit_all_muscles":       "\u05d4\u05db\u05dc",
+        "edit_no_alternatives":   "\u05d0\u05d9\u05df \u05d7\u05dc\u05d5\u05e4\u05d5\u05ea \u05d6\u05de\u05d9\u05e0\u05d5\u05ea \u05dc\u05e6\u05d9\u05d5\u05d3 \u05d4\u05e7\u05d9\u05d9\u05dd.",
+        "edit_rebuilding":        "\u05e9\u05d5\u05de\u05e8 \u05e9\u05d9\u05e0\u05d5\u05d9\u05d9\u05dd\u2026",
+        "edit_rebuild_failed":    "\u05e2\u05d3\u05db\u05d5\u05df \u05d4\u05d0\u05d9\u05de\u05d5\u05df \u05e0\u05db\u05e9\u05dc. \u05e0\u05e1\u05d4 \u05e9\u05d5\u05d1.",
 
         # --- Footer ---
         "footer_text": "\u05db\u05dc\u05d9 \u05d0\u05d9\u05de\u05d5\u05df \u05dc\u05d0 \u05e8\u05e9\u05de\u05d9 \u05e9\u05dc Garmin Connect",

@@ -99,7 +99,7 @@
         <div class="row g-3 mb-4">
           <div class="col-4">
             <div class="stat-card text-center p-3 rounded">
-              <div class="stat-value">{{ plan.exercises | length }}</div>
+              <div class="stat-value" id="statExerciseCount">{{ plan.exercises | length }}</div>
               <div class="stat-label">{{ t("preview_exercises") }}</div>
             </div>
           </div>
@@ -142,50 +142,79 @@
               <div class="d-flex align-items-center gap-2">
                 <i class="bi bi-arrow-repeat text-info fs-5"></i>
                 <span class="fw-bold text-info" style="letter-spacing:.04em">{{ t("badge_circuit") }}</span>
-                <span class="text-muted small">— {{ t("preview_circuit_desc_pre") }}{{ plan.exercises | length }}{{ t("preview_circuit_desc_post") }}</span>
+                <span class="text-muted small" id="circuitDesc">— {{ t("preview_circuit_desc_pre") }}{{ plan.exercises | length }}{{ t("preview_circuit_desc_post") }}</span>
               </div>
               <span class="badge fs-6 px-3 py-1 fw-bold" style="background: var(--bs-info); color:#000;">
                 × {{ sets_count }}
               </span>
             </div>
 
-            <!-- Exercises -->
-            {% for ex in plan.exercises %}
-            <div class="exercise-item d-flex align-items-start gap-3 px-3 py-3
-                         {% if not loop.last %}border-bottom border-secondary{% endif %}">
-              <div class="step-number flex-shrink-0">{{ loop.index }}</div>
-              <div class="flex-grow-1">
-                <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap">
-                  <div>
-                    <span class="fw-semibold">{{ ex.label }}</span>
-                    <span class="badge bg-secondary ms-2 text-capitalize" style="font-size:.65rem">
-                      {{ t("muscle_" ~ ex.muscle_group.replace(" ", "_")) }}
-                    </span>
+            <!-- Sortable exercise list -->
+            <div id="sortableExercises">
+              {% for ex in plan.exercises %}
+              <div class="exercise-item d-flex align-items-start gap-2 px-3 py-3
+                           {% if not loop.last %}border-bottom border-secondary{% endif %}"
+                   data-index="{{ loop.index0 }}">
+                <div class="drag-handle flex-shrink-0 pt-1" title="{{ t('edit_drag_to_reorder') }}">
+                  <i class="bi bi-grip-vertical fs-5"></i>
+                </div>
+                <div class="step-number flex-shrink-0">{{ loop.index }}</div>
+                <div class="flex-grow-1">
+                  <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap">
+                    <div>
+                      <span class="fw-semibold">{{ ex.label }}</span>
+                      <span class="badge bg-secondary ms-2 text-capitalize" style="font-size:.65rem">
+                        {{ t("muscle_" ~ ex.muscle_group.replace(" ", "_")) }}
+                      </span>
+                    </div>
+                    <div class="d-flex gap-1 flex-shrink-0">
+                      <a href="{{ ex.link }}" target="_blank" rel="noopener noreferrer"
+                         class="btn btn-outline-secondary btn-sm py-0 px-2" title="{{ t('preview_tutorial') }}">
+                        <i class="bi bi-play-circle me-1"></i>{{ t("preview_tutorial") }}
+                      </a>
+                      <button type="button"
+                              class="btn btn-outline-info btn-sm py-0 px-2"
+                              onclick="openReplaceModal({{ loop.index0 }})"
+                              title="{{ t('edit_replace') }}">
+                        <i class="bi bi-arrow-left-right"></i>
+                      </button>
+                      <button type="button"
+                              class="btn btn-outline-danger btn-sm py-0 px-2"
+                              onclick="removeExercise({{ loop.index0 }})"
+                              title="{{ t('edit_remove') }}">
+                        <i class="bi bi-trash3"></i>
+                      </button>
+                    </div>
                   </div>
-                  <a href="{{ ex.link }}" target="_blank" rel="noopener noreferrer"
-                     class="btn btn-outline-secondary btn-sm py-0 px-2 flex-shrink-0" title="{{ t('preview_tutorial') }}">
-                    <i class="bi bi-play-circle me-1"></i>{{ t("preview_tutorial") }}
-                  </a>
-                </div>
-                <div class="text-muted small mt-1">
-                  {% if ex.reps %}
-                    <i class="bi bi-repeat me-1"></i>{{ ex.reps }} {{ t("preview_reps") }}
-                  {% else %}
-                    <i class="bi bi-stopwatch me-1"></i>{{ ex.duration_sec | int }}{{ t("preview_hold") }}
+                  <div class="text-muted small mt-1">
+                    {% if ex.reps %}
+                      <i class="bi bi-repeat me-1"></i>{{ ex.reps }} {{ t("preview_reps") }}
+                    {% else %}
+                      <i class="bi bi-stopwatch me-1"></i>{{ ex.duration_sec | int }}{{ t("preview_hold") }}
+                    {% endif %}
+                    &nbsp;·&nbsp;
+                    <i class="bi bi-hourglass-split me-1"></i>{{ ex.rest_seconds | int }}{{ t("preview_rest") }}
+                  </div>
+                  {% if ex.required_equipment_labels %}
+                  <div class="mt-1" style="font-size:.72rem">
+                    <i class="bi bi-tools text-warning me-1"></i>
+                    <span class="text-warning">{{ t("preview_needs") }}</span>
+                    <span class="text-muted">{{ ex.required_equipment_labels | join(' / ') }}</span>
+                  </div>
                   {% endif %}
-                  &nbsp;·&nbsp;
-                  <i class="bi bi-hourglass-split me-1"></i>{{ ex.rest_seconds | int }}{{ t("preview_rest") }}
                 </div>
               </div>
-              {% if ex.required_equipment_labels %}
-              <div class="mt-1" style="font-size:.72rem">
-                <i class="bi bi-tools text-warning me-1"></i>
-                <span class="text-warning">{{ t("preview_needs") }}</span>
-                <span class="text-muted">{{ ex.required_equipment_labels | join(' / ') }}</span>
-              </div>
-              {% endif %}
+              {% endfor %}
             </div>
-            {% endfor %}
+
+            <!-- Add exercise button -->
+            <div class="d-flex justify-content-center py-2 px-3"
+                 style="border-top: 1px dashed rgba(255,255,255,.1);">
+              <button type="button" class="btn btn-outline-secondary btn-sm" id="addExerciseBtn"
+                      onclick="openAddModal()">
+                <i class="bi bi-plus-circle me-1"></i>{{ t("edit_add_exercise") }}
+              </button>
+            </div>
 
             <!-- Round repeat footer -->
             <div class="d-flex align-items-center gap-2 px-3 py-2"
@@ -216,7 +245,7 @@
         <!-- Upload form (only shown when Garmin is connected) -->
         {% if authenticated %}
         <form method="post" action="/workout/upload" id="uploadForm">
-          <input type="hidden" name="payload_json" value="{{ payload_json | e }}" />
+          <input type="hidden" name="payload_json" id="payloadJsonInput" value="{{ payload_json | e }}" />
 
           <div class="mb-3">
             <label for="schedule_date" class="form-label fw-semibold">
@@ -244,10 +273,64 @@
   </div>
 
 </div>
+
+<!-- =====================================================================
+     Replace Exercise Modal
+     ===================================================================== -->
+<div class="modal fade" id="replaceModal" tabindex="-1" aria-labelledby="replaceModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content border-secondary" style="background:#1a1d20;">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title" id="replaceModalLabel">
+          <i class="bi bi-arrow-left-right me-2 text-info"></i>{{ t("edit_replace_title") }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-2" id="replaceModalBody">
+        <div class="text-center py-4 text-muted">
+          <span class="spinner-border spinner-border-sm me-2"></span>Loading…
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================================
+     Add Exercise Modal
+     ===================================================================== -->
+<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content border-secondary" style="background:#1a1d20;">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title" id="addModalLabel">
+          <i class="bi bi-plus-circle me-2 text-success"></i>{{ t("edit_add_title") }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-3">
+        <!-- Muscle group filter -->
+        <div id="muscleGroupFilter" class="d-flex flex-wrap gap-1 mb-3"></div>
+        <!-- Exercise list -->
+        <div id="addModalBody">
+          <div class="text-center py-4 text-muted">
+            <span class="spinner-border spinner-border-sm me-2"></span>Loading…
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
+<!-- SortableJS for drag-and-drop reordering -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+
 <script>
+/* -----------------------------------------------------------------------
+   i18n strings injected from server
+   --------------------------------------------------------------------- */
 const MSG_MIN              = {{ t("form_min") | tojson }};
 const MSG_REGENERATE       = {{ t("form_regenerate_btn") | tojson }};
 const MSG_REGENERATING     = {{ t("form_generating") | tojson }};
@@ -259,7 +342,420 @@ const MSG_SAVE             = {{ t("preview_save_plans") | tojson }};
 const MSG_SAVE_FAILED      = {{ t("preview_save_failed") | tojson }};
 const MSG_SELECTED_SUFFIX  = {{ t("preview_selected_suffix") | tojson }};
 const MSG_NO_EQUIPMENT     = {{ t("preview_no_equipment") | tojson }};
+const MSG_REPS             = {{ t("preview_reps") | tojson }};
+const MSG_HOLD             = {{ t("preview_hold") | tojson }};
+const MSG_REST             = {{ t("preview_rest") | tojson }};
+const MSG_NEEDS            = {{ t("preview_needs") | tojson }};
+const MSG_TUTORIAL         = {{ t("preview_tutorial") | tojson }};
+const MSG_REPLACE          = {{ t("edit_replace") | tojson }};
+const MSG_REMOVE           = {{ t("edit_remove") | tojson }};
+const MSG_DRAG             = {{ t("edit_drag_to_reorder") | tojson }};
+const MSG_NO_ALT           = {{ t("edit_no_alternatives") | tojson }};
+const MSG_REBUILDING       = {{ t("edit_rebuilding") | tojson }};
+const MSG_REBUILD_FAILED   = {{ t("edit_rebuild_failed") | tojson }};
+const MSG_ALL_MUSCLES      = {{ t("edit_all_muscles") | tojson }};
+const MSG_CIRCUIT_PRE      = {{ t("preview_circuit_desc_pre") | tojson }};
+const MSG_CIRCUIT_POST     = {{ t("preview_circuit_desc_post") | tojson }};
 
+/* -----------------------------------------------------------------------
+   State
+   --------------------------------------------------------------------- */
+let exercises        = {{ exercises_json | safe }};
+const SELECTED_GOAL  = {{ selected_goal | tojson }};
+const SELECTED_EQ    = {{ selected_equipment | tojson }};
+const SELECTED_DUR   = {{ selected_duration }};
+const WORKOUT_NAME   = {{ plan.name | tojson }};
+
+let sortableInstance     = null;
+let currentReplaceIndex  = -1;
+let addAllExercises      = [];   // cache for the add-modal
+let addActiveGroup       = null; // currently selected muscle group filter
+
+/* -----------------------------------------------------------------------
+   Bootstrap modal instances (lazy-created)
+   --------------------------------------------------------------------- */
+function getReplaceModal() {
+  return bootstrap.Modal.getOrCreateInstance(document.getElementById('replaceModal'));
+}
+function getAddModal() {
+  return bootstrap.Modal.getOrCreateInstance(document.getElementById('addModal'));
+}
+
+/* -----------------------------------------------------------------------
+   Utility: escape HTML to safely insert user-controlled strings
+   --------------------------------------------------------------------- */
+function esc(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/* -----------------------------------------------------------------------
+   Render a single exercise row HTML string
+   --------------------------------------------------------------------- */
+function exerciseRowHTML(ex, idx, isLast) {
+  const borderCls = isLast ? '' : 'border-bottom border-secondary';
+  const repsHtml = ex.reps
+    ? `<i class="bi bi-repeat me-1"></i>${ex.reps} ${MSG_REPS}`
+    : `<i class="bi bi-stopwatch me-1"></i>${Math.round(ex.duration_sec)}${MSG_HOLD}`;
+  const equipHtml = (ex.required_equipment_labels && ex.required_equipment_labels.length)
+    ? `<div class="mt-1" style="font-size:.72rem">
+         <i class="bi bi-tools text-warning me-1"></i>
+         <span class="text-warning">${MSG_NEEDS}</span>
+         <span class="text-muted">${esc(ex.required_equipment_labels.join(' / '))}</span>
+       </div>`
+    : '';
+  const tutorialBtn = ex.link
+    ? `<a href="${esc(ex.link)}" target="_blank" rel="noopener noreferrer"
+          class="btn btn-outline-secondary btn-sm py-0 px-2" title="${MSG_TUTORIAL}">
+         <i class="bi bi-play-circle me-1"></i>${MSG_TUTORIAL}
+       </a>`
+    : '';
+  const muscleLabel = ex.muscle_group ? ex.muscle_group.replace(/_/g, ' ') : '';
+
+  return `
+    <div class="exercise-item d-flex align-items-start gap-2 px-3 py-3 ${borderCls}"
+         data-index="${idx}">
+      <div class="drag-handle flex-shrink-0 pt-1" title="${MSG_DRAG}">
+        <i class="bi bi-grip-vertical fs-5"></i>
+      </div>
+      <div class="step-number flex-shrink-0">${idx + 1}</div>
+      <div class="flex-grow-1">
+        <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap">
+          <div>
+            <span class="fw-semibold">${esc(ex.label)}</span>
+            <span class="badge bg-secondary ms-2 text-capitalize" style="font-size:.65rem">
+              ${esc(muscleLabel)}
+            </span>
+          </div>
+          <div class="d-flex gap-1 flex-shrink-0">
+            ${tutorialBtn}
+            <button type="button"
+                    class="btn btn-outline-info btn-sm py-0 px-2"
+                    onclick="openReplaceModal(${idx})"
+                    title="${MSG_REPLACE}">
+              <i class="bi bi-arrow-left-right"></i>
+            </button>
+            <button type="button"
+                    class="btn btn-outline-danger btn-sm py-0 px-2"
+                    onclick="removeExercise(${idx})"
+                    title="${MSG_REMOVE}">
+              <i class="bi bi-trash3"></i>
+            </button>
+          </div>
+        </div>
+        <div class="text-muted small mt-1">
+          ${repsHtml}
+          &nbsp;·&nbsp;
+          <i class="bi bi-hourglass-split me-1"></i>${Math.round(ex.rest_seconds)}${MSG_REST}
+        </div>
+        ${equipHtml}
+      </div>
+    </div>`;
+}
+
+/* -----------------------------------------------------------------------
+   Re-render the entire sortable exercise list from the `exercises` array
+   --------------------------------------------------------------------- */
+function renderExercises() {
+  const container = document.getElementById('sortableExercises');
+  if (!container) return;
+
+  // Destroy existing sortable to avoid ghost instances
+  if (sortableInstance) { sortableInstance.destroy(); sortableInstance = null; }
+
+  container.innerHTML = exercises
+    .map((ex, i) => exerciseRowHTML(ex, i, i === exercises.length - 1))
+    .join('');
+
+  // Update stats
+  const countEl = document.getElementById('statExerciseCount');
+  if (countEl) countEl.textContent = exercises.length;
+
+  // Update circuit description
+  const circDesc = document.getElementById('circuitDesc');
+  if (circDesc) circDesc.textContent = `— ${MSG_CIRCUIT_PRE}${exercises.length}${MSG_CIRCUIT_POST}`;
+
+  // Re-init Sortable
+  initSortable();
+}
+
+/* -----------------------------------------------------------------------
+   Initialise SortableJS
+   --------------------------------------------------------------------- */
+function initSortable() {
+  const container = document.getElementById('sortableExercises');
+  if (!container) return;
+  sortableInstance = Sortable.create(container, {
+    handle: '.drag-handle',
+    animation: 150,
+    ghostClass: 'sortable-ghost',
+    chosenClass: 'sortable-chosen',
+    onEnd(evt) {
+      if (evt.oldIndex === evt.newIndex) return;
+      const [moved] = exercises.splice(evt.oldIndex, 1);
+      exercises.splice(evt.newIndex, 0, moved);
+      renderExercises();
+    },
+  });
+}
+
+/* -----------------------------------------------------------------------
+   Remove exercise
+   --------------------------------------------------------------------- */
+function removeExercise(index) {
+  if (exercises.length <= 1) return; // keep at least 1
+  exercises.splice(index, 1);
+  renderExercises();
+}
+
+/* -----------------------------------------------------------------------
+   Replace exercise — open modal
+   --------------------------------------------------------------------- */
+async function openReplaceModal(index) {
+  currentReplaceIndex = index;
+  const ex = exercises[index];
+
+  const body = document.getElementById('replaceModalBody');
+  body.innerHTML = `<div class="text-center py-4 text-muted">
+    <span class="spinner-border spinner-border-sm me-2"></span>Loading…</div>`;
+  getReplaceModal().show();
+
+  try {
+    const params = new URLSearchParams({ goal: SELECTED_GOAL, muscle_group: ex.muscle_group, exclude: ex.name });
+    SELECTED_EQ.forEach(e => params.append('equipment', e));
+    const resp = await fetch(`/workout/exercises?${params}`);
+    if (!resp.ok) throw new Error('Server error');
+    const alts = await resp.json();
+
+    if (!alts.length) {
+      body.innerHTML = `<p class="text-muted text-center py-3">${MSG_NO_ALT}</p>`;
+      return;
+    }
+
+    body.innerHTML = alts.map(a => exercisePickerRowHTML(a, `selectReplacement(${JSON.stringify(a).replace(/"/g, '&quot;')})`)).join('');
+  } catch {
+    body.innerHTML = `<p class="text-danger text-center py-3">${MSG_REBUILD_FAILED}</p>`;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   Replace exercise — select replacement
+   --------------------------------------------------------------------- */
+function selectReplacement(newEx) {
+  const old = exercises[currentReplaceIndex];
+  exercises[currentReplaceIndex] = {
+    category:                newEx.category,
+    name:                    newEx.name,
+    label:                   newEx.label,
+    muscle_group:            newEx.muscle_group,
+    sets:                    old.sets,
+    reps:                    old.reps,
+    duration_sec:            old.duration_sec,
+    rest_seconds:            old.rest_seconds,
+    link:                    newEx.link || '',
+    description:             newEx.label,
+    required_equipment_labels: newEx.equipment_labels || [],
+  };
+  renderExercises();
+  getReplaceModal().hide();
+}
+
+/* -----------------------------------------------------------------------
+   Add exercise — open modal
+   --------------------------------------------------------------------- */
+async function openAddModal() {
+  addActiveGroup = null;
+  const filterEl = document.getElementById('muscleGroupFilter');
+  const bodyEl   = document.getElementById('addModalBody');
+
+  filterEl.innerHTML = '';
+  bodyEl.innerHTML = `<div class="text-center py-4 text-muted">
+    <span class="spinner-border spinner-border-sm me-2"></span>Loading…</div>`;
+  getAddModal().show();
+
+  try {
+    const params = new URLSearchParams({ goal: SELECTED_GOAL });
+    SELECTED_EQ.forEach(e => params.append('equipment', e));
+    const resp = await fetch(`/workout/exercises?${params}`);
+    if (!resp.ok) throw new Error('Server error');
+    addAllExercises = await resp.json();
+
+    // Build muscle group filter buttons
+    const groups = [...new Set(addAllExercises.map(e => e.muscle_group))].sort();
+    filterEl.innerHTML = [
+      `<button type="button" class="btn btn-sm btn-garmin" onclick="filterAddModal(null)" id="addFilter_all">${MSG_ALL_MUSCLES}</button>`,
+      ...groups.map(g =>
+        `<button type="button" class="btn btn-sm btn-outline-secondary" onclick="filterAddModal('${g}')" id="addFilter_${g}">${esc(g.replace(/_/g, ' '))}</button>`
+      ),
+    ].join('');
+
+    renderAddModal();
+  } catch {
+    bodyEl.innerHTML = `<p class="text-danger text-center py-3">${MSG_REBUILD_FAILED}</p>`;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   Add modal — filter by muscle group
+   --------------------------------------------------------------------- */
+function filterAddModal(group) {
+  addActiveGroup = group;
+  // Update button styles
+  document.querySelectorAll('#muscleGroupFilter button').forEach(btn => {
+    btn.className = btn.className.replace(/btn-garmin|btn-outline-secondary/g, '').trim();
+    btn.classList.add(btn.id === `addFilter_${group ?? 'all'}` ? 'btn-garmin' : 'btn-outline-secondary');
+  });
+  renderAddModal();
+}
+
+/* -----------------------------------------------------------------------
+   Add modal — render exercise list
+   --------------------------------------------------------------------- */
+function renderAddModal() {
+  const bodyEl = document.getElementById('addModalBody');
+  const filtered = addActiveGroup
+    ? addAllExercises.filter(e => e.muscle_group === addActiveGroup)
+    : addAllExercises;
+
+  if (!filtered.length) {
+    bodyEl.innerHTML = `<p class="text-muted text-center py-3">${MSG_NO_ALT}</p>`;
+    return;
+  }
+
+  bodyEl.innerHTML = filtered
+    .map(a => exercisePickerRowHTML(a, `addExercise(${JSON.stringify(a).replace(/"/g, '&quot;')})`))
+    .join('');
+}
+
+/* -----------------------------------------------------------------------
+   Add exercise — select and append
+   --------------------------------------------------------------------- */
+function addExercise(newEx) {
+  const ref = exercises[0] || { sets: 3, reps: 10, duration_sec: null, rest_seconds: 60 };
+  exercises.push({
+    category:                newEx.category,
+    name:                    newEx.name,
+    label:                   newEx.label,
+    muscle_group:            newEx.muscle_group,
+    sets:                    ref.sets,
+    reps:                    ref.reps,
+    duration_sec:            ref.duration_sec,
+    rest_seconds:            ref.rest_seconds,
+    link:                    newEx.link || '',
+    description:             newEx.label,
+    required_equipment_labels: newEx.equipment_labels || [],
+  });
+  renderExercises();
+  getAddModal().hide();
+}
+
+/* -----------------------------------------------------------------------
+   Helper: render one exercise picker row (used in both modals)
+   --------------------------------------------------------------------- */
+function exercisePickerRowHTML(ex, onclickExpr) {
+  const muscleLabel = (ex.muscle_group || '').replace(/_/g, ' ');
+  const eqText = (ex.equipment_labels && ex.equipment_labels.length)
+    ? `<small class="text-warning ms-1"><i class="bi bi-tools me-1"></i>${esc(ex.equipment_labels.join(' / '))}</small>`
+    : '';
+  return `
+    <button type="button"
+            class="btn btn-outline-secondary w-100 text-start mb-1 py-2 px-3"
+            onclick='${onclickExpr}'>
+      <div class="d-flex align-items-center gap-2">
+        <div class="flex-grow-1">
+          <span class="fw-semibold">${esc(ex.label)}</span>
+          <span class="badge bg-secondary ms-1 text-capitalize" style="font-size:.6rem">${esc(muscleLabel)}</span>
+          ${eqText}
+        </div>
+        <i class="bi bi-chevron-right text-muted"></i>
+      </div>
+    </button>`;
+}
+
+/* -----------------------------------------------------------------------
+   Upload: rebuild payload from current exercises, then submit
+   --------------------------------------------------------------------- */
+document.getElementById('uploadForm')?.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const btn = document.getElementById('uploadBtn');
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>${MSG_REBUILDING}`;
+
+  try {
+    const resp = await fetch('/workout/rebuild', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        exercises,
+        goal:             SELECTED_GOAL,
+        duration_minutes: SELECTED_DUR,
+        workout_name:     WORKOUT_NAME,
+      }),
+    });
+    if (!resp.ok) throw new Error('Server error');
+    const { payload_json } = await resp.json();
+    document.getElementById('payloadJsonInput').value = payload_json;
+    this.submit();
+  } catch {
+    btn.disabled = false;
+    btn.innerHTML = `<i class="bi bi-cloud-arrow-up me-2"></i>${MSG_UPLOAD}`;
+    alert(MSG_REBUILD_FAILED);
+  }
+});
+
+/* -----------------------------------------------------------------------
+   Save to My Plans: use live exercises array + rebuild payload
+   --------------------------------------------------------------------- */
+document.getElementById('savePlanBtn')?.addEventListener('click', async function () {
+  this.disabled = true;
+  this.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>${MSG_SAVING}`;
+
+  try {
+    // Rebuild payload so saved plan reflects any edits
+    const rebuildResp = await fetch('/workout/rebuild', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        exercises,
+        goal:             SELECTED_GOAL,
+        duration_minutes: SELECTED_DUR,
+        workout_name:     WORKOUT_NAME,
+      }),
+    });
+    if (!rebuildResp.ok) throw new Error('Rebuild failed');
+    const { payload_json } = await rebuildResp.json();
+
+    const resp = await fetch('/my/plans', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name:           WORKOUT_NAME,
+        goal:           SELECTED_GOAL,
+        equipment:      SELECTED_EQ,
+        duration_minutes: SELECTED_DUR,
+        exercises,
+        garmin_payload: JSON.parse(payload_json),
+      }),
+    });
+    if (resp.ok) {
+      this.innerHTML = `<i class="bi bi-bookmark-check-fill me-2"></i>${MSG_SAVED}`;
+      this.classList.replace('btn-outline-info', 'btn-success');
+    } else {
+      throw new Error('Server error');
+    }
+  } catch {
+    this.disabled = false;
+    this.innerHTML = `<i class="bi bi-bookmark-plus me-2"></i>${MSG_SAVE}`;
+    alert(MSG_SAVE_FAILED);
+  }
+});
+
+/* -----------------------------------------------------------------------
+   Generator form UX
+   --------------------------------------------------------------------- */
 const durationInput = document.getElementById('duration');
 const durationLabel = document.getElementById('durationLabel');
 durationInput.addEventListener('input', () => {
@@ -274,7 +770,7 @@ function updateEqCount() {
   const onlyBodyweight = n === 1 && checked[0].value === 'bodyweight';
   eqCount.textContent = (n === 0 || onlyBodyweight) ? MSG_NO_EQUIPMENT : (n + MSG_SELECTED_SUFFIX);
 }
-eqCheckboxes.forEach(cb => cb.addEventListener('change', function() {
+eqCheckboxes.forEach(cb => cb.addEventListener('change', function () {
   if (this.checked && this.value === 'bodyweight') {
     eqCheckboxes.forEach(other => { if (other !== this) other.checked = false; });
   } else if (this.checked) {
@@ -284,44 +780,14 @@ eqCheckboxes.forEach(cb => cb.addEventListener('change', function() {
   updateEqCount();
 }));
 
-document.getElementById('uploadBtn')?.addEventListener('click', function() {
+document.getElementById('generateBtn')?.addEventListener('click', function () {
   this.disabled = true;
-  this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>' + MSG_UPLOADING;
-  document.getElementById('uploadForm').submit();
+  this.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>${MSG_REGENERATING}`;
 });
 
-document.getElementById('generateBtn')?.addEventListener('click', function() {
-  this.disabled = true;
-  this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>' + MSG_REGENERATING;
-});
-
-document.getElementById('savePlanBtn')?.addEventListener('click', async function() {
-  this.disabled = true;
-  this.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>' + MSG_SAVING;
-  try {
-    const resp = await fetch('/my/plans', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        name: {{ plan.name | tojson }},
-        goal: {{ selected_goal | tojson }},
-        equipment: {{ selected_equipment | tojson }},
-        duration_minutes: {{ selected_duration }},
-        exercises: {{ exercises_json | safe }},
-        garmin_payload: {{ payload_json | safe }},
-      })
-    });
-    if (resp.ok) {
-      this.innerHTML = '<i class="bi bi-bookmark-check-fill me-2"></i>' + MSG_SAVED;
-      this.classList.replace('btn-outline-info', 'btn-success');
-    } else {
-      throw new Error('Server error');
-    }
-  } catch {
-    this.disabled = false;
-    this.innerHTML = '<i class="bi bi-bookmark-plus me-2"></i>' + MSG_SAVE;
-    alert(MSG_SAVE_FAILED);
-  }
-});
+/* -----------------------------------------------------------------------
+   Boot: wire up SortableJS on the initial server-rendered list
+   --------------------------------------------------------------------- */
+initSortable();
 </script>
 {% endblock %}
