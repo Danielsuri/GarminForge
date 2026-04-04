@@ -595,6 +595,7 @@ async def workout_upload(
             f"Workout \"{payload.get('workoutName')}\" uploaded to Garmin Connect!"
             + (f" Scheduled for {scheduled_on}." if scheduled_on else "")
         )
+        return RedirectResponse("/", status_code=303)
 
     except TooManyRequestsError:
         return _error_redirect(
@@ -663,5 +664,3 @@ async def workout_rebuild(request: Request) -> JSONResponse:
         return JSONResponse({"error": str(exc)}, status_code=500)
 
     return JSONResponse({"payload_json": json.dumps(payload)})
-
-    return RedirectResponse("/", status_code=303)

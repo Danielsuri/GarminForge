@@ -274,6 +274,10 @@
 
 </div>
 
+<!-- Toast notification container (fixed bottom-right) -->
+<div id="editToastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"
+     style="z-index: 1100;"></div>
+
 <!-- =====================================================================
      Replace Exercise Modal
      ===================================================================== -->
@@ -329,6 +333,12 @@
 
 <script>
 /* -----------------------------------------------------------------------
+   Workout editor — wrapped in IIFE so it can be safely re-injected into
+   the dashboard page (which shares the same JS scope) without const collisions.
+   Functions called from inline onclick="" attrs are exposed on window.
+   --------------------------------------------------------------------- */
+(function () {
+/* -----------------------------------------------------------------------
    i18n strings injected from server
    --------------------------------------------------------------------- */
 const MSG_MIN              = {{ t("form_min") | tojson }};
@@ -356,6 +366,10 @@ const MSG_REBUILD_FAILED   = {{ t("edit_rebuild_failed") | tojson }};
 const MSG_ALL_MUSCLES      = {{ t("edit_all_muscles") | tojson }};
 const MSG_CIRCUIT_PRE      = {{ t("preview_circuit_desc_pre") | tojson }};
 const MSG_CIRCUIT_POST     = {{ t("preview_circuit_desc_post") | tojson }};
+const MSG_REMOVED          = {{ t("edit_toast_removed") | tojson }};
+const MSG_REPLACED         = {{ t("edit_toast_replaced") | tojson }};
+const MSG_ADDED            = {{ t("edit_toast_added") | tojson }};
+const MSG_REORDERED        = {{ t("edit_toast_reordered") | tojson }};
 
 /* -----------------------------------------------------------------------
    State
@@ -493,22 +507,63 @@ function initSortable() {
     animation: 150,
     ghostClass: 'sortable-ghost',
     chosenClass: 'sortable-chosen',
+    // Prevent SortableJS from capturing events on interactive elements
+    filter: 'a, button, .btn',
+    preventOnFilter: false,
     onEnd(evt) {
       if (evt.oldIndex === evt.newIndex) return;
       const [moved] = exercises.splice(evt.oldIndex, 1);
       exercises.splice(evt.newIndex, 0, moved);
       renderExercises();
+      showToast(MSG_REORDERED);
     },
   });
 }
 
 /* -----------------------------------------------------------------------
-   Remove exercise
+   Toast notification
+   --------------------------------------------------------------------- */
+function showToast(msg, type = 'success') {
+  const container = document.getElementById('editToastContainer');
+  if (!container) return;
+  const id = 'toast_' + Date.now();
+  const color = type === 'danger' ? 'text-bg-danger' : 'text-bg-success';
+  container.insertAdjacentHTML('beforeend', `
+    <div id="${id}" class="toast align-items-center ${color} border-0" role="alert"
+         style="min-width:220px">
+      <div class="d-flex">
+        <div class="toast-body fw-semibold">${msg}</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                data-bs-dismiss="toast"></button>
+      </div>
+    </div>`);
+  const el = document.getElementById(id);
+  const t = bootstrap.Toast.getOrCreateInstance(el, { delay: 2000 });
+  t.show();
+  el.addEventListener('hidden.bs.toast', () => el.remove());
+}
+
+/* -----------------------------------------------------------------------
+   Remove exercise (with fade-out animation)
    --------------------------------------------------------------------- */
 function removeExercise(index) {
   if (exercises.length <= 1) return; // keep at least 1
-  exercises.splice(index, 1);
-  renderExercises();
+  const container = document.getElementById('sortableExercises');
+  const item = container?.querySelector(`.exercise-item[data-index="${index}"]`);
+  if (item) {
+    item.style.transition = 'opacity 0.2s, transform 0.2s';
+    item.style.opacity = '0';
+    item.style.transform = 'translateX(20px)';
+    setTimeout(() => {
+      exercises.splice(index, 1);
+      renderExercises();
+      showToast(MSG_REMOVED);
+    }, 200);
+  } else {
+    exercises.splice(index, 1);
+    renderExercises();
+    showToast(MSG_REMOVED);
+  }
 }
 
 /* -----------------------------------------------------------------------
@@ -561,6 +616,7 @@ function selectReplacement(newEx) {
   };
   renderExercises();
   getReplaceModal().hide();
+  showToast(MSG_REPLACED);
 }
 
 /* -----------------------------------------------------------------------
@@ -650,6 +706,7 @@ function addExercise(newEx) {
   });
   renderExercises();
   getAddModal().hide();
+  showToast(MSG_ADDED);
 }
 
 /* -----------------------------------------------------------------------
@@ -788,6 +845,16 @@ document.getElementById('generateBtn')?.addEventListener('click', function () {
 /* -----------------------------------------------------------------------
    Boot: wire up SortableJS on the initial server-rendered list
    --------------------------------------------------------------------- */
+/* Expose onclick-handler functions to window so they work both in
+   direct page load AND when re-injected via the dashboard's AJAX flow. */
+window.removeExercise    = removeExercise;
+window.openReplaceModal  = openReplaceModal;
+window.selectReplacement = selectReplacement;
+window.openAddModal      = openAddModal;
+window.filterAddModal    = filterAddModal;
+window.addExercise       = addExercise;
+
 initSortable();
+})(); // end IIFE
 </script>
 {% endblock %}

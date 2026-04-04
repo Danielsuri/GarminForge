@@ -190,6 +190,10 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "edit_no_alternatives":   "No alternatives available for current equipment.",
         "edit_rebuilding":        "Saving changes\u2026",
         "edit_rebuild_failed":    "Failed to update workout. Please try again.",
+        "edit_toast_removed":     "Exercise removed",
+        "edit_toast_replaced":    "Exercise replaced",
+        "edit_toast_added":       "Exercise added",
+        "edit_toast_reordered":   "Order updated",
 
         # --- Footer ---
         "footer_text": "unofficial Garmin Connect workout tool",
@@ -372,6 +376,10 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "edit_no_alternatives":   "\u05d0\u05d9\u05df \u05d7\u05dc\u05d5\u05e4\u05d5\u05ea \u05d6\u05de\u05d9\u05e0\u05d5\u05ea \u05dc\u05e6\u05d9\u05d5\u05d3 \u05d4\u05e7\u05d9\u05d9\u05dd.",
         "edit_rebuilding":        "\u05e9\u05d5\u05de\u05e8 \u05e9\u05d9\u05e0\u05d5\u05d9\u05d9\u05dd\u2026",
         "edit_rebuild_failed":    "\u05e2\u05d3\u05db\u05d5\u05df \u05d4\u05d0\u05d9\u05de\u05d5\u05df \u05e0\u05db\u05e9\u05dc. \u05e0\u05e1\u05d4 \u05e9\u05d5\u05d1.",
+        "edit_toast_removed":     "\u05ea\u05e8\u05d2\u05d9\u05dc \u05d4\u05d5\u05e1\u05e8",
+        "edit_toast_replaced":    "\u05ea\u05e8\u05d2\u05d9\u05dc \u05d4\u05d5\u05d7\u05dc\u05e3",
+        "edit_toast_added":       "\u05ea\u05e8\u05d2\u05d9\u05dc \u05e0\u05d5\u05e1\u05e3",
+        "edit_toast_reordered":   "\u05d4\u05e1\u05d3\u05e8 \u05e2\u05d5\u05d3\u05db\u05df",
 
         # --- Footer ---
         "footer_text": "\u05db\u05dc\u05d9 \u05d0\u05d9\u05de\u05d5\u05df \u05dc\u05d0 \u05e8\u05e9\u05de\u05d9 \u05e9\u05dc Garmin Connect",
