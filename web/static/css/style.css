@@ -253,19 +253,29 @@ code { color: #5bc08a; }
 
 .muscle-legend {
   display: flex;
-  gap: .75rem;
+  gap: 1.5rem;
   justify-content: center;
   align-items: center;
-  font-size: .72rem;
-  color: #aaa;
-  margin-top: .4rem;
+  font-size: .8rem;
+  color: #ccc;
+  margin-top: .6rem;
   flex-wrap: wrap;
+}
+
+.muscle-legend span:not(.legend-dot) {
+  white-space: nowrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
 }
 
 .legend-dot {
   display: inline-block;
-  width: 10px;
-  height: 10px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   flex-shrink: 0;
 }

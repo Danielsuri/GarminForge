@@ -197,9 +197,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
 
         # --- Muscle map ---
         "muscle_map_title":      "Muscles Targeted",
-        "muscle_map_primary":    "Primary",
-        "muscle_map_secondary":  "Secondary",
-        "muscle_map_untargeted": "Untargeted",
+        "muscle_map_primary":    "Primary Muscles",
+        "muscle_map_secondary":  "Secondary Muscles",
+        "muscle_map_untargeted": "Untargeted Muscles",
 
         # --- Footer ---
         "footer_text": "unofficial Garmin Connect workout tool",
@@ -389,9 +389,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
 
         # --- Muscle map ---
         "muscle_map_title":      "\u05e9\u05e8\u05d9\u05e8\u05d9\u05dd \u05de\u05d5\u05e2\u05d1\u05d3\u05d9\u05dd",
-        "muscle_map_primary":    "\u05e8\u05d0\u05e9\u05d9",
-        "muscle_map_secondary":  "\u05de\u05e9\u05e0\u05d9",
-        "muscle_map_untargeted": "\u05dc\u05dc\u05d0 \u05e2\u05d9\u05d1\u05d5\u05d3",
+        "muscle_map_primary":    "\u05e9\u05e8\u05d9\u05e8\u05d9\u05dd \u05e8\u05d0\u05e9\u05d9\u05d9\u05dd",
+        "muscle_map_secondary":  "\u05e9\u05e8\u05d9\u05e8\u05d9\u05dd \u05de\u05e9\u05e0\u05d9\u05d9\u05dd",
+        "muscle_map_untargeted": "\u05e9\u05e8\u05d9\u05e8\u05d9\u05dd \u05dc\u05dc\u05d0 \u05d9\u05e2\u05d3",
 
         # --- Footer ---
         "footer_text": "\u05db\u05dc\u05d9 \u05d0\u05d9\u05de\u05d5\u05df \u05dc\u05d0 \u05e8\u05e9\u05de\u05d9 \u05e9\u05dc Garmin Connect",
