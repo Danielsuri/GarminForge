@@ -26,8 +26,8 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
-from fastapi import Depends, FastAPI, Form, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi import Depends, FastAPI, Form, Query, Request
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from starlette.middleware.sessions import SessionMiddleware
@@ -52,7 +52,13 @@ from web.rendering import render_template
 from web.routes_auth import router as forge_auth_router
 from web.routes_my import router as my_router
 from web.translations import SUPPORTED_LANGS
-from web.workout_generator import EQUIPMENT_OPTIONS, GOALS, generate
+from web.workout_generator import (
+    EQUIPMENT_OPTIONS,
+    GOALS,
+    generate,
+    get_available_exercises,
+    rebuild_garmin_payload,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -606,5 +612,56 @@ async def workout_upload(
     except Exception as exc:
         logger.exception("Upload failed")
         return _error_redirect(request, f"Upload failed: {exc}")
+
+
+@app.get("/workout/exercises")
+async def workout_exercises(
+    goal: str = Query(...),
+    equipment: list[str] = Query(default=[]),
+    muscle_group: str | None = Query(default=None),
+    exclude: str | None = Query(default=None),
+) -> JSONResponse:
+    """Return available exercises for the workout editor (replace / add modals)."""
+    if goal not in GOALS:
+        return JSONResponse({"error": f"Unknown goal: {goal!r}"}, status_code=400)
+    exercises = get_available_exercises(equipment, goal, muscle_group, exclude)
+    return JSONResponse(exercises)
+
+
+@app.post("/workout/rebuild")
+async def workout_rebuild(request: Request) -> JSONResponse:
+    """Rebuild a Garmin payload from an edited exercises list.
+
+    Body (JSON)::
+        {
+          "exercises": [...],          # list of ExerciseInfo-shaped dicts
+          "goal": "build_muscle",
+          "duration_minutes": 45,
+          "workout_name": "Build Muscle — 45min (Apr 04)"
+        }
+    """
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"error": "Invalid JSON body."}, status_code=400)
+
+    goal = body.get("goal", "")
+    if goal not in GOALS:
+        return JSONResponse({"error": f"Unknown goal: {goal!r}"}, status_code=400)
+
+    exercises_data = body.get("exercises", [])
+    if not isinstance(exercises_data, list) or not exercises_data:
+        return JSONResponse({"error": "exercises must be a non-empty list."}, status_code=400)
+
+    duration_minutes = int(body.get("duration_minutes", 45))
+    workout_name = str(body.get("workout_name", "Workout"))
+
+    try:
+        payload = rebuild_garmin_payload(exercises_data, goal, duration_minutes, workout_name)
+    except Exception as exc:
+        logger.exception("Payload rebuild failed")
+        return JSONResponse({"error": str(exc)}, status_code=500)
+
+    return JSONResponse({"payload_json": json.dumps(payload)})
 
     return RedirectResponse("/", status_code=303)

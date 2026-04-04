@@ -154,6 +154,24 @@ main { flex: 1; }
 .exercise-item { transition: background-color .1s; }
 .exercise-item:hover { background-color: rgba(255,255,255,.02); border-radius: .375rem; }
 
+/* ---------- Workout editor (drag, reorder, replace) ---------- */
+.drag-handle {
+  cursor: grab;
+  color: #444;
+  transition: color .1s;
+  user-select: none;
+}
+.drag-handle:hover { color: #aaa; }
+.drag-handle:active { cursor: grabbing; }
+
+.sortable-ghost {
+  opacity: .35;
+  background: rgba(0,102,204,.15) !important;
+  border-radius: .375rem;
+}
+
+.sortable-chosen { box-shadow: 0 0 0 2px rgba(0,102,204,.4); border-radius: .375rem; }
+
 /* ---------- Font monospace spacing ---------- */
 .letter-spacing-lg { letter-spacing: .4em; }
 

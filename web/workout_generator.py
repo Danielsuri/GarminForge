@@ -596,3 +596,98 @@ def generate(
         exercises=exercises,
         garmin_payload=payload,
     )
+
+
+# ---------------------------------------------------------------------------
+# Editor helpers
+# ---------------------------------------------------------------------------
+
+def get_available_exercises(
+    equipment: list[str],
+    goal: str,
+    muscle_group: str | None = None,
+    exclude_name: str | None = None,
+) -> list[dict[str, Any]]:
+    """Return exercises from the pool, filtered for the workout editor UI.
+
+    Parameters
+    ----------
+    equipment:
+        Available equipment tags (same as ``generate()``).
+    goal:
+        One of the ``GOALS`` keys — used to import the exercise link helper.
+    muscle_group:
+        When provided, only exercises for this muscle group are returned.
+    exclude_name:
+        Exercise ``name`` to exclude (e.g. the current exercise when replacing).
+    """
+    from web.exercise_links import get_exercise_link  # local import avoids circularity
+
+    available = _available(equipment) if equipment else _available(["bodyweight"])
+    _eq_label: dict[str, str] = {eq["tag"]: f"{eq['icon']} {eq['label']}" for eq in EQUIPMENT_OPTIONS}
+
+    result: list[dict[str, Any]] = []
+    for ex in available:
+        if muscle_group and ex.muscle_group != muscle_group:
+            continue
+        if exclude_name and ex.name == exclude_name:
+            continue
+        if "bodyweight" in ex.equipment:
+            req_labels: list[str] = []
+        else:
+            req_labels = [_eq_label[t] for t in ex.equipment if t in _eq_label]
+        result.append({
+            "category": ex.category,
+            "name": ex.name,
+            "label": ex.label,
+            "muscle_group": ex.muscle_group,
+            "tags": list(ex.tags),
+            "equipment_labels": req_labels,
+            "link": get_exercise_link(ex.name, ex.label),
+        })
+    return result
+
+
+def rebuild_garmin_payload(
+    exercises_data: list[dict[str, Any]],
+    goal: str,
+    duration_minutes: int,
+    workout_name: str,
+) -> dict[str, Any]:
+    """Rebuild a Garmin workout payload from a (possibly edited) exercises list.
+
+    Parameters
+    ----------
+    exercises_data:
+        List of dicts with the same shape as ``dataclasses.asdict(ExerciseInfo)``.
+    goal:
+        One of the ``GOALS`` keys — sets/reps/rest come from here.
+    duration_minutes:
+        Retained for metadata only; does not affect payload structure.
+    workout_name:
+        Name to embed in the ``workoutName`` field.
+    """
+    goal_cfg = GOALS[goal]
+    sets: int = goal_cfg["sets"]
+    workout_desc: str = goal_cfg["description"]
+
+    blocks = [
+        ExerciseBlock(
+            category=ex["category"],
+            name=ex["name"],
+            sets=ex["sets"],
+            reps=ex.get("reps"),
+            duration_seconds=ex.get("duration_sec"),
+            rest_seconds=int(ex["rest_seconds"]),
+            description=ex.get("description") or ex["label"],
+        )
+        for ex in exercises_data
+    ]
+
+    builder = (
+        StrengthWorkout(workout_name, description=workout_desc)
+        .add_warmup(description="5 min general warm-up")
+        .add_circuit(blocks, rounds=sets)
+        .add_cooldown(description="Cool-down + stretch")
+    )
+    return builder.build(validate=False)
