@@ -3,6 +3,7 @@ Shared Jinja2 template renderer used by app.py and the route modules.
 """
 from __future__ import annotations
 
+import subprocess
 from pathlib import Path
 
 from fastapi import Request
@@ -14,6 +15,23 @@ from web.translations import SUPPORTED_LANGS, make_t
 
 _BASE_DIR = Path(__file__).parent
 templates = Jinja2Templates(directory=_BASE_DIR / "templates")
+
+
+def _detect_version() -> str:
+    try:
+        result = subprocess.run(
+            ["git", "describe", "--tags", "--abbrev=0"],
+            capture_output=True,
+            text=True,
+            cwd=_BASE_DIR.parent,
+        )
+        v = result.stdout.strip()
+        return v if v else "dev"
+    except Exception:
+        return "dev"
+
+
+APP_VERSION: str = _detect_version()
 
 
 def render_template(
@@ -63,5 +81,5 @@ def render_template(
     return templates.TemplateResponse(
         request,
         template,
-        {"authenticated": authenticated, "forge_user": forge_user, "lang": lang, "t": make_t(lang), **ctx},
+        {"authenticated": authenticated, "forge_user": forge_user, "lang": lang, "t": make_t(lang), "app_version": APP_VERSION, **ctx},
     )

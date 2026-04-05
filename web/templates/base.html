@@ -47,6 +47,9 @@
         <a href="/my/progress" class="btn btn-outline-secondary btn-sm">
           <i class="bi bi-bar-chart me-1"></i>{{ t("nav_progress") }}
         </a>
+        <a href="/my/profile" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-person me-1"></i>Profile
+        </a>
         <span class="text-muted small">{{ forge_user.display_name or forge_user.email }}</span>
         <a href="/auth/logout" class="btn btn-outline-secondary btn-sm">
           <i class="bi bi-box-arrow-right"></i> {{ t("nav_logout") }}
@@ -96,6 +99,7 @@
     <p class="text-muted small mb-0 text-center">
       GarminForge — {{ t("footer_text") }} &nbsp;·&nbsp;
       <a href="https://github.com/Danielsuri/GarminForge" class="text-muted" target="_blank">GitHub</a>
+      &nbsp;·&nbsp; <span class="opacity-50">{{ app_version }}</span>
     </p>
   </div>
 </footer>
