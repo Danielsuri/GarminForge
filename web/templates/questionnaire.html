@@ -267,15 +267,17 @@ input[type=range].wrange { width: 100%; accent-color: #0066cc; }
 {% block scripts %}
 <script>
 (function () {
-  var TOTAL = 7;
+  var QUESTIONS = 7;   /* number of question cards (wc0–wc6) */
+  var TOTAL     = QUESTIONS; /* summary lives at index QUESTIONS, outside dot range */
   var cur = 0;
+  var transitioning = false;
 
   function setProgress(step) {
-    var pct = Math.round((step / TOTAL) * 100);
+    var pct = Math.round(((step + 1) / (TOTAL + 1)) * 100);
     document.getElementById('wFill').style.width = pct + '%';
     document.getElementById('wPctLabel').textContent = pct + '%';
     document.getElementById('wStepLabel').textContent =
-      step < TOTAL ? 'Question ' + (step + 1) + ' of ' + TOTAL : 'Review';
+      step < QUESTIONS ? 'Question ' + (step + 1) + ' of ' + QUESTIONS : 'Review';
   }
 
   function renderDots(step) {
@@ -290,9 +292,11 @@ input[type=range].wrange { width: 100%; accent-color: #0066cc; }
   }
 
   function transition(next) {
+    if (transitioning) return;
+    transitioning = true;
     var outEl = document.getElementById('wc' + cur);
     var inEl  = document.getElementById('wc' + next);
-    if (!outEl || !inEl) return;
+    if (!outEl || !inEl) { transitioning = false; return; }
 
     outEl.classList.remove('active');
     outEl.classList.add('exiting');
@@ -305,15 +309,22 @@ input[type=range].wrange { width: 100%; accent-color: #0066cc; }
     inEl.style.position = 'absolute';
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
+        /* Two rAFs force the browser to compute layout with inEl at
+           position:absolute (its initial state) before we switch it to
+           position:relative via .active. Without this, the CSS transition
+           has no starting keyframe and the card snaps in instead of fading. */
         inEl.style.position = '';
         inEl.classList.add('active');
       });
     });
 
-    setTimeout(function () { outEl.classList.remove('exiting'); }, 380);
+    setTimeout(function () {
+      outEl.classList.remove('exiting');
+      transitioning = false;
+    }, 380);
   }
 
-  window.wNext = function () { if (cur < TOTAL) transition(cur + 1); };
+  window.wNext = function () { if (cur < QUESTIONS) transition(cur + 1); };
   window.wBack = function () { if (cur > 0)     transition(cur - 1); };
 
   document.getElementById('ageRange').addEventListener('input', function () {
