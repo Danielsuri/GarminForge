@@ -23,6 +23,7 @@ from web.auth_utils import get_current_user
 from web.db import get_db
 from web.models import SavedPlan, WorkoutSession
 from web.rendering import render_template
+from web.translations import make_t
 from web.workout_generator import EQUIPMENT_OPTIONS, GOALS, ExerciseInfo, WorkoutPlan
 
 logger = logging.getLogger(__name__)
@@ -42,34 +43,41 @@ def _require_user(request: Request, db: Session):
 # ---------------------------------------------------------------------------
 
 DIET_OPTIONS = [
-    {"value": "general",        "label": "General / No preference"},
-    {"value": "vegetarian",     "label": "Vegetarian"},
-    {"value": "vegan",          "label": "Vegan"},
-    {"value": "keto",           "label": "Keto"},
-    {"value": "paleo",          "label": "Paleo"},
-    {"value": "mediterranean",  "label": "Mediterranean"},
-    {"value": "gluten_free",    "label": "Gluten-free"},
-    {"value": "high_protein",   "label": "High-protein"},
+    {"value": "general",        "label": "diet_general"},
+    {"value": "vegetarian",     "label": "diet_vegetarian"},
+    {"value": "vegan",          "label": "diet_vegan"},
+    {"value": "keto",           "label": "diet_keto"},
+    {"value": "paleo",          "label": "diet_paleo"},
+    {"value": "mediterranean",  "label": "diet_mediterranean"},
+    {"value": "gluten_free",    "label": "diet_gluten_free"},
+    {"value": "high_protein",   "label": "diet_high_protein"},
 ]
 
 HEALTH_OPTIONS = [
-    {"value": "heart_condition",    "label": "Heart condition"},
-    {"value": "diabetes",           "label": "Diabetes"},
-    {"value": "high_blood_pressure","label": "High blood pressure"},
-    {"value": "joint_problems",     "label": "Joint problems / Arthritis"},
-    {"value": "back_pain",          "label": "Back pain"},
-    {"value": "asthma",             "label": "Asthma"},
+    {"value": "heart_condition",    "label": "health_heart_condition"},
+    {"value": "diabetes",           "label": "health_diabetes"},
+    {"value": "high_blood_pressure","label": "health_high_blood_pressure"},
+    {"value": "joint_problems",     "label": "health_joint_problems"},
+    {"value": "back_pain",          "label": "health_back_pain"},
+    {"value": "asthma",             "label": "health_asthma"},
 ]
 
 GOAL_OPTIONS = [
-    {"value": "lose_weight",       "label": "Lose weight"},
-    {"value": "build_muscle",      "label": "Build muscle"},
-    {"value": "improve_endurance", "label": "Improve endurance"},
-    {"value": "flexibility",       "label": "Increase flexibility"},
-    {"value": "general_health",    "label": "General health"},
+    {"value": "lose_weight",       "label": "qgoal_lose_weight"},
+    {"value": "build_muscle",      "label": "qgoal_build_muscle"},
+    {"value": "improve_endurance", "label": "qgoal_improve_endurance"},
+    {"value": "flexibility",       "label": "qgoal_flexibility"},
+    {"value": "general_health",    "label": "qgoal_general_health"},
 ]
 
-FITNESS_LEVELS = ["Beginner", "Intermediate", "Advanced"]
+FITNESS_LEVELS = [
+    {"value": "Beginner",     "key": "fitness_beginner"},
+    {"value": "Intermediate", "key": "fitness_intermediate"},
+    {"value": "Advanced",     "key": "fitness_advanced"},
+]
+
+# Maps stored fitness_level value → translation key (for profile display)
+FITNESS_LEVEL_KEYS = {lvl["value"]: lvl["key"] for lvl in FITNESS_LEVELS}
 
 
 def _decode_json_field(val: str | None) -> list[Any]:
@@ -164,9 +172,20 @@ async def my_profile(request: Request, db: Session = Depends(get_db)):
     if user is None:
         return RedirectResponse("/auth/login-forge", status_code=303)
 
-    diet_labels = {o["value"]: o["label"] for o in DIET_OPTIONS}
-    health_labels = {o["value"]: o["label"] for o in HEALTH_OPTIONS}
-    goal_labels = {o["value"]: o["label"] for o in GOAL_OPTIONS}
+    # Build translated label maps for the active language
+    from web.translations import SUPPORTED_LANGS
+    lang = "en"
+    if user.preferred_lang in SUPPORTED_LANGS:
+        lang = user.preferred_lang  # type: ignore[assignment]
+    else:
+        raw = request.session.get("lang", "en")
+        if raw in SUPPORTED_LANGS:
+            lang = raw
+    t = make_t(lang)
+
+    diet_labels = {o["value"]: t(o["label"]) for o in DIET_OPTIONS}
+    health_labels = {o["value"]: t(o["label"]) for o in HEALTH_OPTIONS}
+    goal_labels = {o["value"]: t(o["label"]) for o in GOAL_OPTIONS}
     eq_labels = {eq["tag"]: f"{eq['icon']} {eq['label']}" for eq in EQUIPMENT_OPTIONS}
 
     return render_template(
@@ -177,6 +196,7 @@ async def my_profile(request: Request, db: Session = Depends(get_db)):
         health_labels=health_labels,
         goal_labels=goal_labels,
         eq_labels=eq_labels,
+        fitness_level_keys=FITNESS_LEVEL_KEYS,
         user_diet=_decode_json_field(user.diet_json),
         user_health=_decode_json_field(user.health_conditions_json),
         user_goals=_decode_json_field(user.fitness_goals_json),

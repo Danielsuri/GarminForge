@@ -30,41 +30,48 @@
       <span class="brand-icon">⚙️</span>
       <span>GarminForge</span>
     </a>
-    <div class="ms-auto d-flex align-items-center gap-3">
-      {% if forge_user %}
-        {% if authenticated %}
-          <span class="text-success small d-flex align-items-center gap-1">
-            <i class="bi bi-shield-check-fill"></i> {{ t("nav_garmin_connected") }}
-          </span>
+    <button class="navbar-toggler ms-auto border-secondary" type="button"
+            data-bs-toggle="collapse" data-bs-target="#navMain"
+            aria-controls="navMain" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMain">
+      <div class="ms-auto d-flex flex-wrap align-items-center gap-2 py-2 py-lg-0">
+        {% if forge_user %}
+          {% if authenticated %}
+            <span class="text-success small d-flex align-items-center gap-1">
+              <i class="bi bi-shield-check-fill"></i> {{ t("nav_garmin_connected") }}
+            </span>
+          {% else %}
+            <span class="text-warning small d-flex align-items-center gap-1">
+              <i class="bi bi-exclamation-triangle-fill"></i> {{ t("nav_garmin_not_connected") }}
+            </span>
+          {% endif %}
+          <a href="/my/plans" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-bookmark me-1"></i>{{ t("nav_my_plans") }}
+          </a>
+          <a href="/my/progress" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-bar-chart me-1"></i>{{ t("nav_progress") }}
+          </a>
+          <a href="/my/profile" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-person me-1"></i>{{ t("nav_profile") }}
+          </a>
+          <span class="text-muted small">{{ forge_user.display_name or forge_user.email }}</span>
+          <a href="/auth/logout" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-box-arrow-right"></i> {{ t("nav_logout") }}
+          </a>
         {% else %}
-          <span class="text-warning small d-flex align-items-center gap-1">
-            <i class="bi bi-exclamation-triangle-fill"></i> {{ t("nav_garmin_not_connected") }}
-          </span>
+          <a href="/auth/login-forge" class="btn btn-outline-secondary btn-sm">{{ t("nav_sign_in") }}</a>
+          <a href="/auth/register" class="btn btn-garmin btn-sm">{{ t("nav_register") }}</a>
         {% endif %}
-        <a href="/my/plans" class="btn btn-outline-secondary btn-sm">
-          <i class="bi bi-bookmark me-1"></i>{{ t("nav_my_plans") }}
-        </a>
-        <a href="/my/progress" class="btn btn-outline-secondary btn-sm">
-          <i class="bi bi-bar-chart me-1"></i>{{ t("nav_progress") }}
-        </a>
-        <a href="/my/profile" class="btn btn-outline-secondary btn-sm">
-          <i class="bi bi-person me-1"></i>Profile
-        </a>
-        <span class="text-muted small">{{ forge_user.display_name or forge_user.email }}</span>
-        <a href="/auth/logout" class="btn btn-outline-secondary btn-sm">
-          <i class="bi bi-box-arrow-right"></i> {{ t("nav_logout") }}
-        </a>
-      {% else %}
-        <a href="/auth/login-forge" class="btn btn-outline-secondary btn-sm">{{ t("nav_sign_in") }}</a>
-        <a href="/auth/register" class="btn btn-garmin btn-sm">{{ t("nav_register") }}</a>
-      {% endif %}
 
-      <!-- Language selector -->
-      <div class="d-flex align-items-center gap-1">
-        <a href="/set-language?lang=en"
-           class="btn btn-sm py-0 px-2 {% if lang == 'en' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">EN</a>
-        <a href="/set-language?lang=he"
-           class="btn btn-sm py-0 px-2 {% if lang == 'he' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">עב</a>
+        <!-- Language selector -->
+        <div class="d-flex align-items-center gap-1">
+          <a href="/set-language?lang=en"
+             class="btn btn-sm py-0 px-2 {% if lang == 'en' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">EN</a>
+          <a href="/set-language?lang=he"
+             class="btn btn-sm py-0 px-2 {% if lang == 'he' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">עב</a>
+        </div>
       </div>
     </div>
   </div>

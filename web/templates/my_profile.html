@@ -1,29 +1,29 @@
 {% extends "base.html" %}
-{% block title %}GarminForge — My Profile{% endblock %}
+{% block title %}GarminForge — {{ t("profile_title") }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-12 col-md-10 col-lg-8">
 
     <div class="d-flex align-items-center justify-content-between mb-4">
-      <h2 class="fw-bold mb-0"><i class="bi bi-person-circle me-2 text-info"></i>My Profile</h2>
+      <h2 class="fw-bold mb-0"><i class="bi bi-person-circle me-2 text-info"></i>{{ t("profile_title") }}</h2>
       <a href="/my/questionnaire" class="btn btn-garmin btn-sm">
-        <i class="bi bi-pencil me-1"></i>{% if forge_user.questionnaire_completed %}Retake Questionnaire{% else %}Complete Questionnaire{% endif %}
+        <i class="bi bi-pencil me-1"></i>{% if forge_user.questionnaire_completed %}{{ t("profile_retake") }}{% else %}{{ t("profile_complete_q") }}{% endif %}
       </a>
     </div>
 
     <!-- Account info -->
     <div class="card bg-dark-subtle border-secondary mb-3">
       <div class="card-body p-4">
-        <h6 class="fw-semibold mb-3 text-muted text-uppercase small">Account</h6>
+        <h6 class="fw-semibold mb-3 text-muted text-uppercase small">{{ t("profile_account") }}</h6>
         <dl class="row mb-0">
-          <dt class="col-sm-4 text-muted">Email</dt>
+          <dt class="col-sm-4 text-muted">{{ t("profile_email") }}</dt>
           <dd class="col-sm-8">{{ forge_user.email }}</dd>
           {% if forge_user.display_name %}
-          <dt class="col-sm-4 text-muted">Name</dt>
+          <dt class="col-sm-4 text-muted">{{ t("profile_name") }}</dt>
           <dd class="col-sm-8">{{ forge_user.display_name }}</dd>
           {% endif %}
-          <dt class="col-sm-4 text-muted">Member since</dt>
+          <dt class="col-sm-4 text-muted">{{ t("profile_member_since") }}</dt>
           <dd class="col-sm-8">{{ forge_user.created_at.strftime('%B %d, %Y') }}</dd>
         </dl>
       </div>
@@ -34,26 +34,26 @@
     <!-- Fitness profile summary -->
     <div class="card bg-dark-subtle border-secondary mb-3">
       <div class="card-body p-4">
-        <h6 class="fw-semibold mb-3 text-muted text-uppercase small">Fitness Profile</h6>
+        <h6 class="fw-semibold mb-3 text-muted text-uppercase small">{{ t("profile_fitness") }}</h6>
         <dl class="row mb-0">
 
           {% if forge_user.age %}
-          <dt class="col-sm-4 text-muted">Age</dt>
+          <dt class="col-sm-4 text-muted">{{ t("profile_age") }}</dt>
           <dd class="col-sm-8">{{ forge_user.age }}</dd>
           {% endif %}
 
           {% if forge_user.fitness_level %}
-          <dt class="col-sm-4 text-muted">Fitness level</dt>
-          <dd class="col-sm-8">{{ forge_user.fitness_level }}</dd>
+          <dt class="col-sm-4 text-muted">{{ t("profile_fitness_level") }}</dt>
+          <dd class="col-sm-8">{{ t(fitness_level_keys.get(forge_user.fitness_level, forge_user.fitness_level)) }}</dd>
           {% endif %}
 
           {% if forge_user.weekly_workout_days %}
-          <dt class="col-sm-4 text-muted">Workout days / week</dt>
+          <dt class="col-sm-4 text-muted">{{ t("profile_workout_days") }}</dt>
           <dd class="col-sm-8">{{ forge_user.weekly_workout_days }}</dd>
           {% endif %}
 
           {% if user_goals %}
-          <dt class="col-sm-4 text-muted">Fitness goals</dt>
+          <dt class="col-sm-4 text-muted">{{ t("profile_goals") }}</dt>
           <dd class="col-sm-8">
             {% for g in user_goals %}
             <span class="badge bg-secondary me-1 mb-1">{{ goal_labels.get(g, g) }}</span>
@@ -62,7 +62,7 @@
           {% endif %}
 
           {% if user_equipment %}
-          <dt class="col-sm-4 text-muted">Equipment</dt>
+          <dt class="col-sm-4 text-muted">{{ t("profile_equipment") }}</dt>
           <dd class="col-sm-8">
             {% for e in user_equipment %}
             <span class="badge bg-secondary me-1 mb-1">{{ eq_labels.get(e, e) }}</span>
@@ -71,7 +71,7 @@
           {% endif %}
 
           {% if user_diet %}
-          <dt class="col-sm-4 text-muted">Diet</dt>
+          <dt class="col-sm-4 text-muted">{{ t("profile_diet") }}</dt>
           <dd class="col-sm-8">
             {% for d in user_diet %}
             <span class="badge bg-secondary me-1 mb-1">{{ diet_labels.get(d, d) }}</span>
@@ -80,7 +80,7 @@
           {% endif %}
 
           {% if user_health %}
-          <dt class="col-sm-4 text-muted">Health conditions</dt>
+          <dt class="col-sm-4 text-muted">{{ t("profile_health") }}</dt>
           <dd class="col-sm-8">
             {% for h in user_health %}
             <span class="badge bg-warning text-dark me-1 mb-1">{{ health_labels.get(h, h) }}</span>
@@ -97,9 +97,9 @@
     <div class="card bg-dark-subtle border-secondary mb-3">
       <div class="card-body p-4 text-center py-5">
         <div class="mb-3" style="font-size:2.5rem">&#x1F4CB;</div>
-        <h5 class="fw-semibold mb-2">No profile yet</h5>
-        <p class="text-muted mb-3">Complete the questionnaire so we can personalise your workouts.</p>
-        <a href="/my/questionnaire" class="btn btn-garmin">Take the questionnaire</a>
+        <h5 class="fw-semibold mb-2">{{ t("profile_no_profile") }}</h5>
+        <p class="text-muted mb-3">{{ t("profile_no_profile_desc") }}</p>
+        <a href="/my/questionnaire" class="btn btn-garmin">{{ t("profile_take_q") }}</a>
       </div>
     </div>
 

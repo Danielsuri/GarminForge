@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}GarminForge — {% if is_retake %}Update Profile{% else %}Set Up Your Profile{% endif %}{% endblock %}
+{% block title %}GarminForge — {% if is_retake %}{{ t("q_page_title_retake") }}{% else %}{{ t("q_page_title_setup") }}{% endif %}{% endblock %}
 
 {% block head %}
 <style>
@@ -97,7 +97,7 @@ input[type=range].wrange { width: 100%; accent-color: #0066cc; }
 <div class="wizard-outer">
 
   <div class="wizard-meta">
-    <span id="wStepLabel">Question 1 of 7</span>
+    <span id="wStepLabel"></span>
     <span id="wPctLabel">14%</span>
   </div>
   <div class="wizard-track">
@@ -109,77 +109,77 @@ input[type=range].wrange { width: 100%; accent-color: #0066cc; }
 
       <!-- Card 0: Age -->
       <div class="wcard active" id="wc0">
-        <div class="wcard-label">About you</div>
-        <div class="wcard-title">How old are you?</div>
+        <div class="wcard-label">{{ t("q_section_about") }}</div>
+        <div class="wcard-title">{{ t("q_age_title") }}</div>
         <div class="slider-display" id="ageDisplay">
-          {{ existing_age if existing_age else 28 }}&nbsp;<span class="slider-unit">years old</span>
+          {{ existing_age if existing_age else 28 }}&nbsp;<span class="slider-unit">{{ t("q_years_old") }}</span>
         </div>
         <input type="range" class="wrange" name="age" id="ageRange"
                min="13" max="80" value="{{ existing_age if existing_age else 28 }}" />
         <div class="slider-limits"><span>13</span><span>80+</span></div>
         <div class="wnav">
-          <button type="button" class="wnav-next" onclick="wNext()">Continue &#8594;</button>
+          <button type="button" class="wnav-next" onclick="wNext()">{{ t("q_continue") }}</button>
         </div>
       </div>
 
       <!-- Card 1: Fitness level -->
       <div class="wcard" id="wc1">
-        <div class="wcard-label">Experience</div>
-        <div class="wcard-title">What is your fitness level?</div>
+        <div class="wcard-label">{{ t("q_section_experience") }}</div>
+        <div class="wcard-title">{{ t("q_fitness_level_title") }}</div>
         <div class="wopts wopts--row">
           {% for level in fitness_levels %}
           <label class="wopt">
-            <input type="radio" name="fitness_level" value="{{ level }}"
-                   {% if existing_fitness_level == level %}checked{% endif %}>
-            {{ level }}
+            <input type="radio" name="fitness_level" value="{{ level.value }}"
+                   {% if existing_fitness_level == level.value %}checked{% endif %}>
+            {{ t(level.key) }}
           </label>
           {% endfor %}
         </div>
         <div class="wnav">
-          <button type="button" class="wnav-back" onclick="wBack()">&#8592; Back</button>
-          <button type="button" class="wnav-next" onclick="wNext()">Continue &#8594;</button>
+          <button type="button" class="wnav-back" onclick="wBack()">{{ t("q_back") }}</button>
+          <button type="button" class="wnav-next" onclick="wNext()">{{ t("q_continue") }}</button>
         </div>
       </div>
 
       <!-- Card 2: Days per week -->
       <div class="wcard" id="wc2">
-        <div class="wcard-label">Commitment</div>
-        <div class="wcard-title">How many days per week do you work out?</div>
+        <div class="wcard-label">{{ t("q_section_commitment") }}</div>
+        <div class="wcard-title">{{ t("q_days_title") }}</div>
         <div class="slider-display" id="daysDisplay">
-          {{ existing_weekly_days if existing_weekly_days else 3 }}&nbsp;<span class="slider-unit" id="daysUnit">{{ 'day / week' if existing_weekly_days == 1 else 'days / week' }}</span>
+          {{ existing_weekly_days if existing_weekly_days else 3 }}&nbsp;<span class="slider-unit" id="daysUnit">{{ t("q_day_week") if existing_weekly_days == 1 else t("q_days_week") }}</span>
         </div>
         <input type="range" class="wrange" name="weekly_workout_days" id="daysRange"
                min="1" max="7" value="{{ existing_weekly_days if existing_weekly_days else 3 }}" />
         <div class="slider-limits"><span>1</span><span>7</span></div>
         <div class="wnav">
-          <button type="button" class="wnav-back" onclick="wBack()">&#8592; Back</button>
-          <button type="button" class="wnav-next" onclick="wNext()">Continue &#8594;</button>
+          <button type="button" class="wnav-back" onclick="wBack()">{{ t("q_back") }}</button>
+          <button type="button" class="wnav-next" onclick="wNext()">{{ t("q_continue") }}</button>
         </div>
       </div>
 
       <!-- Card 3: Fitness goals -->
       <div class="wcard" id="wc3">
-        <div class="wcard-label">Goals</div>
-        <div class="wcard-title">What are your fitness goals?</div>
+        <div class="wcard-label">{{ t("q_section_goals") }}</div>
+        <div class="wcard-title">{{ t("q_goals_title") }}</div>
         <div class="wopts">
           {% for opt in goal_options %}
           <label class="wopt">
             <input type="checkbox" name="fitness_goals" value="{{ opt.value }}"
                    {% if opt.value in existing_goals %}checked{% endif %}>
-            {{ opt.label }}
+            {{ t(opt.label) }}
           </label>
           {% endfor %}
         </div>
         <div class="wnav">
-          <button type="button" class="wnav-back" onclick="wBack()">&#8592; Back</button>
-          <button type="button" class="wnav-next" onclick="wNext()">Continue &#8594;</button>
+          <button type="button" class="wnav-back" onclick="wBack()">{{ t("q_back") }}</button>
+          <button type="button" class="wnav-next" onclick="wNext()">{{ t("q_continue") }}</button>
         </div>
       </div>
 
       <!-- Card 4: Equipment -->
       <div class="wcard" id="wc4">
-        <div class="wcard-label">Equipment</div>
-        <div class="wcard-title">What equipment do you have access to?</div>
+        <div class="wcard-label">{{ t("q_section_equipment") }}</div>
+        <div class="wcard-title">{{ t("q_equipment_title") }}</div>
         <div class="wtags">
           {% for eq in equipment_options %}
           <label class="wtag">
@@ -190,57 +190,57 @@ input[type=range].wrange { width: 100%; accent-color: #0066cc; }
           {% endfor %}
         </div>
         <div class="wnav">
-          <button type="button" class="wnav-back" onclick="wBack()">&#8592; Back</button>
-          <button type="button" class="wnav-next" onclick="wNext()">Continue &#8594;</button>
+          <button type="button" class="wnav-back" onclick="wBack()">{{ t("q_back") }}</button>
+          <button type="button" class="wnav-next" onclick="wNext()">{{ t("q_continue") }}</button>
         </div>
       </div>
 
       <!-- Card 5: Diet -->
       <div class="wcard" id="wc5">
-        <div class="wcard-label">Diet</div>
-        <div class="wcard-title">Do you follow a specific diet?</div>
+        <div class="wcard-label">{{ t("q_section_diet") }}</div>
+        <div class="wcard-title">{{ t("q_diet_title") }}</div>
         <div class="wopts wopts--grid">
           {% for opt in diet_options %}
           <label class="wopt">
             <input type="checkbox" name="diet" value="{{ opt.value }}"
                    {% if opt.value in existing_diet %}checked{% endif %}>
-            {{ opt.label }}
+            {{ t(opt.label) }}
           </label>
           {% endfor %}
         </div>
         <div class="wnav">
-          <button type="button" class="wnav-back" onclick="wBack()">&#8592; Back</button>
-          <button type="button" class="wnav-next" onclick="wNext()">Continue &#8594;</button>
+          <button type="button" class="wnav-back" onclick="wBack()">{{ t("q_back") }}</button>
+          <button type="button" class="wnav-next" onclick="wNext()">{{ t("q_continue") }}</button>
         </div>
       </div>
 
       <!-- Card 6: Health conditions -->
       <div class="wcard" id="wc6">
-        <div class="wcard-label">Health</div>
-        <div class="wcard-title">Any health or medical conditions we should know about?</div>
+        <div class="wcard-label">{{ t("q_section_health") }}</div>
+        <div class="wcard-title">{{ t("q_health_title") }}</div>
         <div class="wopts wopts--grid">
           {% for opt in health_options %}
           <label class="wopt">
             <input type="checkbox" name="health_conditions" value="{{ opt.value }}"
                    {% if opt.value in existing_health %}checked{% endif %}>
-            {{ opt.label }}
+            {{ t(opt.label) }}
           </label>
           {% endfor %}
         </div>
         <div class="wnav">
-          <button type="button" class="wnav-back" onclick="wBack()">&#8592; Back</button>
-          <button type="button" class="wnav-next" onclick="wNext()">Continue &#8594;</button>
+          <button type="button" class="wnav-back" onclick="wBack()">{{ t("q_back") }}</button>
+          <button type="button" class="wnav-next" onclick="wNext()">{{ t("q_continue") }}</button>
         </div>
       </div>
 
       <!-- Card 7: Summary -->
       <div class="wcard" id="wc7">
-        <div class="wcard-label">All done</div>
-        <div class="wcard-title" style="font-size:16px">Here&#8217;s your profile &#8212; looks good?</div>
+        <div class="wcard-label">{{ t("q_section_summary") }}</div>
+        <div class="wcard-title" style="font-size:16px">{{ t("q_summary_title") }}</div>
         <div id="wSummary"></div>
         <div class="wnav">
-          <button type="button" class="wnav-back" onclick="wBack()">&#8592; Edit</button>
-          <button type="submit" class="wnav-save" id="wSaveBtn">&#10003; Save Profile</button>
+          <button type="button" class="wnav-back" onclick="wBack()">{{ t("q_edit_back") }}</button>
+          <button type="submit" class="wnav-save" id="wSaveBtn">{{ t("q_save_profile") }}</button>
         </div>
       </div>
 
@@ -250,12 +250,12 @@ input[type=range].wrange { width: 100%; accent-color: #0066cc; }
   {% if not is_retake %}
   <div class="text-center mt-3">
     <form method="post" action="/my/questionnaire/skip" style="display:inline">
-      <button type="submit" class="btn btn-link text-muted small p-0">Skip for now</button>
+      <button type="submit" class="btn btn-link text-muted small p-0">{{ t("q_skip_now") }}</button>
     </form>
   </div>
   {% else %}
   <div class="text-center mt-3">
-    <a href="/my/profile" class="text-muted small">Cancel</a>
+    <a href="/my/profile" class="text-muted small">{{ t("q_cancel") }}</a>
   </div>
   {% endif %}
 
@@ -265,6 +265,24 @@ input[type=range].wrange { width: 100%; accent-color: #0066cc; }
 {% endblock %}
 
 {% block scripts %}
+<script>
+var WLANG = {
+  years_old:  "{{ t('q_years_old') | e }}",
+  day_week:   "{{ t('q_day_week') | e }}",
+  days_week:  "{{ t('q_days_week') | e }}",
+  q_prefix:   "{{ t('q_question_prefix') | e }}",
+  q_of:       "{{ t('q_question_of') | e }}",
+  q_review:   "{{ t('q_review') | e }}",
+  sum_age:    "{{ t('sum_age') | e }}",
+  sum_level:  "{{ t('sum_level') | e }}",
+  sum_days:   "{{ t('sum_days_week') | e }}",
+  sum_goals:  "{{ t('sum_goals') | e }}",
+  sum_equip:  "{{ t('sum_equipment') | e }}",
+  sum_diet:   "{{ t('sum_diet') | e }}",
+  sum_health: "{{ t('sum_health') | e }}",
+  saving:     "{{ t('q_saving') | e }}"
+};
+</script>
 <script>
 (function () {
   var QUESTIONS = 7;   /* number of question cards (wc0–wc6) */
@@ -277,7 +295,9 @@ input[type=range].wrange { width: 100%; accent-color: #0066cc; }
     document.getElementById('wFill').style.width = pct + '%';
     document.getElementById('wPctLabel').textContent = pct + '%';
     document.getElementById('wStepLabel').textContent =
-      step < QUESTIONS ? 'Question ' + (step + 1) + ' of ' + QUESTIONS : 'Review';
+      step < QUESTIONS
+        ? WLANG.q_prefix + ' ' + (step + 1) + ' ' + WLANG.q_of + ' ' + QUESTIONS
+        : WLANG.q_review;
   }
 
   function renderDots(step) {
@@ -333,7 +353,7 @@ input[type=range].wrange { width: 100%; accent-color: #0066cc; }
     d.appendChild(document.createTextNode(this.value + '\u00a0'));
     var s = document.createElement('span');
     s.className = 'slider-unit';
-    s.textContent = 'years old';
+    s.textContent = WLANG.years_old;
     d.appendChild(s);
   });
 
@@ -344,7 +364,7 @@ input[type=range].wrange { width: 100%; accent-color: #0066cc; }
     d.appendChild(document.createTextNode(v + '\u00a0'));
     var s = document.createElement('span');
     s.className = 'slider-unit';
-    s.textContent = v === 1 ? 'day\u00a0/\u00a0week' : 'days\u00a0/\u00a0week';
+    s.textContent = v === 1 ? WLANG.day_week : WLANG.days_week;
     d.appendChild(s);
   });
 
@@ -386,21 +406,21 @@ input[type=range].wrange { width: 100%; accent-color: #0066cc; }
   function buildSummary() {
     var wrap = document.getElementById('wSummary');
     while (wrap.firstChild) wrap.removeChild(wrap.firstChild);
-    wrap.appendChild(makeRow('Age',
-      [document.getElementById('ageRange').value + '\u00a0years old']));
-    wrap.appendChild(makeRow('Level',      getRadioText('fitness_level')));
-    wrap.appendChild(makeRow('Days\u00a0/\u00a0week',
+    wrap.appendChild(makeRow(WLANG.sum_age,
+      [document.getElementById('ageRange').value + '\u00a0' + WLANG.years_old]));
+    wrap.appendChild(makeRow(WLANG.sum_level,    getRadioText('fitness_level')));
+    wrap.appendChild(makeRow(WLANG.sum_days,
       [document.getElementById('daysRange').value]));
-    wrap.appendChild(makeRow('Goals',      getCheckedText('fitness_goals')));
-    wrap.appendChild(makeRow('Equipment',  getCheckedText('equipment')));
-    wrap.appendChild(makeRow('Diet',       getCheckedText('diet')));
-    wrap.appendChild(makeRow('Health',     getCheckedText('health_conditions')));
+    wrap.appendChild(makeRow(WLANG.sum_goals,    getCheckedText('fitness_goals')));
+    wrap.appendChild(makeRow(WLANG.sum_equip,    getCheckedText('equipment')));
+    wrap.appendChild(makeRow(WLANG.sum_diet,     getCheckedText('diet')));
+    wrap.appendChild(makeRow(WLANG.sum_health,   getCheckedText('health_conditions')));
   }
 
   document.getElementById('wForm').addEventListener('submit', function () {
     var btn = document.getElementById('wSaveBtn');
     btn.disabled = true;
-    btn.textContent = 'Saving\u2026';
+    btn.textContent = WLANG.saving;
   });
 
   setProgress(0);
