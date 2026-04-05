@@ -160,8 +160,7 @@ async def register_submit(
 
     maybe_migrate_file_token(user, db)
     login_session(request, user, db)
-    request.session["flash_success"] = "Account created! Connect your Garmin account below."
-    return RedirectResponse("/", status_code=303)
+    return RedirectResponse("/my/questionnaire", status_code=303)
 
 
 # ---------------------------------------------------------------------------
@@ -251,6 +250,8 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
 
     maybe_migrate_file_token(user, db)
     login_session(request, user, db)
+    if not user.questionnaire_completed:
+        return RedirectResponse("/my/questionnaire", status_code=303)
     return RedirectResponse("/", status_code=303)
 
 
@@ -432,4 +433,6 @@ async def apple_callback(request: Request, db: Session = Depends(get_db)):
 
     maybe_migrate_file_token(user, db)
     login_session(request, user, db)
+    if not user.questionnaire_completed:
+        return RedirectResponse("/my/questionnaire", status_code=303)
     return RedirectResponse("/", status_code=303)

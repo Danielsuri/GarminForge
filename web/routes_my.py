@@ -13,8 +13,9 @@ import dataclasses
 import json
 import logging
 from datetime import datetime
+from typing import Any
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
@@ -34,6 +35,153 @@ def _require_user(request: Request, db: Session):
     if not user:
         return None
     return user
+
+
+# ---------------------------------------------------------------------------
+# Questionnaire data constants
+# ---------------------------------------------------------------------------
+
+DIET_OPTIONS = [
+    {"value": "general",        "label": "General / No preference"},
+    {"value": "vegetarian",     "label": "Vegetarian"},
+    {"value": "vegan",          "label": "Vegan"},
+    {"value": "keto",           "label": "Keto"},
+    {"value": "paleo",          "label": "Paleo"},
+    {"value": "mediterranean",  "label": "Mediterranean"},
+    {"value": "gluten_free",    "label": "Gluten-free"},
+    {"value": "high_protein",   "label": "High-protein"},
+]
+
+HEALTH_OPTIONS = [
+    {"value": "heart_condition",    "label": "Heart condition"},
+    {"value": "diabetes",           "label": "Diabetes"},
+    {"value": "high_blood_pressure","label": "High blood pressure"},
+    {"value": "joint_problems",     "label": "Joint problems / Arthritis"},
+    {"value": "back_pain",          "label": "Back pain"},
+    {"value": "asthma",             "label": "Asthma"},
+]
+
+GOAL_OPTIONS = [
+    {"value": "lose_weight",       "label": "Lose weight"},
+    {"value": "build_muscle",      "label": "Build muscle"},
+    {"value": "improve_endurance", "label": "Improve endurance"},
+    {"value": "flexibility",       "label": "Increase flexibility"},
+    {"value": "general_health",    "label": "General health"},
+]
+
+FITNESS_LEVELS = ["Beginner", "Intermediate", "Advanced"]
+
+
+def _decode_json_field(val: str | None) -> list[Any]:
+    if not val:
+        return []
+    try:
+        return json.loads(val)
+    except Exception:
+        return []
+
+
+# ---------------------------------------------------------------------------
+# Questionnaire routes
+# ---------------------------------------------------------------------------
+
+
+@router.get("/questionnaire", response_class=HTMLResponse)
+async def questionnaire_page(request: Request, db: Session = Depends(get_db)):
+    user = _require_user(request, db)
+    if user is None:
+        return RedirectResponse("/auth/login-forge", status_code=303)
+    return render_template(
+        "questionnaire.html",
+        request,
+        db=db,
+        diet_options=DIET_OPTIONS,
+        health_options=HEALTH_OPTIONS,
+        goal_options=GOAL_OPTIONS,
+        fitness_levels=FITNESS_LEVELS,
+        equipment_options=EQUIPMENT_OPTIONS,
+        existing_diet=_decode_json_field(user.diet_json),
+        existing_health=_decode_json_field(user.health_conditions_json),
+        existing_goals=_decode_json_field(user.fitness_goals_json),
+        existing_equipment=_decode_json_field(user.preferred_equipment_json),
+        existing_fitness_level=user.fitness_level or "",
+        existing_age=user.age,
+        existing_weekly_days=user.weekly_workout_days,
+        is_retake=user.questionnaire_completed,
+    )
+
+
+@router.post("/questionnaire")
+async def questionnaire_submit(request: Request, db: Session = Depends(get_db)):
+    user = _require_user(request, db)
+    if user is None:
+        return RedirectResponse("/auth/login-forge", status_code=303)
+
+    form = await request.form()
+
+    age_raw = form.get("age", "")
+    try:
+        user.age = int(age_raw) if age_raw else None  # type: ignore[assignment]
+    except ValueError:
+        user.age = None  # type: ignore[assignment]
+
+    user.diet_json = json.dumps(form.getlist("diet"))
+    user.health_conditions_json = json.dumps(form.getlist("health_conditions"))
+    user.preferred_equipment_json = json.dumps(form.getlist("equipment"))
+    user.fitness_level = form.get("fitness_level") or None  # type: ignore[assignment]
+    user.fitness_goals_json = json.dumps(form.getlist("fitness_goals"))
+
+    days_raw = form.get("weekly_workout_days", "")
+    try:
+        user.weekly_workout_days = int(days_raw) if days_raw else None  # type: ignore[assignment]
+    except ValueError:
+        user.weekly_workout_days = None  # type: ignore[assignment]
+
+    user.questionnaire_completed = True  # type: ignore[assignment]
+    db.commit()
+
+    request.session["flash_success"] = "Profile saved! Ready to forge your workouts."
+    return RedirectResponse("/", status_code=303)
+
+
+@router.post("/questionnaire/skip")
+async def questionnaire_skip(request: Request, db: Session = Depends(get_db)):
+    user = _require_user(request, db)
+    if user is None:
+        return RedirectResponse("/auth/login-forge", status_code=303)
+    request.session["flash_success"] = "You can complete your profile anytime from the Profile page."
+    return RedirectResponse("/", status_code=303)
+
+
+# ---------------------------------------------------------------------------
+# Profile page
+# ---------------------------------------------------------------------------
+
+
+@router.get("/profile", response_class=HTMLResponse)
+async def my_profile(request: Request, db: Session = Depends(get_db)):
+    user = _require_user(request, db)
+    if user is None:
+        return RedirectResponse("/auth/login-forge", status_code=303)
+
+    diet_labels = {o["value"]: o["label"] for o in DIET_OPTIONS}
+    health_labels = {o["value"]: o["label"] for o in HEALTH_OPTIONS}
+    goal_labels = {o["value"]: o["label"] for o in GOAL_OPTIONS}
+    eq_labels = {eq["tag"]: f"{eq['icon']} {eq['label']}" for eq in EQUIPMENT_OPTIONS}
+
+    return render_template(
+        "my_profile.html",
+        request,
+        db=db,
+        diet_labels=diet_labels,
+        health_labels=health_labels,
+        goal_labels=goal_labels,
+        eq_labels=eq_labels,
+        user_diet=_decode_json_field(user.diet_json),
+        user_health=_decode_json_field(user.health_conditions_json),
+        user_goals=_decode_json_field(user.fitness_goals_json),
+        user_equipment=_decode_json_field(user.preferred_equipment_json),
+    )
 
 
 # ---------------------------------------------------------------------------

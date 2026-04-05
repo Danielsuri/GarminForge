@@ -47,6 +47,14 @@ def init_db() -> None:
     # Each statement is idempotent: the except swallows "duplicate column" errors.
     _additive_migrations = [
         "ALTER TABLE users ADD COLUMN preferred_lang VARCHAR(5)",
+        "ALTER TABLE users ADD COLUMN questionnaire_completed BOOLEAN NOT NULL DEFAULT 0",
+        "ALTER TABLE users ADD COLUMN age INTEGER",
+        "ALTER TABLE users ADD COLUMN diet_json TEXT",
+        "ALTER TABLE users ADD COLUMN health_conditions_json TEXT",
+        "ALTER TABLE users ADD COLUMN preferred_equipment_json TEXT",
+        "ALTER TABLE users ADD COLUMN fitness_level VARCHAR(20)",
+        "ALTER TABLE users ADD COLUMN fitness_goals_json TEXT",
+        "ALTER TABLE users ADD COLUMN weekly_workout_days INTEGER",
     ]
     with engine.begin() as conn:
         for stmt in _additive_migrations:

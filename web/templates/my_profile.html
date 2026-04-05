@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}GarminForge — My Profile{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-10 col-lg-8">
+
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <h2 class="fw-bold mb-0"><i class="bi bi-person-circle me-2 text-info"></i>My Profile</h2>
+      <a href="/my/questionnaire" class="btn btn-garmin btn-sm">
+        <i class="bi bi-pencil me-1"></i>{% if forge_user.questionnaire_completed %}Retake Questionnaire{% else %}Complete Questionnaire{% endif %}
+      </a>
+    </div>
+
+    <!-- Account info -->
+    <div class="card bg-dark-subtle border-secondary mb-3">
+      <div class="card-body p-4">
+        <h6 class="fw-semibold mb-3 text-muted text-uppercase small">Account</h6>
+        <dl class="row mb-0">
+          <dt class="col-sm-4 text-muted">Email</dt>
+          <dd class="col-sm-8">{{ forge_user.email }}</dd>
+          {% if forge_user.display_name %}
+          <dt class="col-sm-4 text-muted">Name</dt>
+          <dd class="col-sm-8">{{ forge_user.display_name }}</dd>
+          {% endif %}
+          <dt class="col-sm-4 text-muted">Member since</dt>
+          <dd class="col-sm-8">{{ forge_user.created_at.strftime('%B %d, %Y') }}</dd>
+        </dl>
+      </div>
+    </div>
+
+    {% if forge_user.questionnaire_completed %}
+
+    <!-- Fitness profile summary -->
+    <div class="card bg-dark-subtle border-secondary mb-3">
+      <div class="card-body p-4">
+        <h6 class="fw-semibold mb-3 text-muted text-uppercase small">Fitness Profile</h6>
+        <dl class="row mb-0">
+
+          {% if forge_user.age %}
+          <dt class="col-sm-4 text-muted">Age</dt>
+          <dd class="col-sm-8">{{ forge_user.age }}</dd>
+          {% endif %}
+
+          {% if forge_user.fitness_level %}
+          <dt class="col-sm-4 text-muted">Fitness level</dt>
+          <dd class="col-sm-8">{{ forge_user.fitness_level }}</dd>
+          {% endif %}
+
+          {% if forge_user.weekly_workout_days %}
+          <dt class="col-sm-4 text-muted">Workout days / week</dt>
+          <dd class="col-sm-8">{{ forge_user.weekly_workout_days }}</dd>
+          {% endif %}
+
+          {% if user_goals %}
+          <dt class="col-sm-4 text-muted">Fitness goals</dt>
+          <dd class="col-sm-8">
+            {% for g in user_goals %}
+            <span class="badge bg-secondary me-1 mb-1">{{ goal_labels.get(g, g) }}</span>
+            {% endfor %}
+          </dd>
+          {% endif %}
+
+          {% if user_equipment %}
+          <dt class="col-sm-4 text-muted">Equipment</dt>
+          <dd class="col-sm-8">
+            {% for e in user_equipment %}
+            <span class="badge bg-secondary me-1 mb-1">{{ eq_labels.get(e, e) }}</span>
+            {% endfor %}
+          </dd>
+          {% endif %}
+
+          {% if user_diet %}
+          <dt class="col-sm-4 text-muted">Diet</dt>
+          <dd class="col-sm-8">
+            {% for d in user_diet %}
+            <span class="badge bg-secondary me-1 mb-1">{{ diet_labels.get(d, d) }}</span>
+            {% endfor %}
+          </dd>
+          {% endif %}
+
+          {% if user_health %}
+          <dt class="col-sm-4 text-muted">Health conditions</dt>
+          <dd class="col-sm-8">
+            {% for h in user_health %}
+            <span class="badge bg-warning text-dark me-1 mb-1">{{ health_labels.get(h, h) }}</span>
+            {% endfor %}
+          </dd>
+          {% endif %}
+
+        </dl>
+      </div>
+    </div>
+
+    {% else %}
+
+    <div class="card bg-dark-subtle border-secondary mb-3">
+      <div class="card-body p-4 text-center py-5">
+        <div class="mb-3" style="font-size:2.5rem">&#x1F4CB;</div>
+        <h5 class="fw-semibold mb-2">No profile yet</h5>
+        <p class="text-muted mb-3">Complete the questionnaire so we can personalise your workouts.</p>
+        <a href="/my/questionnaire" class="btn btn-garmin">Take the questionnaire</a>
+      </div>
+    </div>
+
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}
