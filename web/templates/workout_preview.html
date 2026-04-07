@@ -98,9 +98,14 @@
           <span class="fs-3 me-2">{{ plan.goal_icon }}</span>
           <span class="fw-bold fs-5">{{ plan.name }}</span>
         </div>
-        <span class="badge bg-garmin">
-          <i class="bi bi-clock me-1"></i>{{ plan.duration_minutes }} {{ t("form_min") }}
-        </span>
+        <div class="d-flex align-items-center gap-2">
+          <button type="button" class="btn btn-success btn-sm fw-semibold" id="playBtn">
+            <i class="bi bi-play-fill me-1"></i>Play
+          </button>
+          <span class="badge bg-garmin">
+            <i class="bi bi-clock me-1"></i>{{ plan.duration_minutes }} {{ t("form_min") }}
+          </span>
+        </div>
       </div>
 
       <div class="card-body p-4">
@@ -363,6 +368,70 @@
         <video id="videoTutorialPlayer" controls playsinline
                style="width:100%;display:block;background:#000;max-height:70vh;">
         </video>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================================
+     Workout Player Modal
+     ===================================================================== -->
+<div class="modal fade" id="workoutPlayerModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content border-0" style="background:#0a0a0a;color:#fff;">
+
+      <!-- Header -->
+      <div class="modal-header border-0 px-4 pt-3 pb-0">
+        <span class="text-muted small" id="playerRoundLabel">Round 1 of 3</span>
+        <button type="button" class="btn-close btn-close-white ms-auto"
+                data-bs-dismiss="modal" id="playerCloseBtn"></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body d-flex flex-column align-items-center justify-content-center px-4 py-2"
+           style="gap:16px;flex:1;">
+
+        <!-- Video / thumbnail / fallback area -->
+        <div id="playerMediaArea"
+             style="width:100%;max-width:560px;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center;">
+        </div>
+
+        <!-- Exercise name -->
+        <h1 id="playerExerciseName" class="text-center fw-bold mb-0"
+            style="font-size:clamp(1.4rem,5vw,2.2rem);letter-spacing:-.01em;">
+          Get Ready
+        </h1>
+
+        <!-- Timer / rep count -->
+        <div id="playerTimer"
+             style="font-size:clamp(3rem,15vw,6rem);font-weight:800;line-height:1;color:#4ade80;font-variant-numeric:tabular-nums;">
+          5
+        </div>
+
+        <!-- Step indicator -->
+        <div id="playerStepLabel" class="text-muted" style="font-size:.9rem;">
+          Step 1 of 18
+        </div>
+
+        <!-- Progress bar -->
+        <div style="width:100%;max-width:560px;background:#222;border-radius:4px;height:6px;">
+          <div id="playerProgress"
+               style="background:#4ade80;height:6px;border-radius:4px;width:0%;transition:width .4s ease;">
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="d-flex gap-3 mt-2">
+          <button type="button" class="btn btn-outline-light px-4 py-2 fw-semibold"
+                  id="playerPauseBtn">
+            <i class="bi bi-pause-fill" id="playerPauseIcon"></i>
+            <span id="playerPauseLabel" class="ms-1">Pause</span>
+          </button>
+          <button type="button" class="btn btn-outline-secondary px-4 py-2" id="playerSkipBtn">
+            <i class="bi bi-skip-forward-fill me-1"></i>Skip
+          </button>
+        </div>
+
       </div>
     </div>
   </div>
