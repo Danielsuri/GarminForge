@@ -87,6 +87,18 @@ Key routes:
 
 `web/exercise_links.py` — maps exercise names to tutorial/reference URLs shown in the workout preview.
 
+## Adding local exercise videos
+
+The workout player shows local MP4s where available, falling back to embedded YouTube players.
+
+To add a new video:
+1. Copy the MP4 to `web/static/videos/<filename>.mp4`
+2. Add an entry to `_LOCAL_VIDEO_MAP` in `web/workout_generator.py` (~line 500):
+   ```python
+   "EXERCISE_KEY": "/static/videos/<filename>.mp4",
+   ```
+   The key must be the Garmin exercise key (`ALL_CAPS_SNAKE_CASE`) — find valid keys in `garminforge/workouts/exercises.py`.
+
 ## Garmin API reference map
 
 **`docs/garmin_api_map.md`** — read this before touching any workout payload or API call.
