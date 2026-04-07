@@ -181,10 +181,21 @@
                       </span>
                     </div>
                     <div class="d-flex gap-1 flex-shrink-0">
+                      {% if ex.video_url %}
+                      <button type="button"
+                              class="btn btn-outline-secondary btn-sm py-0 px-2"
+                              data-video-url="{{ ex.video_url | e }}"
+                              data-video-label="{{ ex.label | e }}"
+                              onclick="openVideoTutorial(this.dataset.videoUrl, this.dataset.videoLabel)"
+                              title="{{ t('preview_tutorial') }}">
+                        <i class="bi bi-play-circle me-1"></i>{{ t("preview_tutorial") }}
+                      </button>
+                      {% else %}
                       <a href="{{ ex.link }}" target="_blank" rel="noopener noreferrer"
                          class="btn btn-outline-secondary btn-sm py-0 px-2" title="{{ t('preview_tutorial') }}">
                         <i class="bi bi-play-circle me-1"></i>{{ t("preview_tutorial") }}
                       </a>
+                      {% endif %}
                       <button type="button"
                               class="btn btn-outline-info btn-sm py-0 px-2"
                               onclick="openReplaceModal({{ loop.index0 }})"
@@ -338,6 +349,25 @@
   </div>
 </div>
 
+<!-- =====================================================================
+     Video Tutorial Modal
+     ===================================================================== -->
+<div class="modal fade" id="videoTutorialModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-secondary" style="background:#0d0d0d;">
+      <div class="modal-header border-secondary py-2">
+        <h6 class="modal-title" id="videoTutorialModalLabel">Tutorial</h6>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-0">
+        <video id="videoTutorialPlayer" controls playsinline
+               style="width:100%;display:block;background:#000;max-height:70vh;">
+        </video>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -434,12 +464,21 @@ function exerciseRowHTML(ex, idx, isLast) {
          <span class="text-muted">${esc(ex.required_equipment_labels.join(' / '))}</span>
        </div>`
     : '';
-  const tutorialBtn = ex.link
-    ? `<a href="${esc(ex.link)}" target="_blank" rel="noopener noreferrer"
-          class="btn btn-outline-secondary btn-sm py-0 px-2" title="${MSG_TUTORIAL}">
+  const tutorialBtn = ex.video_url
+    ? `<button type="button"
+               class="btn btn-outline-secondary btn-sm py-0 px-2"
+               data-video-url="${esc(ex.video_url)}"
+               data-video-label="${esc(ex.label)}"
+               onclick="openVideoTutorial(this.dataset.videoUrl, this.dataset.videoLabel)"
+               title="${MSG_TUTORIAL}">
          <i class="bi bi-play-circle me-1"></i>${MSG_TUTORIAL}
-       </a>`
-    : '';
+       </button>`
+    : ex.link
+      ? `<a href="${esc(ex.link)}" target="_blank" rel="noopener noreferrer"
+            class="btn btn-outline-secondary btn-sm py-0 px-2" title="${MSG_TUTORIAL}">
+           <i class="bi bi-play-circle me-1"></i>${MSG_TUTORIAL}
+         </a>`
+      : '';
   const muscleLabel = ex.muscle_group ? ex.muscle_group.replace(/_/g, ' ') : '';
 
   const primaryJson  = JSON.stringify(ex.primary_muscles   || []);
@@ -869,6 +908,26 @@ document.getElementById('generateBtn')?.addEventListener('click', function () {
 /* -----------------------------------------------------------------------
    Boot: wire up SortableJS on the initial server-rendered list
    --------------------------------------------------------------------- */
+/* -----------------------------------------------------------------------
+   Video Tutorial Modal
+   --------------------------------------------------------------------- */
+function openVideoTutorial(url, label) {
+  const player = document.getElementById('videoTutorialPlayer');
+  const title  = document.getElementById('videoTutorialModalLabel');
+  player.setAttribute('src', url);
+  title.textContent = label;
+  bootstrap.Modal.getOrCreateInstance(
+    document.getElementById('videoTutorialModal')
+  ).show();
+}
+
+document.getElementById('videoTutorialModal').addEventListener('hide.bs.modal', () => {
+  const player = document.getElementById('videoTutorialPlayer');
+  player.pause();
+  player.removeAttribute('src');
+  player.load();
+});
+
 /* Expose onclick-handler functions to window so they work both in
    direct page load AND when re-injected via the dashboard's AJAX flow. */
 window.removeExercise    = removeExercise;
@@ -877,6 +936,7 @@ window.selectReplacement = selectReplacement;
 window.openAddModal      = openAddModal;
 window.filterAddModal    = filterAddModal;
 window.addExercise       = addExercise;
+window.openVideoTutorial = openVideoTutorial;
 
 /* -----------------------------------------------------------------------
    Muscle map
