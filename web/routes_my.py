@@ -15,7 +15,7 @@ import logging
 from datetime import datetime
 from typing import Any
 
-from fastapi import APIRouter, Depends, Form, Request
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
@@ -24,7 +24,7 @@ from web.db import get_db
 from web.models import SavedPlan, WorkoutSession
 from web.rendering import render_template
 from web.translations import make_t
-from web.workout_generator import EQUIPMENT_OPTIONS, GOALS, ExerciseInfo, WorkoutPlan
+from web.workout_generator import EQUIPMENT_OPTIONS, GOALS, ExerciseInfo, WorkoutPlan, _LOCAL_VIDEO_MAP
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/my")
@@ -304,6 +304,7 @@ async def load_plan_preview(plan_id: str, request: Request, db: Session = Depend
         plan=workout_plan,
         payload_json=plan.garmin_payload_json,
         exercises_json=plan.exercises_json,
+        video_map_json=json.dumps(_LOCAL_VIDEO_MAP),
         goals=GOALS,
         equipment_options=EQUIPMENT_OPTIONS,
         selected_goal=plan.goal,

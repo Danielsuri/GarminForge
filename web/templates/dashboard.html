@@ -177,7 +177,7 @@ document.getElementById('generatorForm').addEventListener('submit', async functi
       container.appendChild(document.adoptNode(preview));
 
       // Also inject modals and toast container (they live outside #workoutPreviewCard)
-      ['editToastContainer', 'replaceModal', 'addModal'].forEach(function(id) {
+      ['editToastContainer', 'replaceModal', 'addModal', 'videoTutorialModal', 'workoutPlayerModal'].forEach(function(id) {
         const existing = document.getElementById(id);
         if (existing) existing.remove();
         const el = doc.getElementById(id);
