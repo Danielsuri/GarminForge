@@ -1150,18 +1150,14 @@ function renderMediaArea(step) {
   } else {
     const vid = youtubeId(ex.link);
     if (vid) {
-      const img = document.createElement('img');
-      img.alt = ex.label;
-      img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-      // YouTube returns a silent 120×90 placeholder when hqdefault isn't available.
-      // Try hqdefault first; on load, if it's the placeholder (naturalWidth ≤ 120) swap to mqdefault.
-      img.setAttribute('src', 'https://img.youtube.com/vi/' + vid + '/hqdefault.jpg');
-      img.addEventListener('load', function() {
-        if (img.naturalWidth <= 120) {
-          img.setAttribute('src', 'https://img.youtube.com/vi/' + vid + '/mqdefault.jpg');
-        }
-      }, { once: true });
-      area.appendChild(img);
+      const frame = document.createElement('iframe');
+      frame.setAttribute('src', 'https://www.youtube.com/embed/' + vid + '?rel=0&modestbranding=1');
+      frame.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+      frame.setAttribute('allowfullscreen', '');
+      frame.setAttribute('frameborder', '0');
+      frame.setAttribute('title', ex.label);
+      frame.style.cssText = 'width:100%;height:100%;border:0;';
+      area.appendChild(frame);
     } else {
       // Fallback: name + muscle group card
       const wrap   = document.createElement('div');
