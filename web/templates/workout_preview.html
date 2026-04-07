@@ -972,10 +972,6 @@ eqCheckboxes.forEach(cb => cb.addEventListener('change', function () {
   updateEqCount();
 }));
 
-document.getElementById('generateBtn')?.addEventListener('click', function () {
-  this.disabled = true;
-  this.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>${MSG_REGENERATING}`;
-});
 
 /* -----------------------------------------------------------------------
    Boot: wire up SortableJS on the initial server-rendered list
