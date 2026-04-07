@@ -16,6 +16,7 @@ User management and progress routes are in routes_auth.py and routes_my.py.
 
 from __future__ import annotations
 
+import asyncio
 import dataclasses
 import json
 import logging
@@ -170,9 +171,13 @@ def _get_forge_client(request: Request, db: Session | None = None) -> GarminForg
                     TokenStore(token_string=user.garmin_token_b64),
                     inter_call_delay=0.5,
                 )
+            # Forge user exists but has no Garmin token linked yet
+            raise ValueError("No Garmin account linked. Please connect your Garmin account first.")
     # Legacy path: in-memory token store
-    token_id: str = request.session["token_id"]
-    token_b64: str = _TOKEN_STORE[token_id]
+    token_id: str = request.session.get("token_id", "")
+    token_b64: str = _TOKEN_STORE.get(token_id, "")
+    if not token_b64:
+        raise ValueError("Not authenticated with Garmin Connect.")
     return GarminForgeClient(
         TokenStore(token_string=token_b64),
         inter_call_delay=0.5,
@@ -255,7 +260,7 @@ async def auth_login(
 
     # Attempt fast headless login (no browser window)
     try:
-        oauth1, oauth2 = portal_login(email, password)
+        oauth1, oauth2 = await asyncio.to_thread(portal_login, email, password)
         _store_token(request, make_token_b64(oauth1, oauth2), db)
         request.session["flash_success"] = "Connected to Garmin successfully!"
         return RedirectResponse("/", status_code=303)
@@ -301,9 +306,9 @@ async def auth_poll(request: Request):
 async def auth_finalize(request: Request, db: Session = Depends(get_db)):
     """Called by browser (not fetch) once poll reports success — sets session cookie reliably."""
     login_id = request.session.get("login_id")
-    if not login_id or login_id not in _BROWSER_LOGINS:
+    state = _BROWSER_LOGINS.pop(login_id, None) if login_id else None
+    if state is None:
         return _error_redirect(request, "Login session expired. Please try again.")
-    state = _BROWSER_LOGINS.pop(login_id)
     request.session.pop("login_id", None)
     if state["status"] != "success":
         return _error_redirect(request, state.get("error", "Login failed."))
@@ -552,7 +557,6 @@ async def workout_generate(
         return _error_redirect(request, f"Generation error: {exc}")
 
     payload_json = json.dumps(plan.garmin_payload)
-    exercises_json = json.dumps([dataclasses.asdict(e) for e in plan.exercises])
     video_map_json = json.dumps(_LOCAL_VIDEO_MAP)
 
     return _render(
@@ -561,7 +565,7 @@ async def workout_generate(
         db=db,
         plan=plan,
         payload_json=payload_json,
-        exercises_json=exercises_json,
+        exercises_list=[dataclasses.asdict(e) for e in plan.exercises],
         video_map_json=video_map_json,
         goals=GOALS,
         equipment_options=EQUIPMENT_OPTIONS,
@@ -589,7 +593,8 @@ async def workout_upload(
     try:
         forge = _get_forge_client(request, db)
         result = forge.upload_workout(payload)
-        workout_id = result.get("workoutId") or result.get("workout", {}).get("workoutId")
+        workout_obj = result.get("workout") or {}
+        workout_id = result.get("workoutId") or workout_obj.get("workoutId")
 
         scheduled_on = None
         if schedule_date and workout_id:
@@ -658,6 +663,13 @@ async def workout_rebuild(request: Request) -> JSONResponse:
     exercises_data = body.get("exercises", [])
     if not isinstance(exercises_data, list) or not exercises_data:
         return JSONResponse({"error": "exercises must be a non-empty list."}, status_code=400)
+
+    _required_ex_fields = {"category", "name", "sets", "rest_seconds", "label"}
+    for i, ex in enumerate(exercises_data):
+        if not isinstance(ex, dict):
+            return JSONResponse({"error": f"exercises[{i}] must be an object."}, status_code=400)
+        if missing := _required_ex_fields - ex.keys():
+            return JSONResponse({"error": f"exercises[{i}] missing fields: {sorted(missing)}"}, status_code=400)
 
     duration_minutes = int(body.get("duration_minutes", 45))
     workout_name = str(body.get("workout_name", "Workout"))

@@ -489,7 +489,7 @@ const MSG_REORDERED        = {{ t("edit_toast_reordered") | tojson }};
 /* -----------------------------------------------------------------------
    State
    --------------------------------------------------------------------- */
-let exercises        = {{ exercises_json | safe }};
+let exercises        = {{ exercises_list | tojson }};
 const PLAYER_VIDEO_MAP = {{ video_map_json | safe }};
 const SELECTED_GOAL  = {{ selected_goal | tojson }};
 const SELECTED_EQ    = {{ selected_equipment | tojson }};
