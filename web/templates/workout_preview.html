@@ -487,6 +487,7 @@ const MSG_REORDERED        = {{ t("edit_toast_reordered") | tojson }};
    State
    --------------------------------------------------------------------- */
 let exercises        = {{ exercises_json | safe }};
+const PLAYER_VIDEO_MAP = {{ video_map_json | safe }};
 const SELECTED_GOAL  = {{ selected_goal | tojson }};
 const SELECTED_EQ    = {{ selected_equipment | tojson }};
 const SELECTED_DUR   = {{ selected_duration }};
@@ -743,6 +744,7 @@ function selectReplacement(newEx) {
     required_equipment_labels: newEx.equipment_labels || [],
     primary_muscles:         newEx.primary_muscles   || [],
     secondary_muscles:       newEx.secondary_muscles || [],
+    video_url:               PLAYER_VIDEO_MAP[newEx.name] || null,
   };
   renderExercises();
   getReplaceModal().hide();
@@ -835,6 +837,7 @@ function addExercise(newEx) {
     required_equipment_labels: newEx.equipment_labels || [],
     primary_muscles:         newEx.primary_muscles   || [],
     secondary_muscles:       newEx.secondary_muscles || [],
+    video_url:               PLAYER_VIDEO_MAP[newEx.name] || null,
   });
   renderExercises();
   getAddModal().hide();
@@ -1311,8 +1314,8 @@ document.getElementById('playerSkipBtn').addEventListener('click', () => {
   playerAdvance();
 });
 
-// ── Close ─────────────────────────────────────────────────────────────
-document.getElementById('playerCloseBtn').addEventListener('click', () => {
+// ── Teardown on any modal close (backdrop, Escape, or close button) ───
+document.getElementById('workoutPlayerModal').addEventListener('hide.bs.modal', () => {
   clearInterval(playerInterval);
   playerInterval = null;
   playerReleaseWakeLock();

@@ -55,6 +55,7 @@ from web.translations import SUPPORTED_LANGS
 from web.workout_generator import (
     EQUIPMENT_OPTIONS,
     GOALS,
+    _LOCAL_VIDEO_MAP,
     generate,
     get_available_exercises,
     rebuild_garmin_payload,
@@ -550,6 +551,7 @@ async def workout_generate(
 
     payload_json = json.dumps(plan.garmin_payload)
     exercises_json = json.dumps([dataclasses.asdict(e) for e in plan.exercises])
+    video_map_json = json.dumps(_LOCAL_VIDEO_MAP)
 
     return _render(
         "workout_preview.html",
@@ -558,6 +560,7 @@ async def workout_generate(
         plan=plan,
         payload_json=payload_json,
         exercises_json=exercises_json,
+        video_map_json=video_map_json,
         goals=GOALS,
         equipment_options=EQUIPMENT_OPTIONS,
         selected_goal=goal,
