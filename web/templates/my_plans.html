@@ -21,6 +21,16 @@
           </div>
           <span class="badge bg-secondary flex-shrink-0">{{ plan.duration_minutes }} {{ t("form_min") }}</span>
         </div>
+        <div class="mb-2">
+          {% if plan.program_session %}
+            {% set ps = plan.program_session %}
+            <a href="/my/programs/{{ ps.program.id }}" class="badge bg-info text-dark text-decoration-none">
+              <i class="bi bi-collection me-1"></i>Week {{ ps.week_num }} Day {{ ps.day_num }} · {{ ps.focus }}
+            </a>
+          {% else %}
+            <span class="badge bg-secondary">Standalone</span>
+          {% endif %}
+        </div>
         <div class="text-muted small mb-3">
           <i class="bi bi-calendar3 me-1"></i>
           {{ t("plans_saved") }} {{ plan.created_at.strftime('%d/%m/%Y') if lang == 'he' else plan.created_at.strftime('%b %d, %Y') }}

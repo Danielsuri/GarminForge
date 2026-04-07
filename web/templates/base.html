@@ -16,7 +16,7 @@
   {% endif %}
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-  <link rel="stylesheet" href="/static/css/style.css?v=1.7.2" />
+  <link rel="stylesheet" href="/static/css/style.css?v=1.8.0" />
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.bootstrap5.min.css" />
   {% block head %}{% endblock %}
@@ -49,6 +49,9 @@
           {% endif %}
           <a href="/my/plans" class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-bookmark me-1"></i>{{ t("nav_my_plans") }}
+          </a>
+          <a href="/my/programs" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-collection me-1"></i>{{ t("nav_programs") }}
           </a>
           <a href="/my/progress" class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-bar-chart me-1"></i>{{ t("nav_progress") }}

@@ -35,6 +35,11 @@ def get_current_user(request: Request, db: Session) -> User | None:
     return db.get(User, user_id)
 
 
+def require_user(request: Request, db: Session) -> User | None:
+    """Return the current user or None (caller should redirect to login when None)."""
+    return get_current_user(request, db)
+
+
 def login_session(request: Request, user: User, db: Session) -> None:
     """Write user_id into the session and update last_login_at."""
     request.session["user_id"] = user.id

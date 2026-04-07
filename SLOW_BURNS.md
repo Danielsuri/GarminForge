@@ -33,7 +33,7 @@ Initiative 8 (Running + Strength Hybrid) ← requires Initiative 2 + 3
 
 ---
 
-## Initiative 1: Program Data Model & Storage
+## Initiative 1: Program Data Model & Storage ✅ Complete (2026-04-07)
 
 **Priority:** Critical (prerequisite for everything else)
 **Effort:** 1–2 weeks
@@ -387,7 +387,7 @@ Initiative 2 (Program Generator), Initiative 3 (Calendar Scheduling)
 
 | Phase | Initiatives | Horizon | Key Deliverable |
 |-------|-------------|---------|-----------------|
-| **Foundation** | Initiative 1 + Quick Wins 1–6 | Months 1–2 | Program data model; personalized single sessions |
+| **Foundation** | ~~Initiative 1~~ ✅ + Quick Wins 1–6 | Months 1–2 | Program data model; personalized single sessions |
 | **Core** | Initiatives 2 + 3 | Months 3–5 | Full multi-week program generator + calendar scheduling |
 | **Intelligence** | Initiatives 4 + 5 | Months 6–9 | Progressive overload tracking + Garmin history import |
 | **Mastery** | Initiatives 6, 7, 8 | Months 10–15 | Adaptive programs; program library; hybrid training |
@@ -398,7 +398,7 @@ Initiative 2 (Program Generator), Initiative 3 (Calendar Scheduling)
 
 | Initiative | Effort | Risk | Priority | Depends on |
 |------------|--------|------|----------|------------|
-| 1 — Program Data Model | 1–2 wks | Low | Critical | — |
+| ~~1 — Program Data Model~~ ✅ | 1–2 wks | Low | Critical | — |
 | 2 — Program Generator | 3–4 wks | Medium | Critical | 1 |
 | 3 — Calendar Batch Scheduling | 2–3 wks | Medium | High | 2 |
 | 4 — Progressive Overload | 3–4 wks | Medium | High | 1 |

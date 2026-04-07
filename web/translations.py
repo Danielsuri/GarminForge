@@ -16,6 +16,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
     "en": {
         # --- Navbar ---
         "nav_my_plans":            "My Plans",
+        "nav_programs":            "Programs",
         "nav_progress":            "Progress",
         "nav_logout":              "Log out",
         "nav_sign_in":             "Sign In",
@@ -271,6 +272,37 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "fitness_intermediate": "Intermediate",
         "fitness_advanced":    "Advanced",
 
+        # --- Programs list page ---
+        "programs_title":              "My Programs",
+        "programs_new":                "New Program",
+        "programs_new_coming_soon":    "Program generation coming soon",
+        "programs_status_active":      "Active",
+        "programs_status_completed":   "Completed",
+        "programs_status_paused":      "Paused",
+        "programs_weeks_short":        "w",
+        "programs_created":            "Created",
+        "programs_view":               "View",
+        "programs_delete_confirm":     "Delete this program? This cannot be undone.",
+        "programs_delete_error":       "Failed to delete program. Please try again.",
+        "programs_no_programs":        "No programs yet",
+        "programs_no_programs_desc":   "Multi-week program generation is coming soon.",
+        "programs_generate_btn":       "Generate a single workout",
+
+        # --- Program detail page ---
+        "programs_back":               "My Programs",
+        "programs_periodization":      "periodization",
+        "programs_weeks":              "weeks",
+        "programs_detail_sessions":    "Sessions",
+        "programs_detail_week":        "Week",
+        "programs_detail_day":         "Day",
+        "programs_detail_focus":       "Focus",
+        "programs_detail_scheduled":   "Scheduled",
+        "programs_detail_not_sched":   "Not scheduled",
+        "programs_detail_status":      "Status",
+        "programs_detail_done":        "Done",
+        "programs_detail_no_sessions": "No sessions yet",
+        "programs_detail_no_sessions_desc": "Sessions will appear here once program generation is available.",
+
         # --- Profile page ---
         "profile_title":          "My Profile",
         "profile_retake":         "Retake Questionnaire",
@@ -295,6 +327,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
     "he": {
         # --- Navbar ---
         "nav_my_plans":            "\u05d4\u05ea\u05d5\u05db\u05e0\u05d9\u05d5\u05ea \u05e9\u05dc\u05d9",
+        "nav_programs":            "\u05ea\u05d5\u05db\u05e0\u05d9\u05d5\u05ea",
         "nav_progress":            "\u05d4\u05ea\u05e7\u05d3\u05de\u05d5\u05ea",
         "nav_logout":              "\u05d4\u05ea\u05e0\u05ea\u05e7\u05d5\u05ea",
         "nav_sign_in":             "\u05db\u05e0\u05d9\u05e1\u05d4",
@@ -549,6 +582,37 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "fitness_beginner":    "\u05de\u05ea\u05d7\u05d9\u05dc",
         "fitness_intermediate": "\u05d1\u05d9\u05e0\u05d5\u05e0\u05d9",
         "fitness_advanced":    "\u05de\u05ea\u05e7\u05d3\u05dd",
+
+        # --- Programs list page ---
+        "programs_title":              "\u05d4\u05ea\u05d5\u05db\u05e0\u05d9\u05d5\u05ea \u05e9\u05dc\u05d9",
+        "programs_new":                "\u05ea\u05d5\u05db\u05e0\u05d9\u05ea \u05d7\u05d3\u05e9\u05d4",
+        "programs_new_coming_soon":    "\u05d9\u05e6\u05d9\u05e8\u05ea \u05ea\u05d5\u05db\u05e0\u05d9\u05d5\u05ea \u05d1\u05e7\u05e8\u05d5\u05d1",
+        "programs_status_active":      "\u05e4\u05e2\u05d9\u05dc",
+        "programs_status_completed":   "\u05d4\u05d5\u05e9\u05dc\u05dd",
+        "programs_status_paused":      "\u05de\u05d5\u05e9\u05d4\u05d4",
+        "programs_weeks_short":        "\u05e9\u05d1'",
+        "programs_created":            "\u05e0\u05d5\u05e6\u05e8",
+        "programs_view":               "\u05e6\u05e4\u05d4",
+        "programs_delete_confirm":     "\u05dc\u05de\u05d7\u05d5\u05e7 \u05d0\u05ea \u05d4\u05ea\u05d5\u05db\u05e0\u05d9\u05ea? \u05dc\u05d0 \u05e0\u05d9\u05ea\u05df \u05dc\u05d1\u05d8\u05dc \u05e4\u05e2\u05d5\u05dc\u05d4 \u05d6\u05d5.",
+        "programs_delete_error":       "\u05de\u05d7\u05d9\u05e7\u05ea \u05d4\u05ea\u05d5\u05db\u05e0\u05d9\u05ea \u05e0\u05db\u05e9\u05dc\u05d4. \u05d0\u05e0\u05d0 \u05e0\u05e1\u05d4 \u05e9\u05d5\u05d1.",
+        "programs_no_programs":        "\u05d0\u05d9\u05df \u05ea\u05d5\u05db\u05e0\u05d9\u05d5\u05ea \u05e2\u05d3\u05d9\u05d9\u05df",
+        "programs_no_programs_desc":   "\u05d9\u05e6\u05d9\u05e8\u05ea \u05ea\u05d5\u05db\u05e0\u05d9\u05d5\u05ea \u05de\u05e8\u05d5\u05d1\u05d5\u05ea \u05e9\u05d1\u05d5\u05e2\u05d5\u05ea \u05d1\u05e7\u05e8\u05d5\u05d1.",
+        "programs_generate_btn":       "\u05e6\u05d5\u05e8 \u05d0\u05d9\u05de\u05d5\u05df \u05d1\u05d5\u05d3\u05d3",
+
+        # --- Program detail page ---
+        "programs_back":               "\u05d4\u05ea\u05d5\u05db\u05e0\u05d9\u05d5\u05ea \u05e9\u05dc\u05d9",
+        "programs_periodization":      "\u05ea\u05e7\u05d5\u05e4\u05ea\u05d9\u05d5\u05ea",
+        "programs_weeks":              "\u05e9\u05d1\u05d5\u05e2\u05d5\u05ea",
+        "programs_detail_sessions":    "\u05d0\u05d9\u05de\u05d5\u05e0\u05d9\u05dd",
+        "programs_detail_week":        "\u05e9\u05d1\u05d5\u05e2",
+        "programs_detail_day":         "\u05d9\u05d5\u05dd",
+        "programs_detail_focus":       "\u05de\u05d9\u05e7\u05d5\u05d3",
+        "programs_detail_scheduled":   "\u05de\u05ea\u05d5\u05d6\u05de\u05df",
+        "programs_detail_not_sched":   "\u05dc\u05d0 \u05de\u05ea\u05d5\u05d6\u05de\u05df",
+        "programs_detail_status":      "\u05e1\u05d8\u05d0\u05d8\u05d5\u05e1",
+        "programs_detail_done":        "\u05d4\u05d5\u05e9\u05dc\u05dd",
+        "programs_detail_no_sessions": "\u05d0\u05d9\u05df \u05d0\u05d9\u05de\u05d5\u05e0\u05d9\u05dd \u05e2\u05d3\u05d9\u05d9\u05df",
+        "programs_detail_no_sessions_desc": "\u05d0\u05d9\u05de\u05d5\u05e0\u05d9\u05dd \u05d9\u05d5\u05e4\u05d9\u05e2\u05d5 \u05db\u05d0\u05df \u05db\u05d0\u05e9\u05e8 \u05d9\u05e6\u05d9\u05e8\u05ea \u05d4\u05ea\u05d5\u05db\u05e0\u05d9\u05d5\u05ea \u05ea\u05d4\u05d9\u05d4 \u05d6\u05de\u05d9\u05e0\u05d4.",
 
         # --- Profile page ---
         "profile_title":          "\u05d4\u05e4\u05e8\u05d5\u05e4\u05d9\u05dc \u05e9\u05dc\u05d9",

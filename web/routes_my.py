@@ -17,11 +17,11 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
-from web.auth_utils import get_current_user
+from web.auth_utils import require_user
 from web.db import get_db
-from web.models import SavedPlan, WorkoutSession
+from web.models import ProgramSession, SavedPlan, WorkoutSession
 from web.rendering import render_template
 from web.translations import make_t
 from web.workout_generator import EQUIPMENT_OPTIONS, GOALS, ExerciseInfo, WorkoutPlan, _LOCAL_VIDEO_MAP
@@ -30,12 +30,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/my")
 
 
-def _require_user(request: Request, db: Session):
-    """Return current user or raise a redirect to login."""
-    user = get_current_user(request, db)
-    if not user:
-        return None
-    return user
+_require_user = require_user
 
 
 # ---------------------------------------------------------------------------
@@ -216,6 +211,9 @@ async def my_plans(request: Request, db: Session = Depends(get_db)):
         return RedirectResponse("/auth/login-forge", status_code=303)
     plans = (
         db.query(SavedPlan)
+        .options(
+            joinedload(SavedPlan.program_session).joinedload(ProgramSession.program)
+        )
         .filter_by(user_id=user.id)
         .order_by(SavedPlan.created_at.desc())
         .all()

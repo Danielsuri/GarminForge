@@ -4,9 +4,9 @@ SQLAlchemy ORM models for GarminForge user management and progress tracking.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, func
+from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from web.db import Base
@@ -47,6 +47,9 @@ class User(Base):
     sessions: Mapped[list[WorkoutSession]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
+    programs: Mapped[list[Program]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
 
 
 class SavedPlan(Base):
@@ -62,10 +65,14 @@ class SavedPlan(Base):
     duration_minutes: Mapped[int]
     exercises_json: Mapped[str] = mapped_column(Text, nullable=False)
     garmin_payload_json: Mapped[str] = mapped_column(Text, nullable=False)
+    program_session_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("program_sessions.id", ondelete="SET NULL"), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     user: Mapped[User] = relationship(back_populates="plans")
     sessions: Mapped[list[WorkoutSession]] = relationship(back_populates="plan")
+    program_session: Mapped[ProgramSession | None] = relationship(back_populates="saved_plans")
 
 
 class WorkoutSession(Base):
@@ -89,3 +96,46 @@ class WorkoutSession(Base):
 
     user: Mapped[User] = relationship(back_populates="sessions")
     plan: Mapped[SavedPlan | None] = relationship(back_populates="sessions")
+
+
+class Program(Base):
+    __tablename__ = "programs"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    goal: Mapped[str] = mapped_column(String(50), nullable=False)
+    periodization_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    # "linear" | "undulating" | "block"
+    duration_weeks: Mapped[int] = mapped_column(Integer, nullable=False)
+    equipment_json: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="active")
+    # "active" | "completed" | "paused"
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+    user: Mapped[User] = relationship(back_populates="programs")
+    program_sessions: Mapped[list[ProgramSession]] = relationship(
+        back_populates="program", cascade="all, delete-orphan"
+    )
+
+
+class ProgramSession(Base):
+    __tablename__ = "program_sessions"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    program_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("programs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    week_num: Mapped[int] = mapped_column(Integer, nullable=False)
+    day_num: Mapped[int] = mapped_column(Integer, nullable=False)
+    focus: Mapped[str] = mapped_column(String(100), nullable=False)
+    garmin_payload_json: Mapped[str] = mapped_column(Text, nullable=False)
+    exercises_json: Mapped[str] = mapped_column(Text, nullable=False)
+    garmin_workout_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    scheduled_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    program: Mapped[Program] = relationship(back_populates="program_sessions")
+    saved_plans: Mapped[list[SavedPlan]] = relationship(back_populates="program_session")

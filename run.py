@@ -46,12 +46,18 @@ def main() -> None:
         )
         sys.exit(1)
 
+    if args.reload:
+        # Suppress watchfiles noise from OneDrive sync artifacts and __pycache__ writes.
+        import logging as _logging
+        _logging.getLogger("watchfiles.main").setLevel(_logging.WARNING)
+
     print(f"Starting GarminForge at http://{args.host}:{args.port}")
     uvicorn.run(
         "web.app:app",
         host=args.host,
         port=args.port,
         reload=args.reload,
+        reload_dirs=["garminforge", "web"] if args.reload else None,
         log_level="info",
     )
 

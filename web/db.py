@@ -39,7 +39,7 @@ def init_db() -> None:
     ``create_all`` skips on existing databases.  SQLite silently errors when a
     column already exists, so we swallow those exceptions.
     """
-    from web.models import SavedPlan, User, WorkoutSession  # noqa: F401
+    from web.models import Program, ProgramSession, SavedPlan, User, WorkoutSession  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
 
@@ -55,6 +55,7 @@ def init_db() -> None:
         "ALTER TABLE users ADD COLUMN fitness_level VARCHAR(20)",
         "ALTER TABLE users ADD COLUMN fitness_goals_json TEXT",
         "ALTER TABLE users ADD COLUMN weekly_workout_days INTEGER",
+        "ALTER TABLE saved_plans ADD COLUMN program_session_id VARCHAR(36)",
     ]
     with engine.begin() as conn:
         for stmt in _additive_migrations:
