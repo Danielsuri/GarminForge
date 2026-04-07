@@ -75,7 +75,6 @@ class TestGetAvailableExercises:
 
     def test_equipment_labels_empty_for_bodyweight_exercises(self):
         result = get_available_exercises(["bodyweight"], "build_muscle")
-        bw_exercises = [ex for ex in result if "bodyweight" in ex.get("equipment_labels", ["x"])]
         # Bodyweight-only exercises should have no required_equipment_labels
         pure_bw = [ex for ex in result if not ex["equipment_labels"]]
         assert len(pure_bw) > 0
@@ -178,7 +177,6 @@ class TestExerciseInfoVideoUrl:
 
     def test_video_url_populated_when_exercise_matches_map(self):
         """ExerciseInfo.video_url is set when the exercise name is in _LOCAL_VIDEO_MAP."""
-        import dataclasses
         from web.workout_generator import ExerciseInfo, _LOCAL_VIDEO_MAP
         # Build a minimal ExerciseInfo for BULGARIAN_SPLIT_SQUAT
         ex = ExerciseInfo(
