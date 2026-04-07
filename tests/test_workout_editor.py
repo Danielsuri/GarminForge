@@ -156,3 +156,39 @@ class TestRebuildGarminPayload:
         exercises = [dataclasses.asdict(e) for e in timed[:1]]
         payload = rebuild_garmin_payload(exercises, "build_muscle", 45, "Timed Test")
         assert "workoutSegments" in payload
+
+
+class TestExerciseInfoVideoUrl:
+    def test_local_video_map_contains_expected_keys(self):
+        """_LOCAL_VIDEO_MAP must include both videos we ship."""
+        from web.workout_generator import _LOCAL_VIDEO_MAP
+        assert _LOCAL_VIDEO_MAP["BULGARIAN_SPLIT_SQUAT"] == "/static/videos/bulgarian-split-squat.mp4"
+        assert _LOCAL_VIDEO_MAP["JUMP_SQUAT"] == "/static/videos/jump-squat.mp4"
+
+    def test_exercise_info_has_video_url_field(self):
+        """ExerciseInfo dataclass must have a video_url field defaulting to None."""
+        import dataclasses
+        from web.workout_generator import ExerciseInfo
+        field_names = {f.name for f in dataclasses.fields(ExerciseInfo)}
+        assert "video_url" in field_names
+        # default is None
+        plan = generate(["bodyweight"], "build_muscle", 45, seed=42)
+        # at least one exercise should have video_url as None (most won't have local video)
+        assert any(e.video_url is None for e in plan.exercises)
+
+    def test_video_url_populated_when_exercise_matches_map(self):
+        """ExerciseInfo.video_url is set when the exercise name is in _LOCAL_VIDEO_MAP."""
+        import dataclasses
+        from web.workout_generator import ExerciseInfo, _LOCAL_VIDEO_MAP
+        # Build a minimal ExerciseInfo for BULGARIAN_SPLIT_SQUAT
+        ex = ExerciseInfo(
+            category="STRENGTH_TRAINING",
+            name="BULGARIAN_SPLIT_SQUAT",
+            label="Bulgarian Split Squat",
+            muscle_group="legs",
+            sets=3, reps=10, duration_sec=None, rest_seconds=60,
+            link="https://www.youtube.com/watch?v=2C-uNgKwPLE",
+            description="",
+            video_url=_LOCAL_VIDEO_MAP.get("BULGARIAN_SPLIT_SQUAT"),
+        )
+        assert ex.video_url == "/static/videos/bulgarian-split-squat.mp4"

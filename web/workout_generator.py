@@ -480,6 +480,7 @@ class ExerciseInfo:
     required_equipment_labels: list[str] = field(default_factory=list)
     primary_muscles:   list[str] = field(default_factory=list)
     secondary_muscles: list[str] = field(default_factory=list)
+    video_url: str | None = None
 
 
 @dataclass
@@ -492,6 +493,14 @@ class WorkoutPlan:
     duration_minutes: int
     exercises:       list[ExerciseInfo]
     garmin_payload:  dict[str, Any]
+
+
+# Maps Garmin exercise name keys to local static video paths.
+# Add entries here as new AI-generated videos are created.
+_LOCAL_VIDEO_MAP: dict[str, str] = {
+    "BULGARIAN_SPLIT_SQUAT": "/static/videos/bulgarian-split-squat.mp4",
+    "JUMP_SQUAT":            "/static/videos/jump-squat.mp4",
+}
 
 
 def generate(
@@ -585,6 +594,7 @@ def generate(
             required_equipment_labels=req_labels,
             primary_muscles=tmpl.primary_muscles,
             secondary_muscles=tmpl.secondary_muscles,
+            video_url=_LOCAL_VIDEO_MAP.get(tmpl.name),
         )
         # Build description from the same values that go into the Garmin step
         if ex.duration_sec is not None:
