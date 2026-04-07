@@ -240,6 +240,8 @@ code { color: #5bc08a; }
 
 /* ---------- Charged Play Button ---------- */
 .play-btn-charged {
+  -webkit-appearance: none;
+  appearance: none;
   position: relative;
   display: inline-flex;
   align-items: center;
