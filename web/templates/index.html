@@ -326,6 +326,7 @@
     pwToggle.addEventListener('click', function() {
       var isText = pwField.type === 'text';
       pwField.type = isText ? 'password' : 'text';
+      pwToggle.setAttribute('aria-label', isText ? 'Show password' : 'Hide password');
     });
   }
 
