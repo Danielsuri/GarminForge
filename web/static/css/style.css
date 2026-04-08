@@ -99,28 +99,59 @@ a:hover { color: var(--color-brand-pale); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ---------- Koda coda mark (𝄌 U+1D10C) ---------- */
+/* ---------- Koda coda mark (CSS — universal font fallback) ---------- */
+/* Draws the musical coda sign: circle + cross extending beyond the ring */
 .koda-phi {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--color-brand);
   flex-shrink: 0;
-  font-size: 30px;
-  line-height: 1;
-  color: var(--color-brand);
 }
 
+/* Horizontal bar — extends past the circle on both sides */
 .koda-phi::before {
-  content: '\1D10C';
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -5px;
+  right: -5px;
+  height: 2px;
+  background: var(--color-brand);
+  transform: translateY(-50%);
+}
+
+/* Vertical bar — extends past the circle above and below */
+.koda-phi::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -5px;
+  bottom: -5px;
+  width: 2px;
+  background: var(--color-brand);
+  transform: translateX(-50%);
 }
 
 .koda-phi--lg {
-  font-size: 64px;
+  width: 48px;
+  height: 48px;
+  border-width: 2.5px;
 }
+.koda-phi--lg::before { left: -10px; right: -10px; height: 2.5px; }
+.koda-phi--lg::after  { top: -10px; bottom: -10px; width: 2.5px; }
 
 .koda-phi--sm {
-  font-size: 18px;
+  width: 14px;
+  height: 14px;
+  border-width: 1.5px;
 }
+.koda-phi--sm::before { left: -3px; right: -3px; height: 1.5px; }
+.koda-phi--sm::after  { top: -3px; bottom: -3px; width: 1.5px; }
 
 /* ---------- Language toggle ---------- */
 .koda-lang-toggle {
