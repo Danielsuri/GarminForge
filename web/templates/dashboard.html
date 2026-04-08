@@ -274,7 +274,7 @@
         var html = await resp.text();
         var parser = new DOMParser();
         var doc = parser.parseFromString(html, 'text/html');
-        var preview = doc.getElementById('workoutPreviewCard');
+        var preview = doc.getElementById('workoutCard');
         if (preview) {
           // Clear container and inject the preview card
           var container = document.getElementById('previewContainer');

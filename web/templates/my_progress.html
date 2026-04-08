@@ -36,7 +36,7 @@
     <div class="col-6 col-md-3">
       <div class="koda-stat-card">
         <div class="koda-stat-value">
-          {{ stats.total_sessions | default(total_sessions) | default(0) }}
+          {{ (stats.total_sessions if stats is defined else total_sessions) | default(0) }}
         </div>
         <div class="koda-stat-label">{{ t("progress_sessions") }}</div>
       </div>
@@ -44,7 +44,7 @@
     <div class="col-6 col-md-3">
       <div class="koda-stat-card">
         <div class="koda-stat-value">
-          {{ stats.completed | default(completed_sessions | length) | default(0) }}
+          {{ (stats.completed if stats is defined else completed_sessions | length) | default(0) }}
         </div>
         <div class="koda-stat-label">{{ t("progress_completed") }}</div>
       </div>

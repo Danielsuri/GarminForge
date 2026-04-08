@@ -99,49 +99,43 @@ a:hover { color: var(--color-brand-pale); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ---------- Koda φ mark ---------- */
+/* ---------- Koda coda mark (𝄌 U+1D10C) ---------- */
 .koda-phi {
-  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 2px solid var(--color-brand);
   flex-shrink: 0;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--color-brand);
 }
 
 .koda-phi::before {
-  content: '';
-  position: absolute;
-  left: -1px;
-  right: -1px;
-  top: 50%;
-  height: 2px;
-  background: var(--color-brand);
-  transform: translateY(-50%);
-}
-
-.koda-phi::after {
-  content: '';
-  position: absolute;
-  top: -1px;
-  bottom: -1px;
-  left: 50%;
-  width: 2px;
-  background: var(--color-brand);
-  transform: translateX(-50%);
+  content: '\1D10C';
 }
 
 .koda-phi--lg {
-  width: 56px;
-  height: 56px;
+  font-size: 64px;
 }
 
 .koda-phi--sm {
-  width: 24px;
-  height: 24px;
+  font-size: 18px;
+}
+
+/* ---------- Language toggle ---------- */
+.koda-lang-toggle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 4px 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  color: var(--text-secondary) !important;
+}
+.koda-lang-toggle:hover {
+  color: var(--text-primary) !important;
+  border-color: var(--color-brand);
 }
 
 /* ---------- Wordmark ---------- */
