@@ -1,42 +1,38 @@
 {% extends "base.html" %}
-{% block title %}GarminForge — Connect{% endblock %}
+{% block title %}Connect — Koda{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-12 col-md-8 col-lg-6">
-
-    <div class="text-center mb-4">
-      <h2 class="fw-bold">Connect to Garmin</h2>
-      <p class="text-muted">Log in with your Garmin credentials below</p>
-    </div>
-
-    <div id="status-box" class="alert alert-info d-none" role="alert">
-      <span class="spinner-border spinner-border-sm me-2"></span>
-      Completing login, please wait…
-    </div>
-
-    <div id="error-box" class="alert alert-danger d-none" role="alert"></div>
-
-    <div class="card border-secondary" id="sso-card">
-      <div class="card-body p-0 overflow-hidden rounded">
-        <!--
-          sandbox without allow-top-navigation prevents the iframe from
-          hijacking the parent window after login.
-          allow-same-origin keeps the garmin.com origin so postMessage works.
-        -->
-        <iframe
-          id="sso-frame"
-          src="https://sso.garmin.com/sso/embed?id=gauth-widget&embedWidget=true&gauthHost=https://sso.garmin.com/sso&clientId=GarminConnect&locale=en_US&redirectAfterAccountLoginUrl=https://sso.garmin.com/sso/embed&service=https://sso.garmin.com/sso/embed"
-          style="width:100%;height:520px;border:none;display:block;"
-          sandbox="allow-scripts allow-forms allow-same-origin allow-popups">
-        </iframe>
+<div class="container-xl px-3 px-lg-4 py-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+      <div class="koda-card mb-3">
+        <div class="text-center mb-4">
+          <span class="koda-phi koda-phi--lg" style="display:flex;margin:0 auto 16px;" aria-hidden="true"></span>
+          <h1 style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--text-primary);margin-bottom:6px;">
+            Connect to Garmin
+          </h1>
+          <p style="font-size:13px;color:var(--text-secondary);">
+            Sign in with your Garmin Connect account below.
+          </p>
+        </div>
+        <div id="status-box" style="display:none;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);border-radius:8px;padding:12px 14px;margin-bottom:16px;color:#3b82f6;font-size:13px;text-align:center;">
+          <span class="koda-spinner" aria-hidden="true" style="display:inline-block;width:12px;height:12px;margin-right:8px;"></span>
+          Completing login, please wait…
+        </div>
+        <div id="error-box" style="display:none;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);border-radius:8px;padding:12px 14px;margin-bottom:16px;color:#f87171;font-size:13px;"></div>
+        <div style="border:1px solid var(--border-default);border-radius:var(--radius-inner);overflow:hidden;" id="sso-card">
+          <iframe id="sso-frame"
+                  src="https://sso.garmin.com/sso/embed?id=gauth-widget&embedWidget=true&gauthHost=https://sso.garmin.com/sso&clientId=GarminConnect&locale=en_US&redirectAfterAccountLoginUrl=https://sso.garmin.com/sso/embed&service=https://sso.garmin.com/sso/embed"
+                  style="width:100%;min-height:480px;border:none;background:var(--color-card);"
+                  title="Garmin Connect SSO"
+                  sandbox="allow-scripts allow-forms allow-same-origin allow-popups">
+          </iframe>
+        </div>
+      </div>
+      <div class="text-center">
+        <a href="{{ url_for('index') }}" style="font-size:13px;color:var(--text-secondary);">← Back to dashboard</a>
       </div>
     </div>
-
-    <p class="text-muted small text-center mt-3">
-      <a href="/" class="text-muted">Cancel</a>
-    </p>
-
   </div>
 </div>
 {% endblock %}
@@ -57,8 +53,8 @@ window.addEventListener("message", async function (event) {
   const ticket = data.serviceTicket || data.ticket;
   if (!ticket || !ticket.startsWith("ST-")) return;
 
-  document.getElementById("sso-card").classList.add("d-none");
-  document.getElementById("status-box").classList.remove("d-none");
+  document.getElementById("sso-card").style.display = "none";
+  document.getElementById("status-box").style.display = "block";
 
   try {
     const resp = await fetch("/auth/exchange", {
@@ -78,11 +74,11 @@ window.addEventListener("message", async function (event) {
 });
 
 function showError(msg) {
-  document.getElementById("status-box").classList.add("d-none");
-  document.getElementById("sso-card").classList.remove("d-none");
+  document.getElementById("status-box").style.display = "none";
+  document.getElementById("sso-card").style.display = "block";
   const box = document.getElementById("error-box");
   box.textContent = msg;
-  box.classList.remove("d-none");
+  box.style.display = "block";
 }
 </script>
 {% endblock %}
