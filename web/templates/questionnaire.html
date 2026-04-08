@@ -6,7 +6,7 @@
 .wizard-outer { max-width: 420px; margin: 0 auto; }
 .wizard-meta { display: flex; justify-content: space-between; font-size: 11px; color: #666; margin-bottom: 6px; }
 .wizard-track { height: 4px; background: #1e2030; border-radius: 2px; margin-bottom: 28px; }
-.wizard-fill  { height: 4px; background: #0066cc; border-radius: 2px; transition: width .4s ease; }
+.wizard-fill  { height: 4px; background: #7c3aed; border-radius: 2px; transition: width .4s ease; }
 
 .wizard-stage { position: relative; min-height: 360px; }
 
@@ -34,14 +34,14 @@
   pointer-events: none;
 }
 
-.wcard-label { font-size: 11px; font-weight: 600; color: #0066cc; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
+.wcard-label { font-size: 11px; font-weight: 600; color: #7c3aed; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
 .wcard-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 20px; line-height: 1.3; }
 
 /* Sliders */
-.slider-display { font-size: 42px; font-weight: 800; color: #0066cc; text-align: center; margin-bottom: 10px; line-height: 1; }
+.slider-display { font-size: 42px; font-weight: 800; color: #7c3aed; text-align: center; margin-bottom: 10px; line-height: 1; }
 .slider-unit   { font-size: 14px; font-weight: 400; color: #666; }
 .slider-limits { display: flex; justify-content: space-between; font-size: 11px; color: #555; margin-top: 4px; }
-input[type=range].wrange { width: 100%; accent-color: #0066cc; }
+input[type=range].wrange { width: 100%; accent-color: #7c3aed; }
 
 /* Option cards — radio and checkbox styled as clickable cards */
 .wopts       { display: flex; flex-direction: column; gap: 8px; }
@@ -56,7 +56,7 @@ input[type=range].wrange { width: 100%; accent-color: #0066cc; }
 }
 .wopts--row  .wopt { flex: 1; justify-content: center; }
 .wopts--grid .wopt { font-size: 13px; padding: 10px 12px; }
-.wopt:has(input:checked) { border-color: #0066cc; background: #0066cc18; color: #fff; }
+.wopt:has(input:checked) { border-color: #7c3aed; background: #7c3aed18; color: #fff; }
 .wopt input { display: none; }
 
 /* Equipment tag cloud */
@@ -67,15 +67,15 @@ input[type=range].wrange { width: 100%; accent-color: #0066cc; }
   padding: 6px 14px; font-size: 13px; color: #bbb; cursor: pointer;
   transition: border-color .18s, background .18s, color .18s; user-select: none;
 }
-.wtag:has(input:checked) { border-color: #0066cc; background: #0066cc22; color: #fff; }
+.wtag:has(input:checked) { border-color: #7c3aed; background: #7c3aed22; color: #fff; }
 .wtag input { display: none; }
 
 /* Nav buttons */
 .wnav      { display: flex; gap: 10px; margin-top: 22px; }
 .wnav-back { flex: 1; background: transparent; border: 1.5px solid #252840; border-radius: 10px; padding: 10px 14px; color: #666; font-size: 13px; cursor: pointer; transition: border-color .18s, color .18s; }
 .wnav-back:hover { border-color: #444; color: #aaa; }
-.wnav-next, .wnav-save { flex: 2.5; background: #0066cc; border: none; border-radius: 10px; padding: 10px 14px; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .18s; }
-.wnav-next:hover { background: #0055aa; }
+.wnav-next, .wnav-save { flex: 2.5; background: #7c3aed; border: none; border-radius: 10px; padding: 10px 14px; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .18s; }
+.wnav-next:hover { background: #6d28d9; }
 .wnav-save { background: #22863a; }
 .wnav-save:hover { background: #1a6b30; }
 .wnav-save:disabled { background: #1a2a1a; color: #445; cursor: default; }
@@ -83,13 +83,13 @@ input[type=range].wrange { width: 100%; accent-color: #0066cc; }
 /* Dot strip */
 .wdots { display: flex; gap: 7px; justify-content: center; margin-top: 20px; }
 .wdot { width: 7px; height: 7px; border-radius: 50%; background: #252840; transition: background .3s, transform .3s; }
-.wdot--active { background: #0066cc; transform: scale(1.3); }
-.wdot--done   { background: #0066cc55; }
+.wdot--active { background: #7c3aed; transform: scale(1.3); }
+.wdot--done   { background: #7c3aed55; }
 
 /* Summary */
 .wsum-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; font-size: 13px; }
 .wsum-key { color: #666; width: 120px; flex-shrink: 0; padding-top: 3px; }
-.wbadge   { display: inline-block; background: #0066cc22; border: 1px solid #0066cc44; color: #7ab8ff; border-radius: 20px; padding: 3px 10px; font-size: 12px; margin: 2px 3px 2px 0; }
+.wbadge   { display: inline-block; background: #7c3aed22; border: 1px solid #7c3aed44; color: #c4b5fd; border-radius: 20px; padding: 3px 10px; font-size: 12px; margin: 2px 3px 2px 0; }
 </style>
 {% endblock %}
 
