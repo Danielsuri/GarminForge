@@ -118,16 +118,14 @@
 
         </form>
 
-        {# --- Muscle map (if available) --- #}
+        {# --- Muscle map — always embedded, shown after generate --- #}
         <div id="muscle-map-container" class="mt-3 d-none">
-          {% if muscle_map_svg %}
           <div class="koda-card p-3 mt-3">
             <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:8px;">
               {{ t('muscle_map_title') }}
             </div>
             {{ muscle_map_svg | safe }}
           </div>
-          {% endif %}
         </div>
 
       </div>
@@ -291,16 +289,9 @@
             if (el) document.body.appendChild(document.adoptNode(el));
           });
 
-          // Inject muscle map from response into dashboard placeholder
-          var respMuscleMap = doc.getElementById('muscle-map-container');
+          // Reveal the muscle map (SVG is already embedded in the page)
           var dashMuscleMap = document.getElementById('muscle-map-container');
-          if (respMuscleMap && dashMuscleMap) {
-            while (dashMuscleMap.firstChild) dashMuscleMap.removeChild(dashMuscleMap.firstChild);
-            while (respMuscleMap.firstChild) {
-              dashMuscleMap.appendChild(document.adoptNode(respMuscleMap.firstChild));
-            }
-            dashMuscleMap.classList.remove('d-none');
-          }
+          if (dashMuscleMap) dashMuscleMap.classList.remove('d-none');
 
           // Scripts injected via DOM adoption don't execute automatically.
           // Load externals (SortableJS etc.) first, then run inline IIFE scripts.

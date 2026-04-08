@@ -70,6 +70,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 BASE_DIR = Path(__file__).parent
+_MUSCLE_MAP_SVG: str = (BASE_DIR / "static" / "img" / "muscle_map.svg").read_text(encoding="utf-8")
 
 # ---------------------------------------------------------------------------
 # In-process MFA state store (legacy, kept for MFA route).
@@ -238,6 +239,7 @@ async def index(
         db=db,
         goals=GOALS,
         equipment_options=EQUIPMENT_OPTIONS,
+        muscle_map_svg=_MUSCLE_MAP_SVG,
         flash_error=flash_error,
         flash_success=flash_success,
     )
