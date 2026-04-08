@@ -15,14 +15,14 @@
 
 <nav class="koda-navbar">
   <div class="container-fluid px-3 px-lg-4">
-    <a href="{{ url_for('dashboard') }}" class="koda-nav-brand">
+    <a href="{{ url_for('index') }}" class="koda-nav-brand">
       <span class="koda-phi" aria-hidden="true"></span>
       <span class="koda-wordmark">Koda</span>
     </a>
 
     {% if forge_user %}
     <div class="koda-nav-links">
-      <a href="{{ url_for('dashboard') }}"
+      <a href="{{ url_for('index') }}"
          class="koda-nav-link{% if active_page == 'generate' %} active{% endif %}">
         {{ t('nav_generate') }}
       </a>
@@ -30,11 +30,11 @@
          class="koda-nav-link{% if active_page == 'plans' %} active{% endif %}">
         {{ t('nav_my_plans') }}
       </a>
-      <a href="{{ url_for('my_programs') }}"
+      <a href="{{ url_for('list_programs') }}"
          class="koda-nav-link{% if active_page == 'programs' %} active{% endif %}">
         {{ t('nav_programs') }}
       </a>
-      <a href="{{ url_for('progress') }}"
+      <a href="{{ url_for('my_progress') }}"
          class="koda-nav-link{% if active_page == 'progress' %} active{% endif %}">
         {{ t('nav_progress') }}
       </a>
@@ -62,7 +62,7 @@
         </a>
         <button class="koda-hamburger" id="kodaHamburger" aria-label="Menu">&#9776;</button>
       {% else %}
-        <a href="{{ url_for('login_page') }}" class="koda-nav-link">{{ t('nav_sign_in') }}</a>
+        <a href="{{ url_for('login_forge_page') }}" class="koda-nav-link">{{ t('nav_sign_in') }}</a>
         <a href="{{ url_for('register_page') }}" class="btn-koda-primary" style="padding:7px 14px;font-size:13px;">
           {{ t('nav_register') }}
         </a>
@@ -73,10 +73,10 @@
 
 {% if forge_user %}
 <div class="koda-nav-drawer" id="kodaDrawer">
-  <a href="{{ url_for('dashboard') }}" class="koda-nav-link d-block mb-1">{{ t('nav_generate') }}</a>
+  <a href="{{ url_for('index') }}" class="koda-nav-link d-block mb-1">{{ t('nav_generate') }}</a>
   <a href="{{ url_for('my_plans') }}" class="koda-nav-link d-block mb-1">{{ t('nav_my_plans') }}</a>
-  <a href="{{ url_for('my_programs') }}" class="koda-nav-link d-block mb-1">{{ t('nav_programs') }}</a>
-  <a href="{{ url_for('progress') }}" class="koda-nav-link d-block mb-1">{{ t('nav_progress') }}</a>
+  <a href="{{ url_for('list_programs') }}" class="koda-nav-link d-block mb-1">{{ t('nav_programs') }}</a>
+  <a href="{{ url_for('my_progress') }}" class="koda-nav-link d-block mb-1">{{ t('nav_progress') }}</a>
   <a href="{{ url_for('logout') }}" class="koda-nav-link d-block mt-2" style="color:var(--text-muted)">{{ t('nav_logout') }}</a>
 </div>
 {% endif %}
