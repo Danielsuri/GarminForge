@@ -1,67 +1,368 @@
-{% extends "base.html" %}
-{% block title %}GarminForge — Connect{% endblock %}
+<!doctype html>
+<html lang="{{ lang }}" dir="{{ 'rtl' if lang == 'he' else 'ltr' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Koda — Connect Garmin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}?v=2">
+  <style>
+    /* ---------- Garmin Connect cinematic layout ---------- */
+    *, *::before, *::after { box-sizing: border-box; }
 
-{% block content %}
-<div class="row justify-content-center">
-  <div class="col-12 col-md-9 col-lg-7">
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--color-canvas);
+    }
 
-    <!-- Hero -->
-    <div class="text-center mb-5">
-      <div class="hero-icon mb-3">⚙️</div>
-      <h1 class="fw-bold display-6">GarminForge</h1>
-      <p class="text-muted">Generate personalised strength workouts and send them directly to Garmin Connect.</p>
+    .koda-login-wrap {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      min-height: 100vh;
+    }
+
+    /* Left hero panel */
+    .koda-login-hero {
+      background: linear-gradient(160deg, #0e0b1f, #130d2a, #0a0f1e);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding: 32px 48px;
+    }
+
+    .koda-login-hero .koda-hero-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 1;
+    }
+
+    .koda-login-hero .hero-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      z-index: 1;
+      max-width: 560px;
+    }
+
+    .koda-login-eyebrow {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--color-brand-light);
+      margin-bottom: 14px;
+    }
+
+    .koda-login-headline {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 44px;
+      color: var(--text-primary);
+      line-height: 1.1;
+      margin-bottom: 18px;
+    }
+
+    .koda-login-tagline {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 420px;
+      margin-bottom: 40px;
+    }
+
+    /* Right form panel */
+    .koda-login-form-panel {
+      background: var(--color-surface);
+      border-inline-start: 1px solid var(--border-brand-faint);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 48px 40px;
+    }
+
+    .koda-form-eyebrow {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--color-brand-light);
+      margin-bottom: 4px;
+    }
+
+    .koda-form-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 26px;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .koda-form-sub {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+    }
+
+    .koda-field {
+      margin-bottom: 16px;
+    }
+
+    .koda-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    /* Garmin logo mark */
+    .koda-garmin-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 28px;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-input);
+    }
+
+    .koda-garmin-logo svg {
+      flex-shrink: 0;
+    }
+
+    .koda-garmin-logo-text {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .koda-garmin-logo-text strong {
+      display: block;
+      font-size: 13px;
+      color: var(--text-body);
+      font-weight: 600;
+    }
+
+    /* Footer */
+    .koda-form-footer {
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    .koda-form-footer a {
+      color: var(--color-brand-light);
+    }
+
+    .koda-form-footer a:hover {
+      color: var(--color-brand-pale);
+    }
+
+    /* Error alert */
+    .koda-alert-error {
+      background: rgba(220,38,38,0.1);
+      border: 1px solid rgba(220,38,38,0.3);
+      border-radius: var(--radius-input);
+      color: #f87171;
+      font-size: 13px;
+      padding: 10px 14px;
+      margin-bottom: 18px;
+    }
+
+    /* ---------- Mobile ---------- */
+    @media (max-width: 767px) {
+      .koda-login-wrap {
+        display: block;
+        position: relative;
+        min-height: 100vh;
+      }
+
+      .koda-login-hero {
+        position: fixed;
+        inset: 0;
+        padding: 24px 20px 40vh;
+        z-index: 0;
+      }
+
+      .koda-login-headline {
+        font-size: 26px;
+      }
+
+      .koda-login-tagline {
+        display: none;
+      }
+
+      .koda-login-form-panel {
+        position: relative;
+        z-index: 1;
+        margin-top: 40vh;
+        background: rgba(13,17,23,0.88);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(124,58,237,0.3);
+        border-radius: 18px 18px 0 0;
+        border-inline-start: none;
+        border-bottom: none;
+        min-height: 60vh;
+        justify-content: flex-start;
+        padding: 28px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="koda-login-wrap">
+
+  <!-- ===== Left: Cinematic hero ===== -->
+  <div class="koda-login-hero">
+    <div class="koda-hero-texture"></div>
+    <div class="koda-hero-glow koda-hero-glow--br"></div>
+    <div class="koda-hero-glow koda-hero-glow--tl"></div>
+
+    <!-- Brand -->
+    <div class="koda-hero-brand">
+      <span class="koda-phi" aria-hidden="true"></span>
+      <span class="koda-wordmark">Koda</span>
     </div>
 
-    <!-- Auth card -->
-    <div class="card bg-dark-subtle border-secondary mb-3">
-      <div class="card-body p-4">
-        <form method="post" action="/auth/login" id="loginForm">
-          <div class="mb-3">
-            <label for="email" class="form-label fw-semibold">Garmin Connect Email</label>
-            <div class="input-group">
-              <span class="input-group-text bg-dark border-secondary">
-                <i class="bi bi-envelope-fill text-muted"></i>
-              </span>
-              <input type="email" class="form-control bg-dark border-secondary text-white"
-                     id="email" name="email" placeholder="you@example.com" required autocomplete="email" />
-            </div>
-          </div>
-          <div class="mb-4">
-            <label for="password" class="form-label fw-semibold">Password</label>
-            <div class="input-group">
-              <span class="input-group-text bg-dark border-secondary">
-                <i class="bi bi-lock-fill text-muted"></i>
-              </span>
-              <input type="password" class="form-control bg-dark border-secondary text-white"
-                     id="password" name="password" placeholder="••••••••" required autocomplete="current-password" />
-              <button class="btn btn-outline-secondary" type="button" id="togglePwd">
-                <i class="bi bi-eye"></i>
-              </button>
-            </div>
-          </div>
-          <button type="submit" class="btn btn-garmin w-100 py-2 fw-semibold" id="loginBtn">
-            <i class="bi bi-box-arrow-in-right me-2"></i>Sign in to Garmin Connect
-          </button>
-        </form>
+    <!-- Hero body -->
+    <div class="hero-body">
+      <p class="koda-login-eyebrow">Precision Training System</p>
+      <h1 class="koda-login-headline">Connect your Garmin. Train with precision.</h1>
+      <p class="koda-login-tagline">
+        Link your Garmin Connect account to push workouts directly to your device.
+      </p>
+
+      <div class="koda-quote">
+        <p id="heroQuote">The steady baseline compounds.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Right: Form panel ===== -->
+  <div class="koda-login-form-panel">
+    <p class="koda-form-eyebrow">Device Setup</p>
+    <h2 class="koda-form-title">Connect Garmin Account</h2>
+    <p class="koda-form-sub">Sign in with your Garmin Connect credentials to sync workouts.</p>
+
+    {% if flash_error %}
+    <div class="koda-alert-error" role="alert">{{ flash_error }}</div>
+    {% endif %}
+
+    <!-- Garmin notice -->
+    <div class="koda-garmin-logo">
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" stroke="rgba(124,58,237,0.6)" stroke-width="1.5"/>
+        <path d="M12 7v5l3 3" stroke="var(--color-brand-light)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="koda-garmin-logo-text">
+        <strong>Garmin Connect</strong>
+        Your credentials are sent directly to Garmin — never stored by Koda.
       </div>
     </div>
 
-  </div>
-</div>
-{% endblock %}
+    <form method="post" action="{{ url_for('auth_login') }}" id="garminLoginForm">
+      <div class="koda-field">
+        <label for="email">Garmin Connect Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          class="koda-input"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        >
+      </div>
 
-{% block scripts %}
+      <div class="koda-field">
+        <label for="password">Password</label>
+        <div class="koda-input-group">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="koda-input"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            required
+          >
+          <button type="button" id="pwToggle" class="koda-input-toggle" aria-label="Show password">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+              <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" id="connectBtn" class="btn-koda-primary w-100" style="margin-top:8px">
+        <span class="koda-spinner" aria-hidden="true"></span>
+        <span class="koda-btn-label">Connect Garmin Account</span>
+      </button>
+    </form>
+
+    <div class="koda-form-footer">
+      <a href="{{ url_for('index') }}">&#8592; Back to dashboard</a>
+    </div>
+  </div>
+
+</div>
+
 <script>
-document.getElementById('togglePwd')?.addEventListener('click', function () {
-  const pwd = document.getElementById('password');
-  const icon = this.querySelector('i');
-  pwd.type = pwd.type === 'password' ? 'text' : 'password';
-  icon.className = pwd.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
-});
-document.getElementById('loginForm')?.addEventListener('submit', function () {
-  const btn = document.getElementById('loginBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Connecting…';
-});
+(function() {
+  // Password visibility toggle
+  var pwToggle = document.getElementById('pwToggle');
+  var pwField  = document.getElementById('password');
+  if (pwToggle && pwField) {
+    pwToggle.addEventListener('click', function() {
+      var isText = pwField.type === 'text';
+      pwField.type = isText ? 'password' : 'text';
+    });
+  }
+
+  // Form loading state (NO innerHTML)
+  var form       = document.getElementById('garminLoginForm');
+  var connectBtn = document.getElementById('connectBtn');
+  var MSG = 'Connecting\u2026';
+  if (form && connectBtn) {
+    form.addEventListener('submit', function() {
+      connectBtn.disabled = true;
+      connectBtn.classList.add('is-loading');
+      connectBtn.querySelector('.koda-btn-label').textContent = MSG;
+    });
+  }
+
+  // Rotating quotes (NO innerHTML)
+  var quotes = [
+    'The steady baseline compounds.',
+    'Structure is the edge you need.',
+    'Turn intention into architecture.',
+    'Consistency is the infrastructure.',
+    'Precision over hype. Every session.'
+  ];
+  var el  = document.getElementById('heroQuote');
+  var idx = 0;
+  if (el) {
+    setInterval(function() {
+      var quoteBlock = el.closest('.koda-quote');
+      if (quoteBlock) { quoteBlock.classList.add('fade-out'); }
+      setTimeout(function() {
+        idx = (idx + 1) % quotes.length;
+        el.textContent = quotes[idx];
+        if (quoteBlock) { quoteBlock.classList.remove('fade-out'); }
+      }, 400);
+    }, 8000);
+  }
+})();
 </script>
-{% endblock %}
+</body>
+</html>
