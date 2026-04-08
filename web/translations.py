@@ -15,6 +15,7 @@ SUPPORTED_LANGS: frozenset[str] = frozenset({"en", "he"})
 TRANSLATIONS: dict[str, dict[str, str]] = {
     "en": {
         # --- Navbar ---
+        "nav_generate":            "Generate",
         "nav_my_plans":            "My Plans",
         "nav_programs":            "Programs",
         "nav_progress":            "Progress",
@@ -326,6 +327,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
 
     "he": {
         # --- Navbar ---
+        "nav_generate":            "\u05e6\u05d5\u05e8",
         "nav_my_plans":            "\u05d4\u05ea\u05d5\u05db\u05e0\u05d9\u05d5\u05ea \u05e9\u05dc\u05d9",
         "nav_programs":            "\u05ea\u05d5\u05db\u05e0\u05d9\u05d5\u05ea",
         "nav_progress":            "\u05d4\u05ea\u05e7\u05d3\u05de\u05d5\u05ea",
