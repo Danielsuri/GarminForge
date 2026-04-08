@@ -20,7 +20,7 @@
       <span class="koda-wordmark">Koda</span>
     </a>
 
-    {% if current_user %}
+    {% if forge_user %}
     <div class="koda-nav-links">
       <a href="{{ url_for('dashboard') }}"
          class="koda-nav-link{% if active_page == 'generate' %} active{% endif %}">
@@ -42,8 +42,8 @@
     {% endif %}
 
     <div class="koda-nav-right">
-      {% if current_user %}
-        {% if garmin_connected %}
+      {% if forge_user %}
+        {% if authenticated %}
           <span class="koda-badge-connected">
             <span class="koda-badge-dot"></span>
             {{ t('nav_garmin_connected') }}
@@ -55,24 +55,23 @@
           </span>
         {% endif %}
         <div class="koda-avatar">
-          {{ (current_user.name or current_user.email or 'K')[0]|upper }}
+          {{ (forge_user.display_name or forge_user.email or 'K')[0]|upper }}
         </div>
         <a href="{{ url_for('logout') }}" class="koda-nav-link d-none d-lg-inline-flex">
           {{ t('nav_logout') }}
         </a>
+        <button class="koda-hamburger" id="kodaHamburger" aria-label="Menu">&#9776;</button>
       {% else %}
         <a href="{{ url_for('login_page') }}" class="koda-nav-link">{{ t('nav_sign_in') }}</a>
         <a href="{{ url_for('register_page') }}" class="btn-koda-primary" style="padding:7px 14px;font-size:13px;">
           {{ t('nav_register') }}
         </a>
       {% endif %}
-
-      <button class="koda-hamburger" id="kodaHamburger" aria-label="Menu">&#9776;</button>
     </div>
   </div>
 </nav>
 
-{% if current_user %}
+{% if forge_user %}
 <div class="koda-nav-drawer" id="kodaDrawer">
   <a href="{{ url_for('dashboard') }}" class="koda-nav-link d-block mb-1">{{ t('nav_generate') }}</a>
   <a href="{{ url_for('my_plans') }}" class="koda-nav-link d-block mb-1">{{ t('nav_my_plans') }}</a>
@@ -83,6 +82,20 @@
 {% endif %}
 
 <main class="{% block main_class %}container-xl py-4{% endblock %}">
+  {% if flash_error %}
+  <div class="container-xl py-2">
+    <div style="background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);border-radius:8px;padding:10px 16px;color:#f87171;font-size:13px;">
+      {{ flash_error }}
+    </div>
+  </div>
+  {% endif %}
+  {% if flash_success %}
+  <div class="container-xl py-2">
+    <div style="background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);border-radius:8px;padding:10px 16px;color:#4ade80;font-size:13px;">
+      {{ flash_success }}
+    </div>
+  </div>
+  {% endif %}
   {% block content %}{% endblock %}
 </main>
 
