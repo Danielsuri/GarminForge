@@ -45,7 +45,7 @@ from garminforge.exceptions import (
 )
 
 # Web modules
-from web.auth_utils import logout_session
+from web.auth_utils import get_current_user, logout_session
 from web.db import get_db, init_db
 from web.garmin_sso import browser_login, exchange_ticket, make_token_b64, portal_login
 from web.models import User
@@ -233,6 +233,16 @@ async def index(
     flash_error = request.session.pop("flash_error", None) or (error or None)
     flash_success = request.session.pop("flash_success", None)
 
+    selected_goal = None
+    user_equipment: list[str] = []
+    forge_user = get_current_user(request, db)
+    if forge_user is not None:
+        if forge_user.fitness_goals_json:
+            goals_list: list[str] = json.loads(forge_user.fitness_goals_json)
+            selected_goal = goals_list[0] if goals_list else None
+        if forge_user.preferred_equipment_json:
+            user_equipment = json.loads(forge_user.preferred_equipment_json)
+
     return _render(
         "dashboard.html",
         request,
@@ -242,6 +252,8 @@ async def index(
         muscle_map_svg=_MUSCLE_MAP_SVG,
         flash_error=flash_error,
         flash_success=flash_success,
+        selected_goal=selected_goal,
+        user_equipment=user_equipment,
     )
 
 

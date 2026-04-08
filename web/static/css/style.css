@@ -286,7 +286,11 @@ a:hover { color: var(--color-brand-pale); }
   font-weight: 700;
   color: #fff;
   flex-shrink: 0;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter 0.15s;
 }
+.koda-avatar:hover { filter: brightness(1.15); color: #fff; }
 
 /* Mobile hamburger */
 .koda-hamburger {

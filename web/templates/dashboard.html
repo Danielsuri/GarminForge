@@ -204,6 +204,7 @@
   // Tom Select — Equipment
   if (document.getElementById('equipmentSelect')) {
     new TomSelect('#equipmentSelect', {
+      items: {{ user_equipment | tojson }},
       plugins: ['remove_button', 'clear_button'],
       maxOptions: null,
       onItemAdd: function(value) {

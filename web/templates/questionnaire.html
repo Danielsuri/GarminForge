@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Koda — {% if is_retake %}{{ t("q_page_title_retake") }}{% else %}{{ t("q_page_title_setup") }}{% endif %}{% endblock %}
 
-{% block head %}
+{% block extra_head %}
 <style>
 .wizard-outer { max-width: 420px; margin: 0 auto; }
 .wizard-meta { display: flex; justify-content: space-between; font-size: 11px; color: #666; margin-bottom: 6px; }
@@ -91,7 +91,7 @@ input[type=range].wrange { width: 100%; accent-color: #7c3aed; }
 .wsum-key { color: #666; width: 120px; flex-shrink: 0; padding-top: 3px; }
 .wbadge   { display: inline-block; background: #7c3aed22; border: 1px solid #7c3aed44; color: #c4b5fd; border-radius: 20px; padding: 3px 10px; font-size: 12px; margin: 2px 3px 2px 0; }
 </style>
-{% endblock %}
+{% endblock extra_head %}
 
 {% block content %}
 <div class="wizard-outer">
