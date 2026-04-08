@@ -649,7 +649,7 @@ async function openReplaceModal(index) {
       return;
     }
 
-    body.innerHTML = alts.map(a => exercisePickerRowHTML(a, `selectReplacement(${JSON.stringify(a).replace(/"/g, '&quot;')})`)).join('');
+    body.innerHTML = alts.map(a => exercisePickerRowHTML(a, `selectReplacement(${JSON.stringify(a).replace(/"/g, '&quot;').replace(/'/g, '&#39;')})`)).join('');
   } catch {
     body.innerHTML = `<p class="text-danger text-center py-3">${MSG_REBUILD_FAILED}</p>`;
   }
@@ -744,7 +744,7 @@ function renderAddModal() {
   }
 
   bodyEl.innerHTML = filtered
-    .map(a => exercisePickerRowHTML(a, `addExercise(${JSON.stringify(a).replace(/"/g, '&quot;')})`))
+    .map(a => exercisePickerRowHTML(a, `addExercise(${JSON.stringify(a).replace(/"/g, '&quot;').replace(/'/g, '&#39;')})`))
     .join('');
 }
 

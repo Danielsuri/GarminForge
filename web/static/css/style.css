@@ -24,7 +24,7 @@
   /* Semantic */
   --color-success:     #16a34a;
   --color-success-lt:  #4ade80;
-  --color-success-mid: var(--color-success-mid);
+  --color-success-mid: #22c55e;
   --color-warning:     #d97706;
   --color-warning-lt:  #fbbf24;
   --color-danger:      #dc2626;
