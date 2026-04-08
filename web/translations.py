@@ -25,6 +25,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "nav_garmin_connected":    "Garmin Connected",
         "nav_garmin_not_connected": "Garmin not connected",
 
+        # --- Dashboard ---
+        "dashboard_greeting":      "Good to see you, {name}. Build today\u2019s plan.",
+
         # --- Generator form ---
         "form_build_workout":      "Build Your Workout",
         "form_workout_goal":       "Workout Goal",
@@ -336,6 +339,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "nav_register":            "\u05d4\u05e8\u05e9\u05de\u05d4",
         "nav_garmin_connected":    "Garmin \u05de\u05d7\u05d5\u05d1\u05e8",
         "nav_garmin_not_connected": "Garmin \u05dc\u05d0 \u05de\u05d7\u05d5\u05d1\u05e8",
+
+        # --- Dashboard ---
+        "dashboard_greeting":      "\u05d8\u05d5\u05d1 \u05dc\u05e8\u05d0\u05d5\u05ea\u05da, {name}. \u05d1\u05e0\u05d4 \u05d0\u05ea \u05ea\u05d5\u05db\u05e0\u05d9\u05ea \u05d4\u05d9\u05d5\u05dd.",
 
         # --- Generator form ---
         "form_build_workout":      "\u05d1\u05e0\u05d4 \u05d0\u05d9\u05de\u05d5\u05df",

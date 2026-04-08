@@ -1,222 +1,337 @@
 {% extends "base.html" %}
-{% block title %}GarminForge — Workout Generator{% endblock %}
+{% block title %}Koda — Generate{% endblock %}
+{% block main_class %}{% endblock %}
 
 {% block content %}
-<div class="row g-4">
 
-  <!-- ===== LEFT: Generator form ===== -->
-  <div class="col-12 col-lg-5">
-    <div class="card bg-dark-subtle border-secondary">
-      <div class="card-header border-secondary">
-        <h5 class="mb-0 fw-bold"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>{{ t("form_build_workout") }}</h5>
+{# ===== Hero greeting bar ===== #}
+<div class="koda-greeting-bar">
+  <div class="koda-hero-texture"></div>
+  <div class="koda-hero-glow koda-hero-glow--tl"></div>
+  <div class="container-xl px-3 px-lg-4" style="position:relative;z-index:1;">
+    <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+
+      <div>
+        <div class="koda-greeting-day"><span id="greetingDay"></span></div>
+        <h1 class="koda-greeting">
+          {%- if forge_user and forge_user.display_name -%}
+            Good to see you, {{ forge_user.display_name.split()[0] }}. Build today&#8217;s plan.
+          {%- else -%}
+            Build today&#8217;s plan.
+          {%- endif -%}
+        </h1>
       </div>
-      <div class="card-body p-4">
+
+      <div class="d-flex gap-2 flex-wrap">
+        <div class="koda-stat-pill">
+          <div class="koda-stat-pill-value">{{ plan_count|default(0) }}</div>
+          <div class="koda-stat-pill-label">Plans</div>
+        </div>
+        <div class="koda-stat-pill">
+          <div class="koda-stat-pill-value">{{ completion_rate|default('—') }}</div>
+          <div class="koda-stat-pill-label">Completion</div>
+        </div>
+        <div class="koda-stat-pill">
+          <div class="koda-stat-pill-value">{{ program_count|default(0) }}</div>
+          <div class="koda-stat-pill-label">Programs</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{# ===== Mobile section toggle ===== #}
+<div class="koda-section-toggle" id="sectionToggle">
+  <button class="active" data-target="generatorSection">{{ t('nav_generate') }}</button>
+  <button data-target="previewSection">{{ t('form_placeholder_title') }}</button>
+</div>
+
+{# ===== Main two-panel layout ===== #}
+<div class="container-xl px-3 px-lg-4 py-4">
+  <div class="row g-4">
+
+    {# ----- Left: Generator panel ----- #}
+    <div class="col-12 col-lg-4" id="generatorSection">
+      <div class="koda-card p-4">
+
+        <p class="text-muted mb-4" style="font-size:13px;">{{ t('form_build_workout') }}</p>
+
         <form method="post" action="/workout/generate" id="generatorForm">
 
-          <!-- GOAL -->
+          {# --- Goal section --- #}
           <div class="mb-4">
-            <label class="form-label fw-semibold d-flex align-items-center gap-2 mb-2">
-              <i class="bi bi-bullseye text-info"></i> {{ t("form_workout_goal") }}
-            </label>
+            <div class="mb-2" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);">
+              {{ t('form_workout_goal') }}
+            </div>
             <div class="row g-2">
               {% for key, g in goals.items() %}
               <div class="col-6">
-                <input type="radio" class="btn-check" name="goal" id="goal_{{ key }}"
-                       value="{{ key }}" {% if loop.first %}checked{% endif %} />
-                <label class="btn btn-outline-secondary w-100 text-start goal-card p-2" for="goal_{{ key }}">
-                  <span class="d-block fw-semibold">{{ g.icon }} {{ t("goal_label_" ~ key) }}</span>
-                  <span class="d-block text-muted" style="font-size:.75rem;line-height:1.2">{{ t("goal_desc_" ~ key) }}</span>
+                <label class="koda-goal-card{% if key == (selected_goal or '') %} selected{% endif %}" for="goal_{{ key }}">
+                  <input type="radio" name="goal" id="goal_{{ key }}" value="{{ key }}"
+                         {% if loop.first and not selected_goal %}checked{% elif key == selected_goal %}checked{% endif %} />
+                  <span class="d-block" style="font-size:18px;margin-bottom:4px;">{{ g.icon }}</span>
+                  <span class="d-block" style="font-size:12px;font-weight:700;">{{ t("goal_label_" ~ key) }}</span>
+                  <span class="d-block" style="font-size:10px;color:var(--text-muted);line-height:1.3;margin-top:2px;">{{ t("goal_desc_" ~ key) }}</span>
                 </label>
               </div>
               {% endfor %}
             </div>
           </div>
 
-          <!-- EQUIPMENT -->
+          {# --- Equipment section --- #}
           <div class="mb-4">
-            <label class="form-label fw-semibold d-flex align-items-center gap-2 mb-2" for="equipmentSelect">
-              <i class="bi bi-tools text-success"></i> {{ t("form_available_equipment") }}
-            </label>
+            <div class="mb-2" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);">
+              {{ t('form_available_equipment') }}
+            </div>
             <select id="equipmentSelect" name="equipment" multiple
-                    placeholder="Search equipment…">
+                    placeholder="{{ t('form_available_equipment') }}…">
               {% for eq in equipment_options %}
               <option value="{{ eq.tag }}">{{ eq.icon }} {{ t("eq_" ~ eq.tag) }}</option>
               {% endfor %}
             </select>
-            <div class="form-text mt-1">{{ t("form_equipment_hint") }}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">{{ t('form_equipment_hint') }}</div>
           </div>
 
-          <!-- DURATION -->
+          {# --- Duration section --- #}
           <div class="mb-4">
-            <label for="duration" class="form-label fw-semibold d-flex align-items-center gap-2">
-              <i class="bi bi-clock-fill text-primary"></i>
-              {{ t("form_session_duration") }}: <span id="durationLabel" class="text-white ms-1">45 {{ t("form_min") }}</span>
-            </label>
-            <input type="range" class="form-range" id="duration" name="duration"
-                   min="15" max="120" step="5" value="45" />
-            <div class="d-flex justify-content-between text-muted" style="font-size:.75rem">
-              <span>15 {{ t("form_min") }}</span>
-              <span>60 {{ t("form_min") }}</span>
-              <span>120 {{ t("form_min") }}</span>
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);">
+                {{ t('form_session_duration') }}
+              </div>
+              <div class="koda-duration-value" id="durationDisplay">45</div>
+            </div>
+            <input type="range" class="koda-range" id="durationSlider" name="duration"
+                   min="15" max="120" step="5" value="{{ duration|default(45) }}" />
+            <div class="d-flex justify-content-between" style="font-size:10px;color:var(--text-muted);margin-top:4px;">
+              <span>15 {{ t('form_min') }}</span>
+              <span>60 {{ t('form_min') }}</span>
+              <span>120 {{ t('form_min') }}</span>
             </div>
           </div>
 
-          <button type="submit" class="btn btn-garmin w-100 py-3 fw-bold fs-5" id="generateBtn">
-            <i class="bi bi-magic me-2"></i>{{ t("form_generate_btn") }}
+          {# --- Generate button --- #}
+          <button type="submit" class="btn-koda-primary w-100 justify-content-center" id="generateBtn">
+            <span class="koda-spinner"></span>
+            <span class="koda-btn-label">{{ t('form_generate_btn') }}</span>
           </button>
 
         </form>
+
+        {# --- Muscle map (if available) --- #}
+        <div id="muscle-map-container" class="mt-3 d-none">
+          {% if muscle_map_svg %}
+          <div class="koda-card p-3 mt-3">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:8px;">
+              {{ t('muscle_map_title') }}
+            </div>
+            {{ muscle_map_svg | safe }}
+          </div>
+          {% endif %}
+        </div>
+
       </div>
     </div>
 
-    <!-- Muscle map — populated by JS after workout generation -->
-    <div id="muscle-map-container" class="card bg-dark-subtle border-secondary mt-3 p-3 d-none"></div>
-  </div>
+    {# ----- Right: Preview panel ----- #}
+    <div class="col-12 col-lg-8" id="previewSection">
 
-  <!-- ===== RIGHT: Preview placeholder / result ===== -->
-  <div class="col-12 col-lg-7">
-    <div id="previewContainer" class="h-100">
-      <!-- Placeholder shown before generation -->
-      <div class="card bg-dark-subtle border-secondary h-100 d-flex align-items-center justify-content-center"
-           id="previewPlaceholder">
-        <div class="text-center text-muted p-5">
-          <div class="display-1 mb-3 opacity-25">🏋️</div>
-          <h5>{{ t("form_placeholder_title") }}</h5>
-          <p class="small">{{ t("form_placeholder_body") }}</p>
+      {% if workout %}
+        {% include "workout_preview.html" %}
+      {% else %}
+      <div id="previewContainer" class="h-100">
+        <div id="previewPlaceholder"
+             class="koda-card h-100 d-flex align-items-center justify-content-center"
+             style="border-style:dashed;min-height:320px;">
+          <div class="text-center p-5">
+            <div class="koda-phi koda-phi--lg mx-auto mb-4" aria-hidden="true"></div>
+            <h5 style="color:var(--text-secondary);font-weight:700;margin-bottom:8px;">{{ t('form_placeholder_title') }}</h5>
+            <p style="font-size:13px;color:var(--text-muted);margin:0;">{{ t('form_placeholder_body') }}</p>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
+      {% endif %}
 
-</div><!-- /row -->
+    </div>
+
+  </div>
+</div>
+
 {% endblock %}
 
+
 {% block scripts %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <script>
-const MSG_MIN        = {{ t("form_min") | tojson }};
-const MSG_GENERATING = {{ t("form_generating") | tojson }};
-const MSG_GENERATE   = {{ t("form_generate_btn") | tojson }};
-const MSG_FAILED     = {{ t("form_generate_failed") | tojson }};
-
-// Duration slider label
-const durationInput = document.getElementById('duration');
-const durationLabel = document.getElementById('durationLabel');
-durationInput.addEventListener('input', () => {
-  durationLabel.textContent = durationInput.value + ' ' + MSG_MIN;
-});
-
-// Equipment — Tom Select with regex search
-new TomSelect('#equipmentSelect', {
-  plugins: ['remove_button', 'clear_button'],
-  maxOptions: null,
-  onItemAdd: function(value) {
-    if (value === 'bodyweight') {
-      // "No Equipment" selected — clear everything else
-      this.getValue().forEach(v => { if (v !== 'bodyweight') this.removeItem(v, true); });
-    } else {
-      // Any real equipment selected — deselect "No Equipment"
-      this.removeItem('bodyweight', true);
-    }
-  },
-  score: function(search) {
-    let regex;
-    try {
-      regex = new RegExp(search, 'i');
-    } catch(e) {
-      // If the string isn't a valid regex, fall back to literal match
-      regex = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-    }
-    return function(item) {
-      return regex.test(item.text) ? 1 : 0;
-    };
-  },
-  render: {
-    option: function(data, escape) {
-      return `<div class="py-1">${escape(data.text)}</div>`;
-    },
-    item: function(data, escape) {
-      return `<div>${escape(data.text)}</div>`;
-    },
-    no_results: function(data, escape) {
-      return `<div class="no-results">No equipment matching <em>${escape(data.input)}</em></div>`;
-    },
-  },
-});
-
-/* Load an external script once (resolves immediately if already loaded). */
-function _loadScript(src) {
-  return new Promise(function(resolve) {
-    if (document.querySelector('script[src="' + src + '"]')) { resolve(); return; }
-    const s = document.createElement('script');
-    s.src = src;
-    s.onload  = resolve;
-    s.onerror = resolve; // don't block if CDN is unreachable
-    document.head.appendChild(s);
-  });
-}
-
-// Form submit — show spinner, POST form, replace right panel with response HTML
-document.getElementById('generatorForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  const btn = document.getElementById('generateBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>' + MSG_GENERATING;
-
-  const formData = new FormData(this);
-  try {
-    const resp = await fetch('/workout/generate', { method: 'POST', body: formData });
-    const html = await resp.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    const preview = doc.getElementById('workoutPreviewCard');
-    if (preview) {
-      // Clear container and inject the preview card
-      const container = document.getElementById('previewContainer');
-      document.getElementById('previewPlaceholder')?.remove();
-      while (container.firstChild) container.removeChild(container.firstChild);
-      container.appendChild(document.adoptNode(preview));
-
-      // Also inject modals and toast container (they live outside #workoutPreviewCard)
-      ['editToastContainer', 'replaceModal', 'addModal', 'videoTutorialModal', 'workoutPlayerModal'].forEach(function(id) {
-        const existing = document.getElementById(id);
-        if (existing) existing.remove();
-        const el = doc.getElementById(id);
-        if (el) document.body.appendChild(document.adoptNode(el));
-      });
-
-      // Inject muscle map from response into dashboard placeholder
-      const respMuscleMap = doc.getElementById('muscle-map-container');
-      const dashMuscleMap = document.getElementById('muscle-map-container');
-      if (respMuscleMap && dashMuscleMap) {
-        while (dashMuscleMap.firstChild) dashMuscleMap.removeChild(dashMuscleMap.firstChild);
-        while (respMuscleMap.firstChild) {
-          dashMuscleMap.appendChild(document.adoptNode(respMuscleMap.firstChild));
-        }
-        dashMuscleMap.classList.remove('d-none');
-      }
-
-      // Scripts injected via DOM adoption don't execute automatically.
-      // Load externals (SortableJS etc.) first, then run inline IIFE scripts.
-      const respScripts = Array.from(doc.querySelectorAll('script'));
-      for (const es of respScripts.filter(s => s.src)) {
-        await _loadScript(es.src);
-      }
-      for (const is of respScripts.filter(s => !s.src && s.textContent.trim())) {
-        const s = document.createElement('script');
-        s.textContent = is.textContent;
-        document.body.appendChild(s);
-      }
-    } else {
-      // Full page redirect (error) — follow it
-      window.location.href = '/';
-    }
-  } catch(err) {
-    console.error(err);
-    alert(MSG_FAILED);
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<i class="bi bi-magic me-2"></i>' + MSG_GENERATE;
+(function() {
+  // Duration slider
+  var slider  = document.getElementById('durationSlider');
+  var display = document.getElementById('durationDisplay');
+  if (slider && display) {
+    display.textContent = slider.value;
+    slider.addEventListener('input', function() {
+      display.textContent = this.value;
+    });
   }
-});
+
+  // Goal card radio toggle
+  document.querySelectorAll('.koda-goal-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      document.querySelectorAll('.koda-goal-card').forEach(function(c) { c.classList.remove('selected'); });
+      this.classList.add('selected');
+    });
+  });
+
+  // Greeting day label
+  var dayEl = document.getElementById('greetingDay');
+  if (dayEl) {
+    var days   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var now = new Date();
+    dayEl.textContent = days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate();
+  }
+
+  // Mobile section toggle
+  var toggleBtns = document.querySelectorAll('#sectionToggle button');
+  toggleBtns.forEach(function(toggleBtn) {
+    toggleBtn.addEventListener('click', function() {
+      toggleBtns.forEach(function(b) { b.classList.remove('active'); });
+      this.classList.add('active');
+      var target = document.getElementById(this.dataset.target);
+      if (target) { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    });
+  });
+
+  // Tom Select — Equipment
+  if (document.getElementById('equipmentSelect')) {
+    new TomSelect('#equipmentSelect', {
+      plugins: ['remove_button', 'clear_button'],
+      maxOptions: null,
+      onItemAdd: function(value) {
+        if (value === 'bodyweight') {
+          this.getValue().forEach(function(v) { if (v !== 'bodyweight') { this.removeItem(v, true); } }, this);
+        } else {
+          this.removeItem('bodyweight', true);
+        }
+      },
+      score: function(search) {
+        var regex;
+        try {
+          regex = new RegExp(search, 'i');
+        } catch(e) {
+          regex = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+        }
+        return function(item) {
+          return regex.test(item.text) ? 1 : 0;
+        };
+      },
+      render: {
+        option: function(data, escape) {
+          return '<div class="py-1">' + escape(data.text) + '</div>';
+        },
+        item: function(data, escape) {
+          return '<div>' + escape(data.text) + '</div>';
+        },
+        no_results: function(data, escape) {
+          return '<div class="no-results">No equipment matching <em>' + escape(data.input) + '</em></div>';
+        },
+      },
+    });
+  }
+
+  /* Load an external script once (resolves immediately if already loaded). */
+  function _loadScript(src) {
+    return new Promise(function(resolve) {
+      if (document.querySelector('script[src="' + src + '"]')) { resolve(); return; }
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload  = resolve;
+      s.onerror = resolve; // don't block if CDN is unreachable
+      document.head.appendChild(s);
+    });
+  }
+
+  var MSG_MIN        = {{ t("form_min") | tojson }};
+  var MSG_GENERATING = {{ t("form_generating") | tojson }};
+  var MSG_GENERATE   = {{ t("form_generate_btn") | tojson }};
+  var MSG_FAILED     = {{ t("form_generate_failed") | tojson }};
+
+  // Generate form loading state — NO innerHTML
+  var form = document.getElementById('generatorForm');
+  var btn  = document.getElementById('generateBtn');
+
+  if (form && btn) {
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      btn.disabled = true;
+      btn.classList.add('is-loading');
+      btn.querySelector('.koda-btn-label').textContent = MSG_GENERATING;
+
+      var formData = new FormData(form);
+      try {
+        var resp = await fetch('/workout/generate', { method: 'POST', body: formData });
+        var html = await resp.text();
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(html, 'text/html');
+        var preview = doc.getElementById('workoutPreviewCard');
+        if (preview) {
+          // Clear container and inject the preview card
+          var container = document.getElementById('previewContainer');
+          var placeholder = document.getElementById('previewPlaceholder');
+          if (placeholder) placeholder.remove();
+          while (container.firstChild) container.removeChild(container.firstChild);
+          container.appendChild(document.adoptNode(preview));
+
+          // Also inject modals and toast container (they live outside #workoutPreviewCard)
+          ['editToastContainer', 'replaceModal', 'addModal', 'videoTutorialModal', 'workoutPlayerModal'].forEach(function(id) {
+            var existing = document.getElementById(id);
+            if (existing) existing.remove();
+            var el = doc.getElementById(id);
+            if (el) document.body.appendChild(document.adoptNode(el));
+          });
+
+          // Inject muscle map from response into dashboard placeholder
+          var respMuscleMap = doc.getElementById('muscle-map-container');
+          var dashMuscleMap = document.getElementById('muscle-map-container');
+          if (respMuscleMap && dashMuscleMap) {
+            while (dashMuscleMap.firstChild) dashMuscleMap.removeChild(dashMuscleMap.firstChild);
+            while (respMuscleMap.firstChild) {
+              dashMuscleMap.appendChild(document.adoptNode(respMuscleMap.firstChild));
+            }
+            dashMuscleMap.classList.remove('d-none');
+          }
+
+          // Scripts injected via DOM adoption don't execute automatically.
+          // Load externals (SortableJS etc.) first, then run inline IIFE scripts.
+          var respScripts = Array.from(doc.querySelectorAll('script'));
+          for (var i = 0; i < respScripts.length; i++) {
+            var es = respScripts[i];
+            if (es.src) { await _loadScript(es.src); }
+          }
+          for (var j = 0; j < respScripts.length; j++) {
+            var is = respScripts[j];
+            if (!is.src && is.textContent.trim()) {
+              var s = document.createElement('script');
+              s.textContent = is.textContent;
+              document.body.appendChild(s);
+            }
+          }
+        } else {
+          // Full page redirect (error) — follow it
+          window.location.href = '/';
+        }
+      } catch(err) {
+        console.error(err);
+        alert(MSG_FAILED);
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('is-loading');
+        btn.querySelector('.koda-btn-label').textContent = MSG_GENERATE;
+      }
+    });
+  }
+
+})();
 </script>
 {% endblock %}
