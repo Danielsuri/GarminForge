@@ -24,6 +24,7 @@
   /* Semantic */
   --color-success:     #16a34a;
   --color-success-lt:  #4ade80;
+  --color-success-mid: var(--color-success-mid);
   --color-warning:     #d97706;
   --color-warning-lt:  #fbbf24;
   --color-danger:      #dc2626;
@@ -82,7 +83,10 @@ body {
   flex-direction: column;
 }
 
-main { flex: 1; }
+main {
+  flex: 1;
+  animation: koda-fade-in 0.3s ease;
+}
 
 h1, h2, h3, h4, h5, h6 { color: var(--text-primary); }
 
@@ -94,8 +98,6 @@ a:hover { color: var(--color-brand-pale); }
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
-main { animation: koda-fade-in 0.3s ease; }
 
 /* ---------- Koda φ mark ---------- */
 .koda-phi {
@@ -439,7 +441,7 @@ main { animation: koda-fade-in 0.3s ease; }
 .btn-koda-ghost:hover { border-color: rgba(255,255,255,0.25); color: var(--text-body); }
 
 .btn-koda-success {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
+  background: linear-gradient(135deg, var(--color-success-mid), #16a34a);
   color: #fff;
   border: none;
   border-radius: var(--radius-input);
@@ -477,7 +479,7 @@ main { animation: koda-fade-in 0.3s ease; }
 
 /* Keep existing .btn-garmin working (legacy alias) */
 .btn-garmin {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
+  background: linear-gradient(135deg, var(--color-success-mid), #16a34a);
   border-color: transparent;
   color: #fff;
   font-weight: 700;
@@ -640,7 +642,7 @@ main { animation: koda-fade-in 0.3s ease; }
   height: 40px;
   border-radius: 50%;
   border: none;
-  background: linear-gradient(135deg, #22c55e, #16a34a);
+  background: linear-gradient(135deg, var(--color-success-mid), #16a34a);
   color: #fff;
   display: inline-flex;
   align-items: center;
@@ -654,7 +656,7 @@ main { animation: koda-fade-in 0.3s ease; }
 
 .play-btn-charged:hover { filter: brightness(1.12); }
 
-@keyframes play-ring-pulse {
+@keyframes koda-play-ring-pulse {
   0%   { transform: scale(1);   opacity: 0.6; }
   70%  { transform: scale(1.45); opacity: 0; }
   100% { transform: scale(1.45); opacity: 0; }
@@ -665,8 +667,8 @@ main { animation: koda-fade-in 0.3s ease; }
   position: absolute;
   inset: -4px;
   border-radius: 50%;
-  border: 2px solid #22c55e;
-  animation: play-ring-pulse 2.4s ease-out infinite;
+  border: 2px solid var(--color-success-mid);
+  animation: koda-play-ring-pulse 2.4s ease-out infinite;
 }
 
 /* ---------- Exercise list ---------- */
@@ -1080,7 +1082,7 @@ main { animation: koda-fade-in 0.3s ease; }
   background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
 .koda-section-toggle button.active {
