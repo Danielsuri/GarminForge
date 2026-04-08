@@ -1,63 +1,98 @@
 {% extends "base.html" %}
-{% block title %}GarminForge — {{ t("progress_title") }}{% endblock %}
+{% block title %}Koda — {{ t("progress_title") }}{% endblock %}
+{% block main_class %}{% endblock %}
 
 {% block content %}
-<div class="d-flex align-items-center justify-content-between mb-4">
-  <h2 class="fw-bold mb-0"><i class="bi bi-bar-chart-fill text-success me-2"></i>{{ t("progress_title") }}</h2>
-</div>
 
-{% set completed = sessions | selectattr('completed_at') | list %}
-{% set total = sessions | length %}
+{# Precompute stats from sessions #}
+{% set completed_sessions = sessions | selectattr('completed_at') | list %}
+{% set total_sessions = sessions | length %}
 
-<!-- Summary stats -->
-<div class="row g-3 mb-4">
-  <div class="col-6 col-md-3">
-    <div class="stat-card text-center p-3 rounded">
-      <div class="stat-value">{{ total }}</div>
-      <div class="stat-label">{{ t("progress_sessions") }}</div>
-    </div>
-  </div>
-  <div class="col-6 col-md-3">
-    <div class="stat-card text-center p-3 rounded">
-      <div class="stat-value">{{ completed | length }}</div>
-      <div class="stat-label">{{ t("progress_completed") }}</div>
-    </div>
-  </div>
-  <div class="col-6 col-md-3">
-    <div class="stat-card text-center p-3 rounded">
-      <div class="stat-value">
-        {% if total > 0 %}{{ ((completed | length) / total * 100) | int }}%{% else %}—{% endif %}
+{# ===== Page hero ===== #}
+<div class="koda-page-hero">
+  <div class="koda-hero-texture"></div>
+  <div class="koda-hero-glow koda-hero-glow--br"></div>
+  <div class="container-xl px-3 px-lg-4" style="position:relative;z-index:1;">
+    <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
+      <div>
+        <div class="koda-eyebrow">Performance Tracking</div>
+        <h1 class="koda-page-title">{{ t("progress_title") }}</h1>
       </div>
-      <div class="stat-label">{{ t("progress_finish_rate") }}</div>
-    </div>
-  </div>
-  <div class="col-6 col-md-3">
-    <div class="stat-card text-center p-3 rounded">
-      <div class="stat-value">
-        {% if completed %}
-          {% set total_min = namespace(v=0) %}
-          {% for s in completed %}
-            {% if s.completed_at %}
-              {% set total_min.v = total_min.v + ((s.completed_at - s.started_at).seconds // 60) %}
-            {% endif %}
-          {% endfor %}
-          {{ total_min.v }}
-        {% else %}0{% endif %}
+      {# Rotating quote — desktop only #}
+      <div class="d-none d-md-block" style="max-width:320px;text-align:right;">
+        <p id="koda-quote"
+           style="font-style:italic;font-size:13px;color:var(--text-secondary);margin:0;line-height:1.6;">
+        </p>
       </div>
-      <div class="stat-label">{{ t("progress_total_min") }}</div>
     </div>
   </div>
 </div>
 
-<!-- Session history -->
-{% if sessions %}
-<div class="card bg-dark-subtle border-secondary">
-  <div class="card-body p-0">
-    <div class="table-responsive">
-      <table class="table table-dark table-hover mb-0">
-        <thead class="border-secondary">
+{# ===== Main content ===== #}
+<div class="container-xl px-3 px-lg-4 py-4">
+
+  {# ===== Stat cards ===== #}
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="koda-stat-card">
+        <div class="koda-stat-value">
+          {{ stats.total_sessions | default(total_sessions) | default(0) }}
+        </div>
+        <div class="koda-stat-label">{{ t("progress_sessions") }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="koda-stat-card">
+        <div class="koda-stat-value">
+          {{ stats.completed | default(completed_sessions | length) | default(0) }}
+        </div>
+        <div class="koda-stat-label">{{ t("progress_completed") }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="koda-stat-card">
+        <div class="koda-stat-value">
+          {% if stats is defined and stats.finish_rate is defined %}
+            {{ stats.finish_rate }}%
+          {% elif total_sessions > 0 %}
+            {{ ((completed_sessions | length) / total_sessions * 100) | int }}%
+          {% else %}
+            —
+          {% endif %}
+        </div>
+        <div class="koda-stat-label">{{ t("progress_finish_rate") }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="koda-stat-card">
+        <div class="koda-stat-value">
+          {% if stats is defined and stats.total_minutes is defined %}
+            {{ stats.total_minutes }}
+          {% elif completed_sessions %}
+            {% set total_min = namespace(v=0) %}
+            {% for s in completed_sessions %}
+              {% if s.completed_at and s.started_at %}
+                {% set total_min.v = total_min.v + ((s.completed_at - s.started_at).seconds // 60) %}
+              {% endif %}
+            {% endfor %}
+            {{ total_min.v }}
+          {% else %}
+            0
+          {% endif %}
+        </div>
+        <div class="koda-stat-label">{{ t("progress_total_min") }}</div>
+      </div>
+    </div>
+  </div>
+
+  {# ===== Session history table ===== #}
+  {% if sessions %}
+  <div class="koda-card" style="padding:0;">
+    <div style="overflow-x:auto;">
+      <table class="koda-table">
+        <thead>
           <tr>
-            <th class="ps-4">{{ t("progress_workout") }}</th>
+            <th style="padding-left:20px;">{{ t("progress_workout") }}</th>
             <th>{{ t("progress_date") }}</th>
             <th>{{ t("progress_duration") }}</th>
             <th>{{ t("progress_progress") }}</th>
@@ -67,32 +102,44 @@
         <tbody>
           {% for s in sessions %}
           <tr>
-            <td class="ps-4 fw-semibold">{{ s.plan_name }}</td>
-            <td class="text-muted small">
-              {{ s.started_at.strftime('%d/%m/%Y') if lang == 'he' else s.started_at.strftime('%b %d, %Y') }}
+            <td style="padding-left:20px;font-weight:600;">{{ s.plan_name }}</td>
+            <td>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-secondary);">
+                {{ s.started_at.strftime('%d/%m/%Y') if lang == 'he' else s.started_at.strftime('%b %d, %Y') }}
+              </span>
             </td>
-            <td class="text-muted small">
-              {% if s.completed_at %}
-                {{ ((s.completed_at - s.started_at).seconds // 60) }} {{ t("form_min") }}
-              {% else %}—{% endif %}
+            <td>
+              {% if s.completed_at and s.started_at %}
+                <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--color-brand-light);">
+                  {{ ((s.completed_at - s.started_at).seconds // 60) }} {{ t("form_min") }}
+                </span>
+              {% else %}
+                <span style="color:var(--text-muted);">—</span>
+              {% endif %}
             </td>
             <td>
               {% if s.total_exercises > 0 %}
               <div class="d-flex align-items-center gap-2">
-                <div class="progress flex-grow-1" style="height:6px;min-width:80px">
-                  <div class="progress-bar bg-success"
-                       style="width:{{ (s.exercises_completed / s.total_exercises * 100) | int }}%">
+                <div class="koda-progress-track flex-grow-1" style="min-width:80px;">
+                  <div class="koda-progress-fill"
+                       style="width:{{ (s.exercises_completed / s.total_exercises * 100) | int }}%;">
                   </div>
                 </div>
-                <span class="text-muted small">{{ s.exercises_completed }}/{{ s.total_exercises }}</span>
+                <span style="font-size:11px;color:var(--text-muted);white-space:nowrap;">
+                  {{ s.exercises_completed }}/{{ s.total_exercises }}
+                </span>
               </div>
-              {% else %}—{% endif %}
+              {% else %}
+                <span style="color:var(--text-muted);">—</span>
+              {% endif %}
             </td>
             <td>
               {% if s.completed_at %}
-                <span class="badge bg-success"><i class="bi bi-check-lg me-1"></i>{{ t("progress_done") }}</span>
+                <span class="koda-badge koda-badge--green">
+                  <i class="bi bi-check-lg" style="font-size:9px;"></i>{{ t("progress_done") }}
+                </span>
               {% else %}
-                <span class="badge bg-secondary">{{ t("progress_in_progress") }}</span>
+                <span class="koda-badge koda-badge--amber">{{ t("progress_in_progress") }}</span>
               {% endif %}
             </td>
           </tr>
@@ -101,17 +148,42 @@
       </table>
     </div>
   </div>
+
+  {% else %}
+  {# Empty state #}
+  <div class="koda-empty">
+    <div class="koda-phi koda-phi--lg mx-auto mb-4" aria-hidden="true"></div>
+    <h3 class="koda-empty-title">{{ t("progress_no_sessions") }}</h3>
+    <p class="koda-empty-body mb-4">{{ t("progress_no_sessions_desc") }}</p>
+    <a href="{{ url_for('dashboard') }}" class="btn-koda-primary">
+      <span style="font-size:15px;">+</span>{{ t("progress_generate_btn") }}
+    </a>
+  </div>
+  {% endif %}
+
 </div>
 
-{% else %}
-<div class="text-center py-5">
-  <div class="text-muted mb-3" style="font-size:3rem">📊</div>
-  <h5 class="text-muted">{{ t("progress_no_sessions") }}</h5>
-  <p class="text-muted small">{{ t("progress_no_sessions_desc") }}</p>
-  <a href="/" class="btn btn-garmin">
-    <i class="bi bi-lightning-charge-fill me-2"></i>{{ t("progress_generate_btn") }}
-  </a>
-</div>
-{% endif %}
+{% endblock %}
 
+{% block scripts %}
+<script>
+(function () {
+  var quotes = [
+    "Train smarter, not just harder.",
+    "Every rep is a vote for the person you are becoming.",
+    "Consistency compounds. Show up again.",
+    "Strength is built in the spaces between comfort.",
+    "Progress is the sum of small, disciplined choices."
+  ];
+  var idx = 4;
+  var el = document.getElementById('koda-quote');
+  function showQuote() {
+    if (!el) return;
+    el.textContent = quotes[idx];
+    idx = (idx + 1) % quotes.length;
+  }
+  showQuote();
+  setInterval(showQuote, 6000);
+})();
+</script>
 {% endblock %}
