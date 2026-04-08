@@ -1,110 +1,193 @@
 {% extends "base.html" %}
-{% block title %}GarminForge — {{ t("profile_title") }}{% endblock %}
+{% block title %}Koda — {{ t("profile_title") }}{% endblock %}
+{% block main_class %}{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-12 col-md-10 col-lg-8">
 
-    <div class="d-flex align-items-center justify-content-between mb-4">
-      <h2 class="fw-bold mb-0"><i class="bi bi-person-circle me-2 text-info"></i>{{ t("profile_title") }}</h2>
-      <a href="/my/questionnaire" class="btn btn-garmin btn-sm">
-        <i class="bi bi-pencil me-1"></i>{% if forge_user.questionnaire_completed %}{{ t("profile_retake") }}{% else %}{{ t("profile_complete_q") }}{% endif %}
-      </a>
+{# ===== Page hero ===== #}
+<div class="koda-page-hero">
+  <div class="koda-hero-texture"></div>
+  <div class="koda-hero-glow koda-hero-glow--br"></div>
+  <div class="container-xl px-3 px-lg-4" style="position:relative;z-index:1;">
+    <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
+      <div>
+        <div class="koda-eyebrow">Account</div>
+        <h1 class="koda-page-title">
+          {{ forge_user.display_name or forge_user.email }}'s Profile
+        </h1>
+      </div>
+      <div class="d-flex align-items-center" style="padding-top:8px;">
+        <a href="{{ url_for('questionnaire_page') }}" class="btn-koda-ghost" style="padding:9px 18px;font-size:13px;">
+          <i class="bi bi-pencil" style="font-size:11px;"></i>
+          {% if forge_user.questionnaire_completed %}{{ t("profile_retake") }}{% else %}{{ t("profile_complete_q") }}{% endif %}
+        </a>
+      </div>
     </div>
+  </div>
+</div>
 
-    <!-- Account info -->
-    <div class="card bg-dark-subtle border-secondary mb-3">
-      <div class="card-body p-4">
-        <h6 class="fw-semibold mb-3 text-muted text-uppercase small">{{ t("profile_account") }}</h6>
-        <dl class="row mb-0">
-          <dt class="col-sm-4 text-muted">{{ t("profile_email") }}</dt>
-          <dd class="col-sm-8">{{ forge_user.email }}</dd>
-          {% if forge_user.display_name %}
-          <dt class="col-sm-4 text-muted">{{ t("profile_name") }}</dt>
-          <dd class="col-sm-8">{{ forge_user.display_name }}</dd>
+{# ===== Main content ===== #}
+<div class="container-xl px-3 px-lg-4 py-4">
+  <div class="row g-4">
+
+    {# ===== Left column: avatar card ===== #}
+    <div class="col-12 col-md-4 col-lg-3">
+      <div class="koda-avatar-card">
+
+        {# Large avatar circle #}
+        <div class="koda-avatar-lg" aria-hidden="true">
+          {{ (forge_user.display_name or forge_user.email or 'K')[0] | upper }}
+        </div>
+
+        {# Display name #}
+        <div style="font-weight:700;font-size:16px;color:var(--text-primary);margin-bottom:4px;">
+          {{ forge_user.display_name or forge_user.email }}
+        </div>
+
+        {# Email in mono #}
+        {% if forge_user.display_name %}
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);margin-bottom:16px;word-break:break-all;">
+          {{ forge_user.email }}
+        </div>
+        {% else %}
+        <div style="margin-bottom:16px;"></div>
+        {% endif %}
+
+        {# Member since stat #}
+        <div class="koda-info-row" style="justify-content:center;flex-direction:column;gap:2px;text-align:center;">
+          <div class="koda-info-label" style="font-size:9px;text-transform:uppercase;letter-spacing:2px;">{{ t("profile_member_since") }}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-primary);font-weight:600;">
+            {{ forge_user.created_at.strftime('%b %Y') }}
+          </div>
+        </div>
+
+        {# Garmin status #}
+        <div style="margin-top:16px;">
+          {% if authenticated %}
+            <div class="koda-badge koda-badge--green" style="width:100%;justify-content:center;padding:8px 12px;font-size:11px;">
+              <span class="koda-badge-dot" style="width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block;"></span>
+              {{ t("nav_garmin_connected") }}
+            </div>
+          {% else %}
+            <div class="koda-badge koda-badge--slate" style="width:100%;justify-content:center;padding:8px 12px;font-size:11px;">
+              <span style="width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block;"></span>
+              {{ t("nav_garmin_not_connected") }}
+            </div>
           {% endif %}
-          <dt class="col-sm-4 text-muted">{{ t("profile_member_since") }}</dt>
-          <dd class="col-sm-8">{{ forge_user.created_at.strftime('%B %d, %Y') }}</dd>
-        </dl>
+        </div>
+
       </div>
     </div>
 
-    {% if forge_user.questionnaire_completed %}
+    {# ===== Right column: fitness info ===== #}
+    <div class="col-12 col-md-8 col-lg-9">
 
-    <!-- Fitness profile summary -->
-    <div class="card bg-dark-subtle border-secondary mb-3">
-      <div class="card-body p-4">
-        <h6 class="fw-semibold mb-3 text-muted text-uppercase small">{{ t("profile_fitness") }}</h6>
-        <dl class="row mb-0">
+      {% if forge_user.questionnaire_completed %}
 
-          {% if forge_user.age %}
-          <dt class="col-sm-4 text-muted">{{ t("profile_age") }}</dt>
-          <dd class="col-sm-8">{{ forge_user.age }}</dd>
-          {% endif %}
+      {# Fitness info card #}
+      <div class="koda-card mb-4">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:16px;">
+          {{ t("profile_fitness") }}
+        </div>
 
-          {% if forge_user.fitness_level %}
-          <dt class="col-sm-4 text-muted">{{ t("profile_fitness_level") }}</dt>
-          <dd class="col-sm-8">{{ t(fitness_level_keys.get(forge_user.fitness_level, forge_user.fitness_level)) }}</dd>
-          {% endif %}
+        {% if forge_user.age %}
+        <div class="koda-info-row">
+          <span class="koda-info-label">{{ t("profile_age") }}</span>
+          <span class="koda-info-value">{{ forge_user.age }}</span>
+        </div>
+        {% endif %}
 
-          {% if forge_user.weekly_workout_days %}
-          <dt class="col-sm-4 text-muted">{{ t("profile_workout_days") }}</dt>
-          <dd class="col-sm-8">{{ forge_user.weekly_workout_days }}</dd>
-          {% endif %}
+        {% if forge_user.fitness_level %}
+        <div class="koda-info-row">
+          <span class="koda-info-label">{{ t("profile_fitness_level") }}</span>
+          <span class="koda-info-value">
+            {{ t(fitness_level_keys.get(forge_user.fitness_level, forge_user.fitness_level)) }}
+          </span>
+        </div>
+        {% endif %}
 
-          {% if user_goals %}
-          <dt class="col-sm-4 text-muted">{{ t("profile_goals") }}</dt>
-          <dd class="col-sm-8">
-            {% for g in user_goals %}
-            <span class="badge bg-secondary me-1 mb-1">{{ goal_labels.get(g, g) }}</span>
-            {% endfor %}
-          </dd>
-          {% endif %}
+        {% if forge_user.weekly_workout_days %}
+        <div class="koda-info-row">
+          <span class="koda-info-label">{{ t("profile_workout_days") }}</span>
+          <span class="koda-info-value">{{ forge_user.weekly_workout_days }}</span>
+        </div>
+        {% endif %}
 
-          {% if user_equipment %}
-          <dt class="col-sm-4 text-muted">{{ t("profile_equipment") }}</dt>
-          <dd class="col-sm-8">
-            {% for e in user_equipment %}
-            <span class="badge bg-secondary me-1 mb-1">{{ eq_labels.get(e, e) }}</span>
-            {% endfor %}
-          </dd>
-          {% endif %}
-
-          {% if user_diet %}
-          <dt class="col-sm-4 text-muted">{{ t("profile_diet") }}</dt>
-          <dd class="col-sm-8">
-            {% for d in user_diet %}
-            <span class="badge bg-secondary me-1 mb-1">{{ diet_labels.get(d, d) }}</span>
-            {% endfor %}
-          </dd>
-          {% endif %}
-
-          {% if user_health %}
-          <dt class="col-sm-4 text-muted">{{ t("profile_health") }}</dt>
-          <dd class="col-sm-8">
-            {% for h in user_health %}
-            <span class="badge bg-warning text-dark me-1 mb-1">{{ health_labels.get(h, h) }}</span>
-            {% endfor %}
-          </dd>
-          {% endif %}
-
-        </dl>
       </div>
-    </div>
 
-    {% else %}
-
-    <div class="card bg-dark-subtle border-secondary mb-3">
-      <div class="card-body p-4 text-center py-5">
-        <div class="mb-3" style="font-size:2.5rem">&#x1F4CB;</div>
-        <h5 class="fw-semibold mb-2">{{ t("profile_no_profile") }}</h5>
-        <p class="text-muted mb-3">{{ t("profile_no_profile_desc") }}</p>
-        <a href="/my/questionnaire" class="btn btn-garmin">{{ t("profile_take_q") }}</a>
+      {# Goals card #}
+      {% if user_goals %}
+      <div class="koda-card mb-4">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:14px;">
+          {{ t("profile_goals") }}
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          {% for g in user_goals %}
+          <span class="koda-badge koda-badge--violet">{{ goal_labels.get(g, g) }}</span>
+          {% endfor %}
+        </div>
       </div>
-    </div>
+      {% endif %}
 
-    {% endif %}
+      {# Equipment card #}
+      {% if user_equipment %}
+      <div class="koda-card mb-4">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:14px;">
+          {{ t("profile_equipment") }}
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          {% for e in user_equipment %}
+          <span class="koda-badge koda-badge--slate">{{ eq_labels.get(e, e) }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {# Health notes card #}
+      {% if user_health %}
+      <div class="koda-card mb-4">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:14px;">
+          {{ t("profile_health") }}
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          {% for h in user_health %}
+          <span class="koda-badge koda-badge--amber">{{ health_labels.get(h, h) }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {# Diet card (only if data exists) #}
+      {% if user_diet %}
+      <div class="koda-card mb-4">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:14px;">
+          {{ t("profile_diet") }}
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          {% for d in user_diet %}
+          <span class="koda-badge koda-badge--slate">{{ diet_labels.get(d, d) }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% else %}
+
+      {# No profile empty state #}
+      <div class="koda-empty koda-card">
+        <div class="koda-phi koda-phi--lg mx-auto mb-4" aria-hidden="true"></div>
+        <h3 class="koda-empty-title">{{ t("profile_no_profile") }}</h3>
+        <p class="koda-empty-body mb-4">{{ t("profile_no_profile_desc") }}</p>
+        <a href="{{ url_for('questionnaire_page') }}" class="btn-koda-primary">
+          {{ t("profile_take_q") }}
+        </a>
+      </div>
+
+      {% endif %}
+
+    </div>
 
   </div>
 </div>
+
 {% endblock %}

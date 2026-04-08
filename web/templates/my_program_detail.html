@@ -1,93 +1,114 @@
 {% extends "base.html" %}
-{% block title %}GarminForge — {{ program.name }}{% endblock %}
+{% block title %}Koda — {{ program.name }}{% endblock %}
+{% block main_class %}{% endblock %}
 
 {% block content %}
-<div class="mb-4">
-  <a href="/my/programs" class="text-muted small text-decoration-none">
-    <i class="bi bi-arrow-left me-1"></i>{{ t("programs_back") }}
-  </a>
-</div>
 
-<!-- Program header -->
-<div class="card bg-dark-subtle border-secondary mb-4">
-  <div class="card-body p-4">
-    <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
+{# ===== Page hero ===== #}
+<div class="koda-page-hero">
+  <div class="koda-hero-texture"></div>
+  <div class="koda-hero-glow koda-hero-glow--br"></div>
+  <div class="container-xl px-3 px-lg-4" style="position:relative;z-index:1;">
+
+    {# Breadcrumb #}
+    <div class="mb-3">
+      <a href="{{ url_for('list_programs') }}"
+         style="color:var(--text-secondary);font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+        <i class="bi bi-arrow-left" style="font-size:11px;"></i>{{ t("programs_back") }}
+      </a>
+    </div>
+
+    <div class="d-flex align-items-start gap-3 flex-wrap">
       <div>
-        <h2 class="fw-bold mb-1">
-          <span class="me-2">{{ goal_icon }}</span>{{ program.name }}
-        </h2>
-        <div class="d-flex gap-2 flex-wrap mt-2">
+        <h1 class="koda-page-title" style="display:flex;align-items:center;gap:10px;">
+          <span>{{ goal_icon }}</span>{{ program.name }}
+        </h1>
+        <div class="d-flex flex-wrap gap-2 mt-2">
+          {# Status badge #}
           {% if program.status == "active" %}
-            <span class="badge bg-success fs-6">{{ t("programs_status_active") }}</span>
+            <span class="koda-badge koda-badge--green">{{ t("programs_status_active") }}</span>
           {% elif program.status == "completed" %}
-            <span class="badge bg-primary fs-6">{{ t("programs_status_completed") }}</span>
+            <span class="koda-badge koda-badge--slate">{{ t("programs_status_completed") }}</span>
           {% else %}
-            <span class="badge bg-warning text-dark fs-6">{{ t("programs_status_paused") }}</span>
+            <span class="koda-badge koda-badge--amber">{{ t("programs_status_paused") }}</span>
           {% endif %}
-          <span class="badge bg-secondary fs-6">{{ goal_label }}</span>
-          <span class="badge bg-dark border border-secondary fs-6">{{ program.periodization_type | capitalize }} {{ t("programs_periodization") }}</span>
-        </div>
-      </div>
-      <div class="text-end text-muted small">
-        <div><i class="bi bi-calendar-week me-1"></i>{{ program.duration_weeks }} {{ t("programs_weeks") }}</div>
-        <div class="mt-1">
-          <i class="bi bi-clock me-1"></i>
-          {{ t("programs_created") }} {{ program.created_at.strftime('%d/%m/%Y') if lang == 'he' else program.created_at.strftime('%b %d, %Y') }}
+          <span class="koda-badge koda-badge--violet">{{ goal_label }}</span>
+          <span class="koda-badge koda-badge--slate">
+            {{ program.duration_weeks }} {{ t("programs_weeks") }}
+          </span>
+          <span class="koda-badge koda-badge--slate">
+            {{ program.periodization_type | capitalize }} {{ t("programs_periodization") }}
+          </span>
         </div>
       </div>
     </div>
+
   </div>
 </div>
 
-<!-- Sessions table -->
-<h5 class="fw-semibold mb-3"><i class="bi bi-list-ol me-2 text-info"></i>{{ t("programs_detail_sessions") }}</h5>
+{# ===== Main content ===== #}
+<div class="container-xl px-3 px-lg-4 py-4">
 
-{% if program_sessions %}
-<div class="table-responsive">
-  <table class="table table-dark table-hover align-middle">
-    <thead class="text-muted">
-      <tr>
-        <th>{{ t("programs_detail_week") }}</th>
-        <th>{{ t("programs_detail_day") }}</th>
-        <th>{{ t("programs_detail_focus") }}</th>
-        <th>{{ t("programs_detail_scheduled") }}</th>
-        <th>{{ t("programs_detail_status") }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for s in program_sessions %}
-      <tr>
-        <td class="fw-semibold">{{ s.week_num }}</td>
-        <td>{{ s.day_num }}</td>
-        <td>{{ s.focus }}</td>
-        <td>
-          {% if s.scheduled_date %}
-            {{ s.scheduled_date.strftime('%d/%m/%Y') if lang == 'he' else s.scheduled_date.strftime('%b %d, %Y') }}
-          {% else %}
-            <span class="text-muted">—</span>
-          {% endif %}
-        </td>
-        <td>
-          {% if s.completed_at %}
-            <span class="badge bg-success"><i class="bi bi-check-lg me-1"></i>{{ t("programs_detail_done") }}</span>
-          {% elif s.scheduled_date %}
-            <span class="badge bg-secondary">{{ t("programs_detail_scheduled") }}</span>
-          {% else %}
-            <span class="badge bg-dark border border-secondary text-muted">{{ t("programs_detail_not_sched") }}</span>
-          {% endif %}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+  <div class="koda-card">
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:16px;">
+      {{ t("programs_detail_sessions") }}
+    </div>
 
-{% else %}
-<div class="text-center py-5 text-muted">
-  <div style="font-size:2.5rem" class="mb-3">📋</div>
-  <h6>{{ t("programs_detail_no_sessions") }}</h6>
-  <p class="small">{{ t("programs_detail_no_sessions_desc") }}</p>
+    {% if program_sessions %}
+    <div style="overflow-x:auto;">
+      <table class="koda-table">
+        <thead>
+          <tr>
+            <th>{{ t("programs_detail_week") }}</th>
+            <th>{{ t("programs_detail_day") }}</th>
+            <th>{{ t("programs_detail_focus") }}</th>
+            <th>{{ t("programs_detail_scheduled") }}</th>
+            <th>{{ t("programs_detail_status") }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in program_sessions %}
+          <tr>
+            <td style="font-weight:600;">{{ s.week_num }}</td>
+            <td>{{ s.day_num }}</td>
+            <td>{{ s.focus }}</td>
+            <td>
+              {% if s.scheduled_date %}
+                <span style="font-family:'JetBrains Mono',monospace;font-size:12px;">
+                  {{ s.scheduled_date.strftime('%d/%m/%Y') if lang == 'he' else s.scheduled_date.strftime('%b %d, %Y') }}
+                </span>
+              {% else %}
+                <span style="color:var(--text-muted);">—</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if s.completed_at %}
+                <span class="koda-badge koda-badge--green">
+                  <i class="bi bi-check-lg" style="font-size:9px;"></i>{{ t("programs_detail_done") }}
+                </span>
+              {% elif s.scheduled_date %}
+                <span class="koda-badge koda-badge--slate">{{ t("programs_detail_scheduled") }}</span>
+              {% else %}
+                <span class="koda-badge koda-badge--slate">{{ t("programs_detail_not_sched") }}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% else %}
+    {# Empty state #}
+    <div class="koda-empty" style="padding:40px 0;">
+      <div class="koda-phi koda-phi--lg mx-auto mb-4" aria-hidden="true"></div>
+      <h3 class="koda-empty-title">{{ t("programs_detail_no_sessions") }}</h3>
+      <p class="koda-empty-body">{{ t("programs_detail_no_sessions_desc") }}</p>
+    </div>
+    {% endif %}
+
+  </div>
+
 </div>
-{% endif %}
 
 {% endblock %}

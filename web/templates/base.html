@@ -1,124 +1,129 @@
-<!DOCTYPE html>
-<html lang="{{ lang }}"{% if lang == "he" %} dir="rtl"{% endif %} data-bs-theme="dark">
+<!doctype html>
+<html lang="{{ lang }}" dir="{{ 'rtl' if lang == 'he' else 'ltr' }}" data-bs-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}GarminForge{% endblock %}</title>
-  {% if lang == "he" %}
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.rtl.min.css"
-        crossorigin="anonymous" />
-  {% else %}
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-        crossorigin="anonymous" />
-  {% endif %}
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-  <link rel="stylesheet" href="/static/css/style.css?v=1.8.0" />
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.bootstrap5.min.css" />
-  {% block head %}{% endblock %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Koda{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}?v=3">
+  {% block extra_head %}{% endblock %}
 </head>
 <body>
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary">
-  <div class="container-xl">
-    <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="/">
-      <span class="brand-icon">⚙️</span>
-      <span>GarminForge</span>
+<nav class="koda-navbar">
+  <div class="container-fluid px-3 px-lg-4">
+    <a href="{{ url_for('index') }}" class="koda-nav-brand">
+      <span class="koda-phi" aria-hidden="true"></span>
+      <span class="koda-wordmark">Koda</span>
     </a>
-    <button class="navbar-toggler ms-auto border-secondary" type="button"
-            data-bs-toggle="collapse" data-bs-target="#navMain"
-            aria-controls="navMain" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navMain">
-      <div class="ms-auto d-flex flex-wrap align-items-center gap-2 py-2 py-lg-0">
-        {% if forge_user %}
-          {% if authenticated %}
-            <span class="text-success small d-flex align-items-center gap-1">
-              <i class="bi bi-shield-check-fill"></i> {{ t("nav_garmin_connected") }}
-            </span>
-          {% else %}
-            <span class="text-warning small d-flex align-items-center gap-1">
-              <i class="bi bi-exclamation-triangle-fill"></i> {{ t("nav_garmin_not_connected") }}
-            </span>
-          {% endif %}
-          <a href="/my/plans" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-bookmark me-1"></i>{{ t("nav_my_plans") }}
-          </a>
-          <a href="/my/programs" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-collection me-1"></i>{{ t("nav_programs") }}
-          </a>
-          <a href="/my/progress" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-bar-chart me-1"></i>{{ t("nav_progress") }}
-          </a>
-          <a href="/my/profile" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-person me-1"></i>{{ t("nav_profile") }}
-          </a>
-          <span class="text-muted small">{{ forge_user.display_name or forge_user.email }}</span>
-          <a href="/auth/logout" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-box-arrow-right"></i> {{ t("nav_logout") }}
-          </a>
-        {% else %}
-          <a href="/auth/login-forge" class="btn btn-outline-secondary btn-sm">{{ t("nav_sign_in") }}</a>
-          <a href="/auth/register" class="btn btn-garmin btn-sm">{{ t("nav_register") }}</a>
-        {% endif %}
 
-        <!-- Language selector -->
-        <div class="d-flex align-items-center gap-1">
-          <a href="/set-language?lang=en"
-             class="btn btn-sm py-0 px-2 {% if lang == 'en' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">EN</a>
-          <a href="/set-language?lang=he"
-             class="btn btn-sm py-0 px-2 {% if lang == 'he' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">עב</a>
+    {% if forge_user %}
+    <div class="koda-nav-links">
+      <a href="{{ url_for('index') }}"
+         class="koda-nav-link{% if active_page == 'generate' %} active{% endif %}">
+        {{ t('nav_generate') }}
+      </a>
+      <a href="{{ url_for('my_plans') }}"
+         class="koda-nav-link{% if active_page == 'plans' %} active{% endif %}">
+        {{ t('nav_my_plans') }}
+      </a>
+      <a href="{{ url_for('list_programs') }}"
+         class="koda-nav-link{% if active_page == 'programs' %} active{% endif %}">
+        {{ t('nav_programs') }}
+      </a>
+      <a href="{{ url_for('my_progress') }}"
+         class="koda-nav-link{% if active_page == 'progress' %} active{% endif %}">
+        {{ t('nav_progress') }}
+      </a>
+    </div>
+    {% endif %}
+
+    <div class="koda-nav-right">
+      {# Language toggle #}
+      {% if lang == 'he' %}
+        <a href="/set-language?lang=en" class="koda-nav-link koda-lang-toggle" title="Switch to English">EN</a>
+      {% else %}
+        <a href="/set-language?lang=he" class="koda-nav-link koda-lang-toggle" title="עברית">עב</a>
+      {% endif %}
+
+      {% if forge_user %}
+        {% if authenticated %}
+          <span class="koda-badge-connected">
+            <span class="koda-badge-dot"></span>
+            {{ t('nav_garmin_connected') }}
+          </span>
+        {% else %}
+          <span class="koda-badge-disconnected">
+            <span class="koda-badge-dot"></span>
+            {{ t('nav_garmin_not_connected') }}
+          </span>
+        {% endif %}
+        <div class="koda-avatar">
+          {{ (forge_user.display_name or forge_user.email or 'K')[0]|upper }}
         </div>
-      </div>
+        <a href="{{ url_for('logout') }}" class="koda-nav-link d-none d-lg-inline-flex">
+          {{ t('nav_logout') }}
+        </a>
+        <button class="koda-hamburger" id="kodaHamburger" aria-label="Menu">&#9776;</button>
+      {% else %}
+        <a href="{{ url_for('login_forge_page') }}" class="koda-nav-link">{{ t('nav_sign_in') }}</a>
+        <a href="{{ url_for('register_page') }}" class="btn-koda-primary" style="padding:7px 14px;font-size:13px;">
+          {{ t('nav_register') }}
+        </a>
+      {% endif %}
     </div>
   </div>
 </nav>
 
-<!-- Flash messages -->
-<div class="container-xl mt-3">
+{% if forge_user %}
+<div class="koda-nav-drawer" id="kodaDrawer">
+  <a href="{{ url_for('index') }}" class="koda-nav-link d-block mb-1">{{ t('nav_generate') }}</a>
+  <a href="{{ url_for('my_plans') }}" class="koda-nav-link d-block mb-1">{{ t('nav_my_plans') }}</a>
+  <a href="{{ url_for('list_programs') }}" class="koda-nav-link d-block mb-1">{{ t('nav_programs') }}</a>
+  <a href="{{ url_for('my_progress') }}" class="koda-nav-link d-block mb-1">{{ t('nav_progress') }}</a>
+  <a href="{{ url_for('logout') }}" class="koda-nav-link d-block mt-2" style="color:var(--text-muted)">{{ t('nav_logout') }}</a>
+</div>
+{% endif %}
+
+<main class="{% block main_class %}container-xl py-4{% endblock %}">
   {% if flash_error %}
-  <div class="alert alert-danger alert-dismissible fade show d-flex align-items-start gap-2" role="alert">
-    <i class="bi bi-exclamation-triangle-fill mt-1 flex-shrink-0"></i>
-    <div>{{ flash_error }}</div>
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  <div class="container-xl py-2">
+    <div style="background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);border-radius:8px;padding:10px 16px;color:#f87171;font-size:13px;">
+      {{ flash_error }}
+    </div>
   </div>
   {% endif %}
   {% if flash_success %}
-  <div class="alert alert-success alert-dismissible fade show d-flex align-items-start gap-2" role="alert">
-    <i class="bi bi-check-circle-fill mt-1 flex-shrink-0"></i>
-    <div>{{ flash_success }}</div>
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  <div class="container-xl py-2">
+    <div style="background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);border-radius:8px;padding:10px 16px;color:#4ade80;font-size:13px;">
+      {{ flash_success }}
+    </div>
   </div>
   {% endif %}
-</div>
-
-<!-- Page content -->
-<main class="container-xl py-4">
   {% block content %}{% endblock %}
 </main>
 
-<!-- Footer -->
-<footer class="border-top border-secondary mt-auto py-3">
-  <div class="container-xl">
-    <p class="text-muted small mb-0 text-center">
-      GarminForge — {{ t("footer_text") }} &nbsp;·&nbsp;
-      <a href="https://github.com/Danielsuri/GarminForge" class="text-muted" target="_blank">GitHub</a>
-      &nbsp;·&nbsp; <span class="opacity-50">{{ app_version }}</span>
-    </p>
-  </div>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-        crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
-<script src="/static/js/app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 {% block scripts %}{% endblock %}
+
+<script>
+  // Navbar scroll shadow
+  window.addEventListener('scroll', function() {
+    document.querySelector('.koda-navbar').classList.toggle('scrolled', window.scrollY > 10);
+  }, { passive: true });
+
+  // Mobile hamburger
+  var btn = document.getElementById('kodaHamburger');
+  var drawer = document.getElementById('kodaDrawer');
+  if (btn && drawer) {
+    btn.addEventListener('click', function() {
+      drawer.classList.toggle('open');
+    });
+  }
+</script>
 </body>
 </html>

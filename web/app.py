@@ -1,5 +1,5 @@
 """
-GarminForge Web Application — FastAPI entry point.
+Koda Web Application — FastAPI entry point.
 
 Routes
 ------
@@ -36,7 +36,7 @@ from starlette.middleware.sessions import SessionMiddleware
 # Garmin imports
 from garminconnect import Garmin, GarminConnectAuthenticationError
 
-# GarminForge library
+# Koda library (GarminForge core)
 from garminforge.auth import TokenStore, _garth
 from garminforge.client import GarminForgeClient
 from garminforge.exceptions import (
@@ -121,7 +121,7 @@ async def lifespan(app: FastAPI):  # type: ignore[type-arg]
     yield
 
 
-app = FastAPI(title="GarminForge", docs_url=None, redoc_url=None, lifespan=lifespan)
+app = FastAPI(title="Koda", docs_url=None, redoc_url=None, lifespan=lifespan)
 app.add_middleware(
     SessionMiddleware,
     secret_key=os.environ.get("SECRET_KEY", secrets.token_hex(32)),
@@ -185,7 +185,7 @@ def _get_forge_client(request: Request, db: Session | None = None) -> GarminForg
 
 
 def _store_token(request: Request, token_b64: str, db: Session | None = None) -> None:
-    """Save Garmin token — to DB if a GarminForge user is logged in, else to legacy store."""
+    """Save Garmin token — to DB if a Koda user is logged in, else to legacy store."""
     if db is not None:
         user_id = request.session.get("user_id")
         if user_id:
