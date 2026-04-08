@@ -1,318 +1,257 @@
-{% extends "base.html" %}
-{% block title %}GarminForge — Workout Preview{% endblock %}
+{# -----------------------------------------------------------------------
+   workout_preview.html — Koda UI
+   Included (no extends/block) inside dashboard.html's preview panel.
+   Top-level wrapper: .koda-card.koda-card--active  id="workoutCard"
+   ----------------------------------------------------------------------- #}
 
-{% block content %}
-<div class="row g-4">
+<div class="koda-card koda-card--active" id="workoutCard">
 
-  <!-- Generator form (left) — preserved so user can tweak and regenerate -->
-  <div class="col-12 col-lg-5">
-    <div class="card bg-dark-subtle border-secondary">
-      <div class="card-header border-secondary">
-        <h5 class="mb-0 fw-bold"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>{{ t("form_build_workout") }}</h5>
-      </div>
-      <div class="card-body p-4">
-        <form method="post" action="/workout/generate" id="generatorForm">
+  {# ── Header row ─────────────────────────────────────────────────────── #}
+  <div class="d-flex align-items-start justify-content-between gap-3 mb-4">
 
-          <!-- GOAL -->
-          <div class="mb-4">
-            <label class="form-label fw-semibold d-flex align-items-center gap-2 mb-2">
-              <i class="bi bi-bullseye text-info"></i> {{ t("form_workout_goal") }}
-            </label>
-            <div class="row g-2">
-              {% for key, g in goals.items() %}
-              <div class="col-6">
-                <input type="radio" class="btn-check" name="goal" id="goal_{{ key }}"
-                       value="{{ key }}" {% if key == selected_goal %}checked{% endif %} />
-                <label class="btn btn-outline-secondary w-100 text-start goal-card p-2" for="goal_{{ key }}">
-                  <span class="d-block fw-semibold">{{ g.icon }} {{ t("goal_label_" ~ key) }}</span>
-                  <span class="d-block text-muted" style="font-size:.75rem;line-height:1.2">{{ t("goal_desc_" ~ key) }}</span>
-                </label>
-              </div>
-              {% endfor %}
-            </div>
-          </div>
-
-          <!-- EQUIPMENT -->
-          <div class="mb-4">
-            <label class="form-label fw-semibold d-flex align-items-center gap-2 mb-2">
-              <i class="bi bi-tools text-success"></i> {{ t("form_available_equipment") }}
-              <span class="badge bg-secondary ms-auto" id="eqCount">
-                {% if selected_equipment | length == 0 or (selected_equipment | length == 1 and selected_equipment[0] == 'bodyweight') %}
-                  {{ t("preview_no_equipment") }}
-                {% else %}
-                  {{ selected_equipment | length }}{{ t("preview_selected_suffix") }}
-                {% endif %}
-              </span>
-            </label>
-            <div class="row g-2">
-              {% for eq in equipment_options %}
-              <div class="col-6">
-                <input type="checkbox" class="btn-check equipment-cb" name="equipment"
-                       id="eq_{{ eq.tag }}" value="{{ eq.tag }}"
-                       {% if eq.tag in selected_equipment %}checked{% endif %} />
-                <label class="btn btn-outline-secondary w-100 text-start p-2" for="eq_{{ eq.tag }}">
-                  <span class="me-2">{{ eq.icon }}</span>{{ t("eq_" ~ eq.tag) }}
-                </label>
-              </div>
-              {% endfor %}
-            </div>
-          </div>
-
-          <!-- DURATION -->
-          <div class="mb-4">
-            <label for="duration" class="form-label fw-semibold d-flex align-items-center gap-2">
-              <i class="bi bi-clock-fill text-primary"></i>
-              {{ t("form_session_duration") }}: <span id="durationLabel" class="text-white ms-1">{{ selected_duration }} {{ t("form_min") }}</span>
-            </label>
-            <input type="range" class="form-range" id="duration" name="duration"
-                   min="15" max="120" step="5" value="{{ selected_duration }}" />
-            <div class="d-flex justify-content-between text-muted" style="font-size:.75rem">
-              <span>15 {{ t("form_min") }}</span><span>60 {{ t("form_min") }}</span><span>120 {{ t("form_min") }}</span>
-            </div>
-          </div>
-
-          <button type="submit" class="btn btn-garmin w-100 py-3 fw-bold fs-5" id="generateBtn">
-            <i class="bi bi-arrow-repeat me-2"></i>{{ t("form_regenerate_btn") }}
-          </button>
-        </form>
-      </div>
+    <div class="flex-grow-1 min-w-0">
+      <div class="koda-section-label">{{ plan.goal_icon }} {{ t("form_workout_goal") }}</div>
+      <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;
+                 color:var(--text-primary);margin:0 0 4px 0;line-height:1.2;">
+        {{ plan.name }}
+      </h2>
+      <p style="font-size:13px;color:var(--text-secondary);margin:0;line-height:1.4;">
+        {{ plan.description }}
+      </p>
     </div>
 
-    <!-- Muscle map -->
-    <div id="muscle-map-container" class="card bg-dark-subtle border-secondary mt-3 p-3">
-      <h6 class="text-muted mb-2 text-center" style="font-size:.75rem;letter-spacing:.05em;text-transform:uppercase">{{ t("muscle_map_title") }}</h6>
-      {% include "partials/muscle_map.svg" %}
-      <div class="muscle-legend">
-        <span class="legend-item"><span class="legend-dot primary-dot"></span><span>{{ t("muscle_map_primary") }}</span></span>
-        <span class="legend-item"><span class="legend-dot secondary-dot"></span><span>{{ t("muscle_map_secondary") }}</span></span>
-        <span class="legend-item"><span class="legend-dot untargeted-dot"></span><span>{{ t("muscle_map_untargeted") }}</span></span>
+    <div class="d-flex align-items-center gap-2 flex-shrink-0">
+      <button type="button" id="playBtn" class="play-btn-charged" aria-label="{{ t('preview_play_btn') }}">
+        <svg class="play-btn-icon" viewBox="0 0 16 16" fill="#ffffff" aria-hidden="true" width="14" height="14">
+          <path d="M5.5 3.5l8 4.5-8 4.5V3.5z"/>
+        </svg>
+      </button>
+      <span class="koda-badge koda-badge--violet">
+        <i class="bi bi-clock me-1"></i>{{ plan.duration_minutes }} {{ t("form_min") }}
+      </span>
+    </div>
+  </div>
+
+  {# ── Stats row ───────────────────────────────────────────────────────── #}
+  <div class="row g-2 mb-4">
+    <div class="col-4">
+      <div class="koda-stat-card">
+        <div class="koda-stat-value" id="statExerciseCount">{{ plan.exercises | length }}</div>
+        <div class="koda-stat-label">{{ t("preview_exercises") }}</div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="koda-stat-card">
+        <div class="koda-stat-value">{{ plan.exercises[0].sets if plan.exercises else '—' }}</div>
+        <div class="koda-stat-label">{{ t("preview_sets_each") }}</div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="koda-stat-card">
+        <div class="koda-stat-value">
+          {% if plan.exercises and plan.exercises[0].reps %}
+            {{ plan.exercises[0].reps }}
+          {% elif plan.exercises and plan.exercises[0].duration_sec %}
+            {{ plan.exercises[0].duration_sec | int }}s
+          {% else %}—{% endif %}
+        </div>
+        <div class="koda-stat-label">{{ t("preview_reps_per_set") }}</div>
       </div>
     </div>
   </div>
 
-  <!-- Workout preview card (right) -->
-  <div class="col-12 col-lg-7" id="previewContainer">
-    <div id="workoutPreviewCard" class="card bg-dark-subtle border-secondary">
-      <div class="card-header border-secondary d-flex align-items-center justify-content-between">
-        <div>
-          <span class="fs-3 me-2">{{ plan.goal_icon }}</span>
-          <span class="fw-bold fs-5">{{ plan.name }}</span>
-        </div>
+  {# ── Exercise list ───────────────────────────────────────────────────── #}
+  <div class="exercise-list mb-4">
+
+    {# Warm-up row #}
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <span class="koda-badge koda-badge--slate">{{ t("badge_warmup") }}</span>
+      <div class="exercise-item flex-grow-1" style="padding:8px 12px;">
+        <div class="step-number flex-shrink-0">W</div>
+        <span style="font-size:13px;color:var(--text-secondary);">{{ t("preview_warmup_label") }}</span>
+      </div>
+    </div>
+
+    {# Circuit block #}
+    {% set sets_count = plan.exercises[0].sets if plan.exercises else 3 %}
+    <div class="koda-circuit-block mb-3">
+
+      {# Circuit header #}
+      <div class="koda-circuit-header justify-content-between">
         <div class="d-flex align-items-center gap-2">
-          <button type="button" id="playBtn" class="play-btn-charged">
-            <svg class="play-btn-icon" viewBox="0 0 16 16" fill="#ffffff" aria-hidden="true">
-              <path d="M5.5 3.5l8 4.5-8 4.5V3.5z"/>
-            </svg>
-            <span class="play-btn-label">Play</span>
-          </button>
-          <span class="badge bg-garmin">
-            <i class="bi bi-clock me-1"></i>{{ plan.duration_minutes }} {{ t("form_min") }}
+          <span class="koda-badge koda-badge--violet" style="text-transform:uppercase;letter-spacing:.08em;">
+            {{ t("badge_circuit") }}
+          </span>
+          <span style="font-size:12px;color:var(--text-secondary);" id="circuitDesc">
+            — {{ t("preview_circuit_desc_pre") }}{{ plan.exercises | length }}{{ t("preview_circuit_desc_post") }}
           </span>
         </div>
+        <span class="koda-badge koda-badge--violet" style="font-size:13px;font-weight:700;">
+          × {{ sets_count }}
+        </span>
       </div>
 
-      <div class="card-body p-4">
-        <p class="text-muted small mb-4">{{ plan.description }}</p>
-
-        <!-- Stats row -->
-        <div class="row g-3 mb-4">
-          <div class="col-4">
-            <div class="stat-card text-center p-3 rounded">
-              <div class="stat-value" id="statExerciseCount">{{ plan.exercises | length }}</div>
-              <div class="stat-label">{{ t("preview_exercises") }}</div>
-            </div>
+      {# Sortable exercise list #}
+      <div class="koda-circuit-body" id="sortableExercises">
+        {% for ex in plan.exercises %}
+        <div class="exercise-item"
+             data-index="{{ loop.index0 }}"
+             data-primary='{{ ex.primary_muscles | tojson }}'
+             data-secondary='{{ ex.secondary_muscles | tojson }}'>
+          <div class="drag-handle" title="{{ t('edit_drag_to_reorder') }}">
+            <i class="bi bi-grip-vertical"></i>
           </div>
-          <div class="col-4">
-            <div class="stat-card text-center p-3 rounded">
-              <div class="stat-value">{{ plan.exercises[0].sets if plan.exercises else '—' }}</div>
-              <div class="stat-label">{{ t("preview_sets_each") }}</div>
-            </div>
-          </div>
-          <div class="col-4">
-            <div class="stat-card text-center p-3 rounded">
-              <div class="stat-value">
-                {% if plan.exercises and plan.exercises[0].reps %}
-                  {{ plan.exercises[0].reps }}
-                {% elif plan.exercises and plan.exercises[0].duration_sec %}
-                  {{ plan.exercises[0].duration_sec | int }}s
-                {% else %}—{% endif %}
+          <div class="step-number flex-shrink-0">{{ loop.index }}</div>
+          <div class="flex-grow-1 min-w-0">
+            <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap">
+              <div class="min-w-0">
+                <span class="fw-semibold" style="font-size:14px;color:var(--text-primary);">{{ ex.label }}</span>
+                <span class="koda-badge koda-badge--slate ms-1" style="text-transform:capitalize;">
+                  {{ t("muscle_" ~ ex.muscle_group.replace(" ", "_")) }}
+                </span>
               </div>
-              <div class="stat-label">{{ t("preview_reps_per_set") }}</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Exercise list -->
-        <div class="exercise-list mb-4">
-
-          <!-- Warm-up -->
-          <div class="d-flex align-items-center gap-2 mb-3">
-            <div class="step-badge bg-secondary text-white rounded-pill px-2 py-0" style="font-size:.7rem">{{ t("badge_warmup") }}</div>
-            <span class="text-muted small">{{ t("preview_warmup_label") }}</span>
-          </div>
-
-          <!-- Circuit block -->
-          {% set sets_count = plan.exercises[0].sets if plan.exercises else 3 %}
-          <div class="circuit-block rounded-3 mb-3" style="border: 2px solid var(--bs-info); overflow: hidden;">
-
-            <!-- Circuit header -->
-            <div class="circuit-header d-flex align-items-center justify-content-between px-3 py-2"
-                 style="background: rgba(13,202,240,.12); border-bottom: 1px solid rgba(13,202,240,.3);">
-              <div class="d-flex align-items-center gap-2">
-                <i class="bi bi-arrow-repeat text-info fs-5"></i>
-                <span class="fw-bold text-info" style="letter-spacing:.04em">{{ t("badge_circuit") }}</span>
-                <span class="text-muted small" id="circuitDesc">— {{ t("preview_circuit_desc_pre") }}{{ plan.exercises | length }}{{ t("preview_circuit_desc_post") }}</span>
+              <div class="d-flex gap-1 flex-shrink-0">
+                {% if ex.video_url %}
+                <button type="button"
+                        class="btn btn-outline-secondary btn-sm py-0 px-2"
+                        data-video-url="{{ ex.video_url | e }}"
+                        data-video-label="{{ ex.label | e }}"
+                        onclick="openVideoTutorial(this.dataset.videoUrl, this.dataset.videoLabel)"
+                        title="{{ t('preview_tutorial') }}">
+                  <i class="bi bi-play-circle me-1"></i>{{ t("preview_tutorial") }}
+                </button>
+                {% else %}
+                <a href="{{ ex.link }}" target="_blank" rel="noopener noreferrer"
+                   class="btn btn-outline-secondary btn-sm py-0 px-2" title="{{ t('preview_tutorial') }}">
+                  <i class="bi bi-play-circle me-1"></i>{{ t("preview_tutorial") }}
+                </a>
+                {% endif %}
+                <button type="button"
+                        class="btn btn-outline-info btn-sm py-0 px-2"
+                        onclick="openReplaceModal({{ loop.index0 }})"
+                        title="{{ t('edit_replace') }}">
+                  <i class="bi bi-arrow-left-right"></i>
+                </button>
+                <button type="button"
+                        class="btn btn-outline-danger btn-sm py-0 px-2"
+                        onclick="removeExercise({{ loop.index0 }})"
+                        title="{{ t('edit_remove') }}">
+                  <i class="bi bi-trash3"></i>
+                </button>
               </div>
-              <span class="badge fs-6 px-3 py-1 fw-bold" style="background: var(--bs-info); color:#000;">
-                × {{ sets_count }}
-              </span>
             </div>
-
-            <!-- Sortable exercise list -->
-            <div id="sortableExercises">
-              {% for ex in plan.exercises %}
-              <div class="exercise-item d-flex align-items-start gap-2 px-3 py-3
-                           {% if not loop.last %}border-bottom border-secondary{% endif %}"
-                   data-index="{{ loop.index0 }}"
-                   data-primary='{{ ex.primary_muscles | tojson }}'
-                   data-secondary='{{ ex.secondary_muscles | tojson }}'>
-                <div class="drag-handle flex-shrink-0 pt-1" title="{{ t('edit_drag_to_reorder') }}">
-                  <i class="bi bi-grip-vertical fs-5"></i>
-                </div>
-                <div class="step-number flex-shrink-0">{{ loop.index }}</div>
-                <div class="flex-grow-1">
-                  <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap">
-                    <div>
-                      <span class="fw-semibold">{{ ex.label }}</span>
-                      <span class="badge bg-secondary ms-2 text-capitalize" style="font-size:.65rem">
-                        {{ t("muscle_" ~ ex.muscle_group.replace(" ", "_")) }}
-                      </span>
-                    </div>
-                    <div class="d-flex gap-1 flex-shrink-0">
-                      {% if ex.video_url %}
-                      <button type="button"
-                              class="btn btn-outline-secondary btn-sm py-0 px-2"
-                              data-video-url="{{ ex.video_url | e }}"
-                              data-video-label="{{ ex.label | e }}"
-                              onclick="openVideoTutorial(this.dataset.videoUrl, this.dataset.videoLabel)"
-                              title="{{ t('preview_tutorial') }}">
-                        <i class="bi bi-play-circle me-1"></i>{{ t("preview_tutorial") }}
-                      </button>
-                      {% else %}
-                      <a href="{{ ex.link }}" target="_blank" rel="noopener noreferrer"
-                         class="btn btn-outline-secondary btn-sm py-0 px-2" title="{{ t('preview_tutorial') }}">
-                        <i class="bi bi-play-circle me-1"></i>{{ t("preview_tutorial") }}
-                      </a>
-                      {% endif %}
-                      <button type="button"
-                              class="btn btn-outline-info btn-sm py-0 px-2"
-                              onclick="openReplaceModal({{ loop.index0 }})"
-                              title="{{ t('edit_replace') }}">
-                        <i class="bi bi-arrow-left-right"></i>
-                      </button>
-                      <button type="button"
-                              class="btn btn-outline-danger btn-sm py-0 px-2"
-                              onclick="removeExercise({{ loop.index0 }})"
-                              title="{{ t('edit_remove') }}">
-                        <i class="bi bi-trash3"></i>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="text-muted small mt-1">
-                    {% if ex.reps %}
-                      <i class="bi bi-repeat me-1"></i>{{ ex.reps }} {{ t("preview_reps") }}
-                    {% else %}
-                      <i class="bi bi-stopwatch me-1"></i>{{ ex.duration_sec | int }}{{ t("preview_hold") }}
-                    {% endif %}
-                    &nbsp;·&nbsp;
-                    <i class="bi bi-hourglass-split me-1"></i>{{ ex.rest_seconds | int }}{{ t("preview_rest") }}
-                  </div>
-                  {% if ex.required_equipment_labels %}
-                  <div class="mt-1" style="font-size:.72rem">
-                    <i class="bi bi-tools text-warning me-1"></i>
-                    <span class="text-warning">{{ t("preview_needs") }}</span>
-                    <span class="text-muted">{{ ex.required_equipment_labels | join(' / ') }}</span>
-                  </div>
-                  {% endif %}
-                </div>
-              </div>
-              {% endfor %}
+            <div class="text-muted small mt-1">
+              {% if ex.reps %}
+                <i class="bi bi-repeat me-1"></i>{{ ex.reps }} {{ t("preview_reps") }}
+              {% else %}
+                <i class="bi bi-stopwatch me-1"></i>{{ ex.duration_sec | int }}{{ t("preview_hold") }}
+              {% endif %}
+              &nbsp;·&nbsp;
+              <i class="bi bi-hourglass-split me-1"></i>{{ ex.rest_seconds | int }}{{ t("preview_rest") }}
             </div>
-
-            <!-- Add exercise button -->
-            <div class="d-flex justify-content-center py-2 px-3"
-                 style="border-top: 1px dashed rgba(255,255,255,.1);">
-              <button type="button" class="btn btn-outline-secondary btn-sm" id="addExerciseBtn"
-                      onclick="openAddModal()">
-                <i class="bi bi-plus-circle me-1"></i>{{ t("edit_add_exercise") }}
-              </button>
+            {% if ex.required_equipment_labels %}
+            <div class="mt-1" style="font-size:.72rem">
+              <i class="bi bi-tools text-warning me-1"></i>
+              <span class="text-warning">{{ t("preview_needs") }}</span>
+              <span class="text-muted">{{ ex.required_equipment_labels | join(' / ') }}</span>
             </div>
-
-            <!-- Round repeat footer -->
-            <div class="d-flex align-items-center gap-2 px-3 py-2"
-                 style="background: rgba(13,202,240,.07); border-top: 1px dashed rgba(13,202,240,.3);">
-              <i class="bi bi-arrow-counterclockwise text-info"></i>
-              <span class="text-info small fw-semibold">
-                {{ t("preview_round_footer_pre") }}{{ sets_count }}{{ t("preview_round_footer_post") }}
-              </span>
-            </div>
-          </div>
-
-          <!-- Cool-down -->
-          <div class="d-flex align-items-center gap-2 pt-1">
-            <div class="step-badge bg-secondary text-white rounded-pill px-2 py-0" style="font-size:.7rem">{{ t("badge_cooldown") }}</div>
-            <span class="text-muted small">{{ t("preview_cooldown_label") }}</span>
+            {% endif %}
           </div>
         </div>
+        {% endfor %}
+      </div>
 
-        <!-- Save to My Plans -->
-        {% if forge_user %}
-        <div class="mb-3">
-          <button type="button" class="btn btn-outline-info w-100" id="savePlanBtn">
-            <i class="bi bi-bookmark-plus me-2"></i>{{ t("preview_save_plans") }}
-          </button>
-        </div>
-        {% endif %}
+      {# Add exercise #}
+      <div class="d-flex justify-content-center py-2 px-3"
+           style="border-top:1px dashed rgba(124,58,237,0.2);">
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="addExerciseBtn"
+                onclick="openAddModal()">
+          <i class="bi bi-plus-circle me-1"></i>{{ t("edit_add_exercise") }}
+        </button>
+      </div>
 
-        <!-- Upload form (only shown when Garmin is connected) -->
-        {% if authenticated %}
-        <form method="post" action="/workout/upload" id="uploadForm">
-          <input type="hidden" name="payload_json" id="payloadJsonInput" value="{{ payload_json | e }}" />
+      {# Round footer #}
+      <div class="d-flex align-items-center gap-2 px-3 py-2"
+           style="background:rgba(124,58,237,0.06);border-top:1px dashed rgba(124,58,237,0.2);">
+        <i class="bi bi-arrow-counterclockwise" style="color:var(--color-brand-light);"></i>
+        <span style="font-size:12px;font-weight:600;color:var(--color-brand-light);">
+          {{ t("preview_round_footer_pre") }}{{ sets_count }}{{ t("preview_round_footer_post") }}
+        </span>
+      </div>
+    </div>
 
-          <div class="mb-3">
-            <label for="schedule_date" class="form-label fw-semibold">
-              <i class="bi bi-calendar3 me-1"></i>{{ t("preview_schedule_label") }}
-            </label>
-            <input type="date" class="form-control bg-dark border-secondary text-white"
-                   id="schedule_date" name="schedule_date" />
-            <div class="form-text">{{ t("preview_schedule_hint") }}</div>
-          </div>
-
-          <button type="submit" class="btn btn-garmin w-100 py-3 fw-bold fs-5" id="uploadBtn">
-            <i class="bi bi-cloud-arrow-up me-2"></i>{{ t("preview_upload_garmin") }}
-          </button>
-        </form>
-        {% else %}
-        <div class="text-center p-3 border border-secondary rounded">
-          <p class="text-muted mb-2">{{ t("preview_connect_prompt") }}</p>
-          <a href="/auth/login-forge" class="btn btn-outline-secondary">
-            <i class="bi bi-box-arrow-in-right me-2"></i>{{ t("preview_connect_btn") }}
-          </a>
-        </div>
-        {% endif %}
+    {# Cool-down row #}
+    <div class="d-flex align-items-center gap-2 pt-1">
+      <span class="koda-badge koda-badge--slate">{{ t("badge_cooldown") }}</span>
+      <div class="exercise-item flex-grow-1" style="padding:8px 12px;">
+        <div class="step-number flex-shrink-0">C</div>
+        <span style="font-size:13px;color:var(--text-secondary);">{{ t("preview_cooldown_label") }}</span>
       </div>
     </div>
   </div>
 
-</div>
+  {# ── Action buttons ──────────────────────────────────────────────────── #}
 
-<!-- Toast notification container (fixed bottom-right) -->
+  {# Save to My Plans #}
+  {% if forge_user %}
+  <div class="mb-3">
+    <button type="button"
+            class="btn btn-koda-secondary w-100 d-inline-flex align-items-center justify-content-center gap-2"
+            id="saveBtn">
+      <span class="koda-spinner" aria-hidden="true"></span>
+      <span class="koda-btn-label">
+        <i class="bi bi-bookmark-plus me-1"></i>{{ t("preview_save_plans") }}
+      </span>
+    </button>
+  </div>
+  {% endif %}
+
+  {# Upload to Garmin #}
+  {% if authenticated %}
+  <form method="post" action="/workout/upload" id="uploadForm">
+    <input type="hidden" name="payload_json" id="payloadJsonInput" value="{{ payload_json | e }}" />
+
+    <div class="mb-3">
+      <label for="schedule_date" class="koda-section-label d-block mb-1">
+        <i class="bi bi-calendar3 me-1"></i>{{ t("preview_schedule_label") }}
+      </label>
+      <input type="date" class="koda-input"
+             id="schedule_date" name="schedule_date" />
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">
+        {{ t("preview_schedule_hint") }}
+      </div>
+    </div>
+
+    <button type="submit"
+            class="btn btn-garmin btn-koda-success w-100 py-3 fw-bold fs-6
+                   d-inline-flex align-items-center justify-content-center gap-2"
+            id="uploadBtn">
+      <span class="koda-spinner" aria-hidden="true"></span>
+      <span class="koda-btn-label">
+        <i class="bi bi-cloud-arrow-up me-1"></i>{{ t("preview_upload_garmin") }}
+      </span>
+    </button>
+  </form>
+  {% else %}
+  <div class="text-center p-3 rounded" style="border:1px solid var(--border-default);">
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:10px;">
+      {{ t("preview_connect_prompt") }}
+    </p>
+    <a href="/auth/login-forge" class="btn btn-koda-ghost">
+      <i class="bi bi-box-arrow-in-right me-1"></i>{{ t("preview_connect_btn") }}
+    </a>
+  </div>
+  {% endif %}
+
+</div>{# end .koda-card #}
+
+{# ── Toast container ─────────────────────────────────────────────────── #}
 <div id="editToastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"
-     style="z-index: 1100;"></div>
+     style="z-index:1100;"></div>
 
-<!-- =====================================================================
-     Replace Exercise Modal
-     ===================================================================== -->
+{# =====================================================================
+   Replace Exercise Modal
+   ===================================================================== #}
 <div class="modal fade" id="replaceModal" tabindex="-1" aria-labelledby="replaceModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-scrollable">
     <div class="modal-content border-secondary" style="background:#1a1d20;">
@@ -331,9 +270,9 @@
   </div>
 </div>
 
-<!-- =====================================================================
-     Add Exercise Modal
-     ===================================================================== -->
+{# =====================================================================
+   Add Exercise Modal
+   ===================================================================== #}
 <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content border-secondary" style="background:#1a1d20;">
@@ -344,9 +283,7 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body p-3">
-        <!-- Muscle group filter -->
         <div id="muscleGroupFilter" class="d-flex flex-wrap gap-1 mb-3"></div>
-        <!-- Exercise list -->
         <div id="addModalBody">
           <div class="text-center py-4 text-muted">
             <span class="spinner-border spinner-border-sm me-2"></span>Loading…
@@ -357,9 +294,9 @@
   </div>
 </div>
 
-<!-- =====================================================================
-     Video Tutorial Modal
-     ===================================================================== -->
+{# =====================================================================
+   Video Tutorial Modal
+   ===================================================================== #}
 <div class="modal fade" id="videoTutorialModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content border-secondary" style="background:#0d0d0d;">
@@ -376,54 +313,48 @@
   </div>
 </div>
 
-<!-- =====================================================================
-     Workout Player Modal
-     ===================================================================== -->
+{# =====================================================================
+   Workout Player Modal
+   ===================================================================== #}
 <div class="modal fade" id="workoutPlayerModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-fullscreen">
     <div class="modal-content border-0" style="background:#0a0a0a;color:#fff;">
 
-      <!-- Header -->
       <div class="modal-header border-0 px-4 pt-3 pb-0">
         <span class="text-muted small" id="playerRoundLabel">Round 1 of 3</span>
         <button type="button" class="btn-close btn-close-white ms-auto"
                 data-bs-dismiss="modal" id="playerCloseBtn"></button>
       </div>
 
-      <!-- Body -->
       <div class="modal-body d-flex flex-column align-items-center justify-content-center px-4 py-2"
            style="gap:16px;flex:1;">
 
-        <!-- Video / thumbnail / fallback area -->
         <div id="playerMediaArea"
-             style="width:100%;max-width:560px;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center;">
+             style="width:100%;max-width:560px;aspect-ratio:16/9;border-radius:12px;overflow:hidden;
+                    background:#111;display:flex;align-items:center;justify-content:center;">
         </div>
 
-        <!-- Exercise name -->
         <h1 id="playerExerciseName" class="text-center fw-bold mb-0"
             style="font-size:clamp(1.4rem,5vw,2.2rem);letter-spacing:-.01em;">
           Get Ready
         </h1>
 
-        <!-- Timer / rep count -->
         <div id="playerTimer"
-             style="font-size:clamp(3rem,15vw,6rem);font-weight:800;line-height:1;color:#4ade80;font-variant-numeric:tabular-nums;">
+             style="font-size:clamp(3rem,15vw,6rem);font-weight:800;line-height:1;
+                    color:#4ade80;font-variant-numeric:tabular-nums;">
           5
         </div>
 
-        <!-- Step indicator -->
         <div id="playerStepLabel" class="text-muted" style="font-size:.9rem;">
           Step 1 of 18
         </div>
 
-        <!-- Progress bar -->
         <div style="width:100%;max-width:560px;background:#222;border-radius:4px;height:6px;">
           <div id="playerProgress"
                style="background:#4ade80;height:6px;border-radius:4px;width:0%;transition:width .4s ease;">
           </div>
         </div>
 
-        <!-- Controls -->
         <div class="d-flex gap-3 mt-2">
           <button type="button" class="btn btn-outline-light px-4 py-2 fw-semibold"
                   id="playerPauseBtn">
@@ -440,10 +371,7 @@
   </div>
 </div>
 
-{% endblock %}
-
-{% block scripts %}
-<!-- SortableJS for drag-and-drop reordering -->
+{# ── SortableJS + workout editor script ─────────────────────────────── #}
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
 
 <script>
@@ -526,7 +454,6 @@ function esc(str) {
    Render a single exercise row HTML string
    --------------------------------------------------------------------- */
 function exerciseRowHTML(ex, idx, isLast) {
-  const borderCls = isLast ? '' : 'border-bottom border-secondary';
   const repsHtml = ex.reps
     ? `<i class="bi bi-repeat me-1"></i>${ex.reps} ${MSG_REPS}`
     : `<i class="bi bi-stopwatch me-1"></i>${Math.round(ex.duration_sec)}${MSG_HOLD}`;
@@ -557,19 +484,19 @@ function exerciseRowHTML(ex, idx, isLast) {
   const primaryJson  = JSON.stringify(ex.primary_muscles   || []);
   const secondaryJson = JSON.stringify(ex.secondary_muscles || []);
   return `
-    <div class="exercise-item d-flex align-items-start gap-2 px-3 py-3 ${borderCls}"
+    <div class="exercise-item"
          data-index="${idx}"
          data-primary="${esc(primaryJson)}"
          data-secondary="${esc(secondaryJson)}">
-      <div class="drag-handle flex-shrink-0 pt-1" title="${MSG_DRAG}">
-        <i class="bi bi-grip-vertical fs-5"></i>
+      <div class="drag-handle" title="${MSG_DRAG}">
+        <i class="bi bi-grip-vertical"></i>
       </div>
       <div class="step-number flex-shrink-0">${idx + 1}</div>
-      <div class="flex-grow-1">
+      <div class="flex-grow-1 min-w-0">
         <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap">
-          <div>
-            <span class="fw-semibold">${esc(ex.label)}</span>
-            <span class="badge bg-secondary ms-2 text-capitalize" style="font-size:.65rem">
+          <div class="min-w-0">
+            <span class="fw-semibold" style="font-size:14px;color:var(--text-primary);">${esc(ex.label)}</span>
+            <span class="koda-badge koda-badge--slate ms-1" style="text-transform:capitalize;">
               ${esc(muscleLabel)}
             </span>
           </div>
@@ -872,12 +799,15 @@ function exercisePickerRowHTML(ex, onclickExpr) {
 
 /* -----------------------------------------------------------------------
    Upload: rebuild payload from current exercises, then submit
+   Uses .is-loading class toggle — no innerHTML for loading state.
    --------------------------------------------------------------------- */
 document.getElementById('uploadForm')?.addEventListener('submit', async function (e) {
   e.preventDefault();
   const btn = document.getElementById('uploadBtn');
   btn.disabled = true;
-  btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>${MSG_REBUILDING}`;
+  btn.classList.add('is-loading');
+  const labelEl = btn.querySelector('.koda-btn-label');
+  if (labelEl) labelEl.textContent = MSG_REBUILDING;
 
   try {
     const resp = await fetch('/workout/rebuild', {
@@ -896,17 +826,25 @@ document.getElementById('uploadForm')?.addEventListener('submit', async function
     this.submit();
   } catch {
     btn.disabled = false;
-    btn.innerHTML = `<i class="bi bi-cloud-arrow-up me-2"></i>${MSG_UPLOAD}`;
+    btn.classList.remove('is-loading');
+    if (labelEl) {
+      const icon = document.createElement('i');
+      icon.className = 'bi bi-cloud-arrow-up me-1';
+      labelEl.replaceChildren(icon, document.createTextNode(MSG_UPLOAD));
+    }
     alert(MSG_REBUILD_FAILED);
   }
 });
 
 /* -----------------------------------------------------------------------
    Save to My Plans: use live exercises array + rebuild payload
+   Uses .is-loading class toggle — no innerHTML for loading state.
    --------------------------------------------------------------------- */
-document.getElementById('savePlanBtn')?.addEventListener('click', async function () {
+document.getElementById('saveBtn')?.addEventListener('click', async function () {
   this.disabled = true;
-  this.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>${MSG_SAVING}`;
+  this.classList.add('is-loading');
+  const labelEl = this.querySelector('.koda-btn-label');
+  if (labelEl) labelEl.textContent = MSG_SAVING;
 
   try {
     // Rebuild payload so saved plan reflects any edits
@@ -936,49 +874,29 @@ document.getElementById('savePlanBtn')?.addEventListener('click', async function
       }),
     });
     if (resp.ok) {
-      this.innerHTML = `<i class="bi bi-bookmark-check-fill me-2"></i>${MSG_SAVED}`;
-      this.classList.replace('btn-outline-info', 'btn-success');
+      this.classList.remove('is-loading');
+      this.classList.remove('btn-koda-secondary');
+      this.classList.add('btn-koda-success');
+      if (labelEl) {
+        const icon = document.createElement('i');
+        icon.className = 'bi bi-bookmark-check-fill me-1';
+        labelEl.replaceChildren(icon, document.createTextNode(MSG_SAVED));
+      }
     } else {
       throw new Error('Server error');
     }
   } catch {
     this.disabled = false;
-    this.innerHTML = `<i class="bi bi-bookmark-plus me-2"></i>${MSG_SAVE}`;
+    this.classList.remove('is-loading');
+    if (labelEl) {
+      const icon = document.createElement('i');
+      icon.className = 'bi bi-bookmark-plus me-1';
+      labelEl.replaceChildren(icon, document.createTextNode(MSG_SAVE));
+    }
     alert(MSG_SAVE_FAILED);
   }
 });
 
-/* -----------------------------------------------------------------------
-   Generator form UX
-   --------------------------------------------------------------------- */
-const durationInput = document.getElementById('duration');
-const durationLabel = document.getElementById('durationLabel');
-durationInput.addEventListener('input', () => {
-  durationLabel.textContent = durationInput.value + ' ' + MSG_MIN;
-});
-
-const eqCheckboxes = document.querySelectorAll('.equipment-cb');
-const eqCount = document.getElementById('eqCount');
-function updateEqCount() {
-  const checked = document.querySelectorAll('.equipment-cb:checked');
-  const n = checked.length;
-  const onlyBodyweight = n === 1 && checked[0].value === 'bodyweight';
-  eqCount.textContent = (n === 0 || onlyBodyweight) ? MSG_NO_EQUIPMENT : (n + MSG_SELECTED_SUFFIX);
-}
-eqCheckboxes.forEach(cb => cb.addEventListener('change', function () {
-  if (this.checked && this.value === 'bodyweight') {
-    eqCheckboxes.forEach(other => { if (other !== this) other.checked = false; });
-  } else if (this.checked) {
-    const bwCb = document.getElementById('eq_bodyweight');
-    if (bwCb) bwCb.checked = false;
-  }
-  updateEqCount();
-}));
-
-
-/* -----------------------------------------------------------------------
-   Boot: wire up SortableJS on the initial server-rendered list
-   --------------------------------------------------------------------- */
 /* -----------------------------------------------------------------------
    Video Tutorial Modal
    --------------------------------------------------------------------- */
@@ -1345,4 +1263,3 @@ document.getElementById('playBtn').addEventListener('click', () => {
 
 })(); // end IIFE
 </script>
-{% endblock %}
