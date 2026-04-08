@@ -1,5 +1,5 @@
 """
-Translation strings for GarminForge UI.
+Translation strings for Koda UI.
 
 ``t(key, lang, **kwargs)`` is the public helper used by rendering.py to inject
 a bound ``t`` function into every Jinja2 template context.
@@ -164,7 +164,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "progress_generate_btn": "Generate a Workout",
 
         # --- Auth ---
-        "auth_tagline":         "Generate personalised strength workouts and send them directly to Garmin Connect.",
+        "auth_tagline":         "Structure your training. Push to Garmin Connect.",
         "auth_sign_in_heading": "Sign In",
         "auth_register_heading": "Create Account",
         "auth_register_sub":    "Save workouts and track your progress.",
@@ -207,7 +207,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "muscle_map_untargeted": "Untargeted Muscles",
 
         # --- Footer ---
-        "footer_text": "unofficial Garmin Connect workout tool",
+        "footer_text": "Your precision training system",
 
         # --- Navbar (profile) ---
         "nav_profile": "Profile",
@@ -479,7 +479,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "progress_generate_btn": "\u05e6\u05d5\u05e8 \u05d0\u05d9\u05de\u05d5\u05df",
 
         # --- Auth ---
-        "auth_tagline":         "\u05e6\u05d5\u05e8 \u05d0\u05d9\u05de\u05d5\u05e0\u05d9 \u05db\u05d5\u05d7 \u05de\u05d5\u05ea\u05d0\u05de\u05d9\u05dd \u05d0\u05d9\u05e9\u05d9\u05ea \u05d5\u05e9\u05dc\u05d7 \u05d0\u05d5\u05ea\u05dd \u05d9\u05e9\u05d9\u05e8\u05d5\u05ea \u05dc-Garmin Connect.",
+        "auth_tagline":         "\u05e1\u05d3\u05e8 \u05d0\u05ea \u05d4\u05d4\u05db\u05e9\u05e8\u05d5\u05ea \u05e9\u05dc\u05da. \u05d3\u05d7\u05d5\u05e3 \u05dc-Garmin Connect.",
         "auth_sign_in_heading": "\u05db\u05e0\u05d9\u05e1\u05d4",
         "auth_register_heading": "\u05d9\u05e6\u05d9\u05e8\u05ea \u05d7\u05e9\u05d1\u05d5\u05df",
         "auth_register_sub":    "\u05e9\u05de\u05d5\u05e8 \u05d0\u05d9\u05de\u05d5\u05e0\u05d9\u05dd \u05d5\u05e2\u05e7\u05d5\u05d1 \u05d0\u05d7\u05e8 \u05d4\u05ea\u05e7\u05d3\u05de\u05d5\u05ea\u05da.",
@@ -522,7 +522,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "muscle_map_untargeted": "\u05e9\u05e8\u05d9\u05e8\u05d9\u05dd \u05dc\u05dc\u05d0 \u05d9\u05e2\u05d3",
 
         # --- Footer ---
-        "footer_text": "\u05db\u05dc\u05d9 \u05d0\u05d9\u05de\u05d5\u05df \u05dc\u05d0 \u05e8\u05e9\u05de\u05d9 \u05e9\u05dc Garmin Connect",
+        "footer_text": "\u05de\u05e2\u05e8\u05db\u05ea \u05d4\u05d4\u05d3\u05e8\u05da \u05e9\u05dc\u05da",
 
         # --- Navbar (profile) ---
         "nav_profile": "\u05e4\u05e8\u05d5\u05e4\u05d9\u05dc",
