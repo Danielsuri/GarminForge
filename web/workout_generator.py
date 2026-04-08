@@ -500,6 +500,7 @@ class WorkoutPlan:
 _LOCAL_VIDEO_MAP: dict[str, str] = {
     "BULGARIAN_SPLIT_SQUAT": "/static/videos/bulgarian-split-squat.mp4",
     "JUMP_SQUAT":            "/static/videos/jump-squat.mp4",
+    "BURPEE":                "/static/videos/burpee.mp4",
 }
 
 
