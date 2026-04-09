@@ -14,13 +14,17 @@
         <div class="koda-eyebrow">Training Architecture</div>
         <h1 class="koda-page-title">{{ t("nav_programs") }}</h1>
       </div>
-      {% if programs %}
       <div class="d-flex align-items-center gap-3 flex-wrap">
+        {% if programs %}
         <div class="koda-badge koda-badge--slate">
           {{ programs|length }} {{ "program" if programs|length == 1 else "programs" }}
         </div>
+        {% endif %}
+        <a href="{{ url_for('new_program_wizard') }}" class="koda-btn koda-btn--primary"
+           style="font-size:13px;padding:8px 16px;">
+          <span style="font-size:15px;margin-right:4px;">+</span>New Program
+        </a>
       </div>
-      {% endif %}
     </div>
   </div>
 </div>
@@ -97,7 +101,7 @@
     <div class="koda-phi koda-phi--lg mx-auto mb-4" aria-hidden="true"></div>
     <h3 class="koda-empty-title">{{ t("programs_no_programs") }}</h3>
     <p class="koda-empty-body mb-4">{{ t("programs_no_programs_desc") }}</p>
-    <a href="{{ url_for('index') }}" class="btn-koda-primary">
+    <a href="{{ url_for('new_program_wizard') }}" class="btn-koda-primary">
       <span style="font-size:15px;">+</span>{{ t("programs_generate_btn") }}
     </a>
   </div>
