@@ -64,11 +64,13 @@
             <th>{{ t("programs_detail_focus") }}</th>
             <th>{{ t("programs_detail_scheduled") }}</th>
             <th>{{ t("programs_detail_status") }}</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           {% for s in program_sessions %}
-          <tr>
+          {% set exes = sessions_exercises.get(s.id, []) %}
+          <tr class="koda-session-row" style="cursor:pointer;" onclick="toggleSession('{{ s.id }}')">
             <td style="font-weight:600;">{{ s.week_num }}</td>
             <td>{{ s.day_num }}</td>
             <td>{{ s.focus }}</td>
@@ -92,6 +94,43 @@
                 <span class="koda-badge koda-badge--slate">{{ t("programs_detail_not_sched") }}</span>
               {% endif %}
             </td>
+            <td style="white-space:nowrap;">
+              <i class="bi bi-chevron-down session-chevron" id="chevron-{{ s.id }}"
+                 style="font-size:12px;color:var(--text-muted);transition:transform .2s;"></i>
+            </td>
+          </tr>
+          <tr class="koda-session-expand" id="expand-{{ s.id }}" style="display:none;">
+            <td colspan="6" style="padding:0;">
+              <div style="background:rgba(255,255,255,0.03);border-top:1px solid rgba(255,255,255,0.06);
+                          padding:16px 20px;display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
+                <div style="flex:1;min-width:200px;">
+                  <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;
+                               color:var(--text-muted);margin-bottom:10px;">Exercises</div>
+                  {% if exes %}
+                  <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;">
+                    {% for ex in exes %}
+                    <li style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-primary);">
+                      <span style="width:6px;height:6px;border-radius:50%;background:var(--accent-violet);
+                                   flex-shrink:0;"></span>
+                      {{ ex.name }}
+                      <span style="font-size:11px;color:var(--text-muted);">{{ ex.muscle_group }}</span>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                  {% else %}
+                  <span style="color:var(--text-muted);font-size:13px;">No exercise data</span>
+                  {% endif %}
+                </div>
+                <div style="flex-shrink:0;align-self:center;">
+                  <a href="/my/programs/{{ program.id }}/sessions/{{ s.id }}"
+                     class="btn-koda-primary"
+                     style="text-decoration:none;font-size:13px;padding:8px 16px;"
+                     onclick="event.stopPropagation()">
+                    <i class="bi bi-play-fill" style="font-size:11px;"></i> Start Session
+                  </a>
+                </div>
+              </div>
+            </td>
           </tr>
           {% endfor %}
         </tbody>
@@ -111,4 +150,17 @@
 
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleSession(id) {
+  var row = document.getElementById('expand-' + id);
+  var chevron = document.getElementById('chevron-' + id);
+  if (!row) return;
+  var open = row.style.display !== 'none';
+  row.style.display = open ? 'none' : 'table-row';
+  if (chevron) chevron.style.transform = open ? '' : 'rotate(180deg)';
+}
+</script>
 {% endblock %}

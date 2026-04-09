@@ -12,6 +12,7 @@ from __future__ import annotations
 import dataclasses
 import json
 import logging
+from datetime import date, timedelta
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
@@ -218,14 +219,22 @@ async def create_program(request: Request, db: Session = Depends(get_db)):
 
     # If sessions were provided (from preview step), persist them now
     sessions_data: list[dict] = body.get("sessions") or []
+    today = date.today()
+    weekly_workout_days = max((int(s["day_num"]) for s in sessions_data), default=1)
+    day_spacing = max(1, 7 // weekly_workout_days)
+
     for s in sessions_data:
+        week_num = int(s["week_num"])
+        day_num = int(s["day_num"])
+        day_offset = (week_num - 1) * 7 + (day_num - 1) * day_spacing
         program_session = ProgramSession(
             program_id=program.id,
-            week_num=int(s["week_num"]),
-            day_num=int(s["day_num"]),
+            week_num=week_num,
+            day_num=day_num,
             focus=str(s["focus"])[:100],
             garmin_payload_json=json.dumps(s["garmin_payload"]),
             exercises_json=json.dumps(s["exercises"]),
+            scheduled_date=today + timedelta(days=day_offset),
         )
         db.add(program_session)
 
@@ -278,6 +287,14 @@ async def program_detail(program_id: str, request: Request, db: Session = Depend
     sessions_sorted = sorted(
         program.program_sessions, key=lambda s: (s.week_num, s.day_num)
     )
+    # Parse exercises per session for inline display
+    sessions_exercises: dict[str, list[dict]] = {}
+    for s in sessions_sorted:
+        try:
+            sessions_exercises[s.id] = json.loads(s.exercises_json)
+        except Exception:
+            sessions_exercises[s.id] = []
+
     goal_cfg = GOALS.get(program.goal, {})
     return render_template(
         "my_program_detail.html",
@@ -285,6 +302,55 @@ async def program_detail(program_id: str, request: Request, db: Session = Depend
         db=db,
         program=program,
         program_sessions=sessions_sorted,
+        sessions_exercises=sessions_exercises,
         goal_icon=goal_cfg.get("icon", "🏋️"),
         goal_label=goal_cfg.get("label", program.goal),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Session preview
+# ---------------------------------------------------------------------------
+
+
+@router.get("/programs/{program_id}/sessions/{session_id}", response_class=HTMLResponse)
+async def session_preview(
+    program_id: str, session_id: str, request: Request, db: Session = Depends(get_db)
+):
+    user = _require_user(request, db)
+    if user is None:
+        return RedirectResponse("/auth/login-forge", status_code=303)
+
+    program = db.query(Program).filter_by(id=program_id, user_id=user.id).first()
+    if program is None:
+        request.session["flash_error"] = "Program not found."
+        return RedirectResponse("/my/programs", status_code=303)
+
+    session_obj = next(
+        (s for s in program.program_sessions if s.id == session_id), None
+    )
+    if session_obj is None:
+        request.session["flash_error"] = "Session not found."
+        return RedirectResponse(f"/my/programs/{program_id}", status_code=303)
+
+    try:
+        exercises = json.loads(session_obj.exercises_json)
+    except Exception:
+        exercises = []
+
+    try:
+        garmin_payload = json.loads(session_obj.garmin_payload_json)
+    except Exception:
+        garmin_payload = {}
+
+    goal_cfg = GOALS.get(program.goal, {})
+    return render_template(
+        "my_session_preview.html",
+        request,
+        db=db,
+        program=program,
+        session=session_obj,
+        exercises=exercises,
+        payload_json=session_obj.garmin_payload_json,
+        goal_icon=goal_cfg.get("icon", "🏋️"),
     )

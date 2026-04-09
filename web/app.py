@@ -23,6 +23,7 @@ import logging
 import os
 import secrets
 import uuid
+from datetime import date
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
@@ -48,7 +49,7 @@ from garminforge.exceptions import (
 from web.auth_utils import get_current_user, logout_session
 from web.db import get_db, init_db
 from web.garmin_sso import browser_login, exchange_ticket, make_token_b64, portal_login
-from web.models import User
+from web.models import Program, User
 from web.rendering import render_template
 from web.routes_auth import router as forge_auth_router
 from web.routes_my import router as my_router
@@ -235,6 +236,8 @@ async def index(
 
     selected_goal = None
     user_equipment: list[str] = []
+    today_session = None
+    today_program = None
     forge_user = get_current_user(request, db)
     if forge_user is not None:
         if forge_user.fitness_goals_json:
@@ -242,6 +245,29 @@ async def index(
             selected_goal = goals_list[0] if goals_list else None
         if forge_user.preferred_equipment_json:
             user_equipment = json.loads(forge_user.preferred_equipment_json)
+
+        # Find today's session from an active program
+        active_program = (
+            db.query(Program)
+            .filter_by(user_id=forge_user.id, status="active")
+            .first()
+        )
+        if active_program:
+            today_program = active_program
+            today = date.today()
+            # Look for a session scheduled today (not yet completed)
+            sessions = active_program.program_sessions
+            today_session = next(
+                (s for s in sessions if s.scheduled_date == today and not s.completed_at),
+                None,
+            )
+            if today_session is None:
+                # Fall back to the next upcoming session
+                upcoming = sorted(
+                    [s for s in sessions if s.scheduled_date and s.scheduled_date >= today and not s.completed_at],
+                    key=lambda s: s.scheduled_date,  # type: ignore[return-value]
+                )
+                today_session = upcoming[0] if upcoming else None
 
     return _render(
         "dashboard.html",
@@ -254,6 +280,8 @@ async def index(
         flash_success=flash_success,
         selected_goal=selected_goal,
         user_equipment=user_equipment,
+        today_session=today_session,
+        today_program=today_program,
     )
 
 

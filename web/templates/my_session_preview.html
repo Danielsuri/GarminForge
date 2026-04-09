@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Koda — {{ session.focus }} · Week {{ session.week_num }} Day {{ session.day_num }}{% endblock %}
+{% block main_class %}{% endblock %}
+
+{% block content %}
+
+{# ===== Page hero ===== #}
+<div class="koda-page-hero">
+  <div class="koda-hero-texture"></div>
+  <div class="koda-hero-glow koda-hero-glow--br"></div>
+  <div class="container-xl px-3 px-lg-4" style="position:relative;z-index:1;">
+
+    {# Breadcrumb #}
+    <div class="mb-3">
+      <a href="/my/programs/{{ program.id }}"
+         style="color:var(--text-secondary);font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+        <i class="bi bi-arrow-left" style="font-size:11px;"></i>{{ program.name }}
+      </a>
+    </div>
+
+    <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
+      <div>
+        <div class="koda-eyebrow">Week {{ session.week_num }} · Day {{ session.day_num }}</div>
+        <h1 class="koda-page-title" style="display:flex;align-items:center;gap:10px;">
+          <span>{{ goal_icon }}</span>{{ session.focus }}
+        </h1>
+        <div class="d-flex flex-wrap gap-2 mt-2">
+          {% if session.scheduled_date %}
+          <span class="koda-badge koda-badge--violet">
+            {{ session.scheduled_date.strftime('%b %d, %Y') }}
+          </span>
+          {% endif %}
+          {% if session.completed_at %}
+          <span class="koda-badge koda-badge--green">
+            <i class="bi bi-check-lg" style="font-size:9px;"></i> Done
+          </span>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if authenticated %}
+      <form method="post" action="/workout/upload" id="uploadForm" style="flex-shrink:0;">
+        <input type="hidden" name="payload_json" value="{{ payload_json | e }}" />
+        <button type="submit" class="btn-koda-primary" id="uploadBtn">
+          <span class="koda-spinner"></span>
+          <span class="koda-btn-label">
+            <i class="bi bi-cloud-arrow-up"></i> Upload to Garmin
+          </span>
+        </button>
+      </form>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+{# ===== Main content ===== #}
+<div class="container-xl px-3 px-lg-4 py-4">
+  <div class="koda-card">
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:16px;">
+      Exercises
+    </div>
+
+    {% if exercises %}
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      {% for ex in exercises %}
+      <div style="display:flex;align-items:center;gap:16px;padding:14px 16px;
+                  background:rgba(255,255,255,0.03);border-radius:10px;
+                  border:1px solid rgba(255,255,255,0.07);">
+        <div style="flex-shrink:0;width:36px;height:36px;border-radius:8px;
+                    background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(167,139,250,.1));
+                    display:flex;align-items:center;justify-content:center;
+                    font-size:16px;">💪</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;font-size:14px;color:var(--text-primary);margin-bottom:2px;">
+            {{ ex.name }}
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);">
+            {{ ex.muscle_group | replace('_', ' ') | capitalize }}
+          </div>
+        </div>
+        {% if ex.link %}
+        <a href="{{ ex.link }}" target="_blank" rel="noopener"
+           style="flex-shrink:0;font-size:12px;color:var(--accent-violet);text-decoration:none;">
+          <i class="bi bi-box-arrow-up-right"></i>
+        </a>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="koda-empty" style="padding:32px 0;">
+      <p style="color:var(--text-muted);margin:0;">No exercise data for this session.</p>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('uploadForm')?.addEventListener('submit', function() {
+  var btn = document.getElementById('uploadBtn');
+  if (btn) {
+    btn.disabled = true;
+    btn.classList.add('is-loading');
+  }
+});
+</script>
+{% endblock %}
