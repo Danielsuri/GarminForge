@@ -269,6 +269,12 @@ async def index(
                 )
                 today_session = upcoming[0] if upcoming else None
 
+            if today_session is not None:
+                return RedirectResponse(
+                    f"/my/programs/{active_program.id}/sessions/{today_session.id}",
+                    status_code=303,
+                )
+
     return _render(
         "dashboard.html",
         request,
