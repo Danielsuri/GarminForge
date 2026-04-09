@@ -13,6 +13,7 @@ import dataclasses
 import json
 import logging
 from datetime import date, timedelta
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
@@ -27,6 +28,14 @@ from web.workout_generator import EQUIPMENT_OPTIONS, GOALS
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/my")
+
+_MUSCLE_MAP_SVG: str = ""
+try:
+    _MUSCLE_MAP_SVG = (Path(__file__).parent / "static" / "img" / "muscle_map.svg").read_text(
+        encoding="utf-8"
+    )
+except Exception:
+    pass
 
 _require_user = require_user
 
@@ -343,6 +352,8 @@ async def session_preview(
     except Exception:
         garmin_payload = {}
 
+    duration_minutes = int(garmin_payload.get("estimatedDurationInSecs", 2700)) // 60
+
     goal_cfg = GOALS.get(program.goal, {})
     return render_template(
         "my_session_preview.html",
@@ -353,4 +364,7 @@ async def session_preview(
         exercises=exercises,
         payload_json=session_obj.garmin_payload_json,
         goal_icon=goal_cfg.get("icon", "🏋️"),
+        goal_label=goal_cfg.get("label", program.goal),
+        duration_minutes=duration_minutes,
+        muscle_map_svg=_MUSCLE_MAP_SVG,
     )

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Koda — {{ session.focus }} · Week {{ session.week_num }} Day {{ session.day_num }}{% endblock %}
+{% block title %}Koda — {{ session.focus }} · W{{ session.week_num }}D{{ session.day_num }}{% endblock %}
 {% block main_class %}{% endblock %}
 
 {% block content %}
@@ -13,16 +13,18 @@
     {# Breadcrumb #}
     <div class="mb-3">
       <a href="/my/programs/{{ program.id }}"
-         style="color:var(--text-secondary);font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+         style="color:var(--text-secondary);font-size:13px;text-decoration:none;
+                display:inline-flex;align-items:center;gap:6px;">
         <i class="bi bi-arrow-left" style="font-size:11px;"></i>{{ program.name }}
       </a>
     </div>
 
     <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
       <div>
-        <div class="koda-eyebrow">Week {{ session.week_num }} · Day {{ session.day_num }}</div>
-        <h1 class="koda-page-title" style="display:flex;align-items:center;gap:10px;">
-          <span>{{ goal_icon }}</span>{{ session.focus }}
+        <div class="koda-section-label">{{ goal_icon }} {{ goal_label }}</div>
+        <h1 style="font-family:'Syne',sans-serif;font-weight:800;font-size:26px;
+                   color:var(--text-primary);margin:0 0 4px 0;line-height:1.2;">
+          Week {{ session.week_num }} · Day {{ session.day_num }} — {{ session.focus }}
         </h1>
         <div class="d-flex flex-wrap gap-2 mt-2">
           {% if session.scheduled_date %}
@@ -32,23 +34,23 @@
           {% endif %}
           {% if session.completed_at %}
           <span class="koda-badge koda-badge--green">
-            <i class="bi bi-check-lg" style="font-size:9px;"></i> Done
+            <i class="bi bi-check-lg" style="font-size:9px;"></i> Completed
           </span>
           {% endif %}
         </div>
       </div>
 
-      {% if authenticated %}
-      <form method="post" action="/workout/upload" id="uploadForm" style="flex-shrink:0;">
-        <input type="hidden" name="payload_json" value="{{ payload_json | e }}" />
-        <button type="submit" class="btn-koda-primary" id="uploadBtn">
-          <span class="koda-spinner"></span>
-          <span class="koda-btn-label">
-            <i class="bi bi-cloud-arrow-up"></i> Upload to Garmin
-          </span>
+      <div class="d-flex align-items-center gap-2 flex-shrink-0">
+        <button type="button" id="playBtn" class="play-btn-charged" aria-label="Start workout"
+                onclick="document.getElementById('uploadBtn')?.click()">
+          <svg class="play-btn-icon" viewBox="0 0 16 16" fill="#ffffff" aria-hidden="true" width="14" height="14">
+            <path d="M5.5 3.5l8 4.5-8 4.5V3.5z"/>
+          </svg>
         </button>
-      </form>
-      {% endif %}
+        <span class="koda-badge koda-badge--violet">
+          <i class="bi bi-clock me-1"></i>{{ duration_minutes }} min
+        </span>
+      </div>
     </div>
 
   </div>
@@ -56,45 +58,208 @@
 
 {# ===== Main content ===== #}
 <div class="container-xl px-3 px-lg-4 py-4">
-  <div class="koda-card">
-    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:16px;">
-      Exercises
-    </div>
+  <div class="row g-4">
 
-    {% if exercises %}
-    <div style="display:flex;flex-direction:column;gap:12px;">
-      {% for ex in exercises %}
-      <div style="display:flex;align-items:center;gap:16px;padding:14px 16px;
-                  background:rgba(255,255,255,0.03);border-radius:10px;
-                  border:1px solid rgba(255,255,255,0.07);">
-        <div style="flex-shrink:0;width:36px;height:36px;border-radius:8px;
-                    background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(167,139,250,.1));
-                    display:flex;align-items:center;justify-content:center;
-                    font-size:16px;">💪</div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-weight:600;font-size:14px;color:var(--text-primary);margin-bottom:2px;">
-            {{ ex.name }}
+    {# ----- Left: workout card ----- #}
+    <div class="col-12 col-lg-8">
+
+      <div class="koda-card koda-card--active" id="workoutCard">
+
+        {# Stats row #}
+        {% set ex_count = exercises | length %}
+        {% set sets_val = exercises[0].sets if exercises else 3 %}
+        {% set reps_val = exercises[0].reps if exercises and exercises[0].reps else '—' %}
+        <div class="row g-2 mb-4">
+          <div class="col-4">
+            <div class="koda-stat-card">
+              <div class="koda-stat-value">{{ ex_count }}</div>
+              <div class="koda-stat-label">Exercises</div>
+            </div>
           </div>
-          <div style="font-size:12px;color:var(--text-muted);">
-            {{ ex.muscle_group | replace('_', ' ') | capitalize }}
+          <div class="col-4">
+            <div class="koda-stat-card">
+              <div class="koda-stat-value">{{ sets_val }}</div>
+              <div class="koda-stat-label">Sets each</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="koda-stat-card">
+              <div class="koda-stat-value">{{ reps_val }}</div>
+              <div class="koda-stat-label">Reps / set</div>
+            </div>
           </div>
         </div>
-        {% if ex.link %}
-        <a href="{{ ex.link }}" target="_blank" rel="noopener"
-           style="flex-shrink:0;font-size:12px;color:var(--accent-violet);text-decoration:none;">
-          <i class="bi bi-box-arrow-up-right"></i>
-        </a>
+
+        {# Exercise list #}
+        <div class="exercise-list mb-4">
+
+          {# Warm-up #}
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <span class="koda-badge koda-badge--slate">WARM-UP</span>
+            <div class="exercise-item flex-grow-1" style="padding:8px 12px;">
+              <div class="step-number flex-shrink-0">W</div>
+              <span style="font-size:13px;color:var(--text-secondary);">5 min general warm-up</span>
+            </div>
+          </div>
+
+          {# Circuit block #}
+          <div class="koda-circuit-block mb-3">
+            <div class="koda-circuit-header justify-content-between">
+              <div class="d-flex align-items-center gap-2">
+                <span class="koda-badge koda-badge--violet" style="text-transform:uppercase;letter-spacing:.08em;">
+                  CIRCUIT
+                </span>
+                <span style="font-size:12px;color:var(--text-secondary);">
+                  — do all {{ ex_count }} exercises, then repeat
+                </span>
+              </div>
+              <span class="koda-badge koda-badge--violet" style="font-size:13px;font-weight:700;">
+                × {{ sets_val }}
+              </span>
+            </div>
+
+            <div class="koda-circuit-body" id="sortableExercises">
+              {% for ex in exercises %}
+              <div class="exercise-item"
+                   data-index="{{ loop.index0 }}"
+                   data-primary='{{ (ex.primary_muscles or []) | tojson }}'
+                   data-secondary='{{ (ex.secondary_muscles or []) | tojson }}'>
+                <div class="step-number flex-shrink-0">{{ loop.index }}</div>
+                <div class="flex-grow-1 min-w-0">
+                  <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap">
+                    <div class="min-w-0">
+                      <span class="fw-semibold" style="font-size:14px;color:var(--text-primary);">
+                        {{ ex.label or ex.name }}
+                      </span>
+                      <span class="koda-badge koda-badge--slate ms-1" style="text-transform:capitalize;">
+                        {{ ex.muscle_group | replace('_', ' ') }}
+                      </span>
+                    </div>
+                    <div class="d-flex gap-1 flex-shrink-0">
+                      {% if ex.video_url %}
+                      <button type="button"
+                              class="btn btn-outline-secondary btn-sm py-0 px-2"
+                              onclick="openVideoTutorial('{{ ex.video_url | e }}', '{{ (ex.label or ex.name) | e }}')"
+                              title="Tutorial">
+                        <i class="bi bi-play-circle me-1"></i>Tutorial
+                      </button>
+                      {% elif ex.link %}
+                      <a href="{{ ex.link }}" target="_blank" rel="noopener noreferrer"
+                         class="btn btn-outline-secondary btn-sm py-0 px-2" title="Tutorial">
+                        <i class="bi bi-play-circle me-1"></i>Tutorial
+                      </a>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="text-muted small mt-1">
+                    {% if ex.reps %}
+                      <i class="bi bi-repeat me-1"></i>{{ ex.reps }} reps
+                    {% elif ex.duration_sec %}
+                      <i class="bi bi-stopwatch me-1"></i>{{ ex.duration_sec | int }}s hold
+                    {% endif %}
+                    &nbsp;·&nbsp;
+                    <i class="bi bi-hourglass-split me-1"></i>{{ ex.rest_seconds | int }}s rest
+                  </div>
+                  {% if ex.required_equipment_labels %}
+                  <div class="mt-1" style="font-size:.72rem;">
+                    <i class="bi bi-tools text-warning me-1"></i>
+                    <span class="text-warning">Needs:</span>
+                    <span class="text-muted">{{ ex.required_equipment_labels | join(' / ') }}</span>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+
+            {# Round footer #}
+            <div class="d-flex align-items-center gap-2 px-3 py-2"
+                 style="background:rgba(124,58,237,0.06);border-top:1px dashed rgba(124,58,237,0.2);">
+              <i class="bi bi-arrow-counterclockwise" style="color:var(--color-brand-light);"></i>
+              <span style="font-size:12px;font-weight:600;color:var(--color-brand-light);">
+                Rest {{ (exercises[0].rest_seconds or 60) | int }}s, then repeat from exercise 1 — {{ sets_val }} rounds total
+              </span>
+            </div>
+          </div>
+
+          {# Cool-down #}
+          <div class="d-flex align-items-center gap-2 pt-1">
+            <span class="koda-badge koda-badge--slate">COOL-DOWN</span>
+            <div class="exercise-item flex-grow-1" style="padding:8px 12px;">
+              <div class="step-number flex-shrink-0">C</div>
+              <span style="font-size:13px;color:var(--text-secondary);">Cool-down + stretch</span>
+            </div>
+          </div>
+
+        </div>
+
+        {# Upload to Garmin #}
+        {% if authenticated %}
+        <form method="post" action="/workout/upload" id="uploadForm">
+          <input type="hidden" name="payload_json" id="payloadJsonInput" value="{{ payload_json | e }}" />
+          <div class="mb-3">
+            <label for="schedule_date" class="koda-section-label d-block mb-1">
+              <i class="bi bi-calendar3 me-1"></i>Schedule for
+            </label>
+            <input type="date" class="koda-input" id="schedule_date" name="schedule_date"
+                   value="{{ session.scheduled_date.strftime('%Y-%m-%d') if session.scheduled_date else '' }}" />
+          </div>
+          <button type="submit" id="uploadBtn"
+                  class="btn btn-garmin btn-koda-success w-100 py-3 fw-bold fs-6
+                         d-inline-flex align-items-center justify-content-center gap-2">
+            <span class="koda-spinner" aria-hidden="true"></span>
+            <span class="koda-btn-label">
+              <i class="bi bi-cloud-arrow-up me-1"></i>Upload to Garmin Connect
+            </span>
+          </button>
+        </form>
+        {% else %}
+        <div class="koda-flash koda-flash--info" style="font-size:13px;">
+          <i class="bi bi-info-circle me-2"></i>
+          Connect your Garmin account to upload this session.
+          <a href="/" style="color:inherit;text-decoration:underline;">Go to dashboard</a>
+        </div>
         {% endif %}
+
       </div>
-      {% endfor %}
     </div>
 
-    {% else %}
-    <div class="koda-empty" style="padding:32px 0;">
-      <p style="color:var(--text-muted);margin:0;">No exercise data for this session.</p>
+    {# ----- Right: Muscle map ----- #}
+    {% if muscle_map_svg %}
+    <div class="col-12 col-lg-4">
+      <div class="koda-card" style="position:sticky;top:80px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;
+                    color:var(--text-muted);margin-bottom:12px;">Muscle Map</div>
+        <div id="muscleMapContainer">
+          {{ muscle_map_svg | safe }}
+        </div>
+        <div class="d-flex gap-3 mt-3" style="font-size:11px;color:var(--text-muted);">
+          <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;
+                             background:rgb(194,21,21);margin-right:4px;"></span>Primary</span>
+          <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;
+                             background:rgb(245,191,42);margin-right:4px;"></span>Secondary</span>
+        </div>
+      </div>
     </div>
     {% endif %}
 
+  </div>
+</div>
+
+{# Video tutorial modal (same as workout preview) #}
+<div class="modal fade" id="videoModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content koda-modal">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title" id="videoModalLabel" style="font-weight:700;font-size:15px;"></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body pt-2">
+        <div id="videoContainer" style="position:relative;width:100%;padding-bottom:56.25%;background:#000;border-radius:8px;overflow:hidden;">
+          <video id="videoPlayer" controls style="position:absolute;top:0;left:0;width:100%;height:100%;"></video>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -102,12 +267,86 @@
 
 {% block scripts %}
 <script>
+/* -----------------------------------------------------------------------
+   Session preview — muscle map + video tutorial
+   --------------------------------------------------------------------- */
+const MUSCLE_SVG_CLASSES = {
+  chest:       ['FrontChestRight',    'FrontChestLeft'],
+  triceps:     ['BackTricepsLeft',    'BackTricepsRight'],
+  front_delt:  ['FrontShouldersRight','FrontShouldersLeft'],
+  rear_delt:   ['BackShouldersLeft',  'BackShouldersRight'],
+  biceps:      ['FrontBicepsRight',   'FrontBicepsLeft'],
+  forearms:    ['FrontForearmsRight', 'FrontForearmsLeft', 'BackForearmsRight', 'BackForearmsLeft'],
+  lats:        ['BackLatsLeft',       'BackLatsRight'],
+  traps:       ['BackTrapsLeft',      'BackTrapsRight'],
+  abs:         ['FrontAbsRight',      'FrontAbsLeft'],
+  obliques:    ['FrontObliquesRight', 'FrontObliquesLeft'],
+  lower_back:  ['BackLowerBackLeft',  'BackLowerBackRight'],
+  quads:       ['FrontQuadsRight',    'FrontQuadsLeft'],
+  hamstrings:  ['BackHamstringsLeft', 'BackHamstringsRight'],
+  glutes:      ['BackGlutesLeft',     'BackGlutesRight'],
+  adductors:   ['BackAdductorsRight', 'BackAdductorsLeft'],
+  abductors:   ['BackAbductorsRight', 'BackAbductorsLeft'],
+  calves:      ['BackCalvesLeft',     'BackCalvesRight'],
+  neck:        ['BackNeckRight',      'BackNeckLeft'],
+};
+
+function updateMuscleMap() {
+  var PRIMARY_COLOR    = 'rgb(194, 21, 21)';
+  var SECONDARY_COLOR  = 'rgb(245, 191, 42)';
+  var UNTARGETED_COLOR = 'rgb(216, 216, 216)';
+
+  var primarySet   = new Set();
+  var secondarySet = new Set();
+
+  document.querySelectorAll('.exercise-item').forEach(function(row) {
+    try {
+      var p = JSON.parse(row.dataset.primary   || '[]');
+      var s = JSON.parse(row.dataset.secondary || '[]');
+      p.forEach(function(m) { primarySet.add(m); });
+      s.forEach(function(m) { secondarySet.add(m); });
+    } catch (_) {}
+  });
+
+  Object.values(MUSCLE_SVG_CLASSES).flat().forEach(function(cls) {
+    document.querySelectorAll('.' + cls).forEach(function(el) { el.style.fill = UNTARGETED_COLOR; });
+  });
+  secondarySet.forEach(function(muscle) {
+    (MUSCLE_SVG_CLASSES[muscle] || []).forEach(function(cls) {
+      document.querySelectorAll('.' + cls).forEach(function(el) { el.style.fill = SECONDARY_COLOR; });
+    });
+  });
+  primarySet.forEach(function(muscle) {
+    (MUSCLE_SVG_CLASSES[muscle] || []).forEach(function(cls) {
+      document.querySelectorAll('.' + cls).forEach(function(el) { el.style.fill = PRIMARY_COLOR; });
+    });
+  });
+}
+
+window.openVideoTutorial = function(url, label) {
+  var player = document.getElementById('videoPlayer');
+  var titleEl = document.getElementById('videoModalLabel');
+  if (player) { player.src = url; player.load(); }
+  if (titleEl) { titleEl.textContent = label; }
+  var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('videoModal'));
+  modal.show();
+};
+
+document.getElementById('videoModal')?.addEventListener('hidden.bs.modal', function() {
+  var player = document.getElementById('videoPlayer');
+  if (player) { player.pause(); player.src = ''; }
+});
+
 document.getElementById('uploadForm')?.addEventListener('submit', function() {
   var btn = document.getElementById('uploadBtn');
   if (btn) {
     btn.disabled = true;
     btn.classList.add('is-loading');
+    var label = btn.querySelector('.koda-btn-label');
+    if (label) { label.textContent = 'Uploading…'; }
   }
 });
+
+updateMuscleMap();
 </script>
 {% endblock %}
