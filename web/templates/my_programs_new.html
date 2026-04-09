@@ -1,0 +1,616 @@
+{% extends "base.html" %}
+{% block title %}Koda — New Program{% endblock %}
+{% block main_class %}{% endblock %}
+
+{% block content %}
+
+{# ===== Page hero ===== #}
+<div class="koda-page-hero">
+  <div class="koda-hero-texture"></div>
+  <div class="koda-hero-glow koda-hero-glow--br"></div>
+  <div class="container-xl px-3 px-lg-4" style="position:relative;z-index:1;">
+    <div class="mb-3">
+      <a href="{{ url_for('list_programs') }}"
+         style="color:var(--text-secondary);font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+        <i class="bi bi-arrow-left" style="font-size:11px;"></i> Programs
+      </a>
+    </div>
+    <div class="koda-eyebrow">Training Architecture</div>
+    <h1 class="koda-page-title">New Program</h1>
+  </div>
+</div>
+
+{# ===== Main content ===== #}
+<div class="container-xl px-3 px-lg-4 py-4">
+
+  {# ------------------------------------------------------------------ #}
+  {#  STATE 1 — FORM                                                     #}
+  {# ------------------------------------------------------------------ #}
+  <div id="wizardForm">
+    <div class="koda-card" style="max-width:680px;">
+
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:20px;">
+        Program Configuration
+      </div>
+
+      {# --- Goal --- #}
+      <div class="mb-4">
+        <label class="form-label" style="font-size:13px;font-weight:600;color:var(--text-secondary);">Goal</label>
+        <select id="goalSelect" class="form-select koda-input">
+          {% for key, cfg in goals.items() %}
+          <option value="{{ key }}" {% if key == profile_goal %}selected{% endif %}>
+            {{ cfg.icon }} {{ cfg.label }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      {# --- Equipment --- #}
+      <div class="mb-4">
+        <label class="form-label" style="font-size:13px;font-weight:600;color:var(--text-secondary);">Equipment</label>
+        <select id="equipmentSelect" multiple placeholder="Select equipment…">
+          {% for eq in equipment_options %}
+          <option value="{{ eq.tag }}"
+            {% if eq.tag in profile_equipment %}selected{% endif %}>
+            {{ eq.icon }} {{ eq.label }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      {# --- Duration weeks --- #}
+      <div class="mb-4">
+        <label class="form-label" style="font-size:13px;font-weight:600;color:var(--text-secondary);">Duration</label>
+        <div class="d-flex gap-2 flex-wrap" role="group">
+          {% for weeks in [4, 6, 8] %}
+          <button type="button"
+                  class="koda-pill-btn {% if weeks == 8 %}active{% endif %}"
+                  data-group="duration_weeks" data-value="{{ weeks }}">
+            {{ weeks }} weeks
+          </button>
+          {% endfor %}
+        </div>
+        <input type="hidden" id="durationWeeks" value="8">
+      </div>
+
+      {# --- Periodization type --- #}
+      <div class="mb-4">
+        <label class="form-label" style="font-size:13px;font-weight:600;color:var(--text-secondary);">Periodization</label>
+        <div class="d-flex gap-2 flex-wrap" role="group">
+          <button type="button" class="koda-pill-btn active"
+                  data-group="periodization" data-value="linear"
+                  title="Gradual progression from high volume to high intensity over the program">
+            Linear
+          </button>
+          <button type="button" class="koda-pill-btn"
+                  data-group="periodization" data-value="undulating"
+                  title="Strength, hypertrophy, and endurance days rotate within each week">
+            Undulating
+          </button>
+          <button type="button" class="koda-pill-btn"
+                  data-group="periodization" data-value="block"
+                  title="Distinct training blocks: accumulation → intensification → peak">
+            Block
+          </button>
+        </div>
+        <input type="hidden" id="periodizationType" value="linear">
+        <p id="periodizationDesc" style="font-size:12px;color:var(--text-muted);margin-top:6px;margin-bottom:0;">
+          Gradual progression from high volume to high intensity over the program.
+        </p>
+      </div>
+
+      {# --- Days per week --- #}
+      <div class="mb-4">
+        <label class="form-label" style="font-size:13px;font-weight:600;color:var(--text-secondary);">Training days / week</label>
+        <div class="d-flex gap-2 flex-wrap" role="group">
+          {% for days in [2, 3, 4, 5] %}
+          <button type="button"
+                  class="koda-pill-btn {% if days == profile_weekly_days %}active{% endif %}"
+                  data-group="weekly_days" data-value="{{ days }}">
+            {{ days }}
+          </button>
+          {% endfor %}
+        </div>
+        <input type="hidden" id="weeklyDays" value="{{ profile_weekly_days }}">
+      </div>
+
+      {# --- Session duration --- #}
+      <div class="mb-4">
+        <label class="form-label" style="font-size:13px;font-weight:600;color:var(--text-secondary);">Session duration</label>
+        <div class="d-flex gap-2 flex-wrap" role="group">
+          {% for mins in [30, 45, 60] %}
+          <button type="button"
+                  class="koda-pill-btn {% if mins == 45 %}active{% endif %}"
+                  data-group="session_duration" data-value="{{ mins }}">
+            {{ mins }} min
+          </button>
+          {% endfor %}
+        </div>
+        <input type="hidden" id="sessionDuration" value="45">
+      </div>
+
+      {# --- Fitness level --- #}
+      <div class="mb-4">
+        <label class="form-label" style="font-size:13px;font-weight:600;color:var(--text-secondary);">Fitness level</label>
+        <div class="d-flex gap-2 flex-wrap" role="group">
+          {% for level in ["beginner", "intermediate", "advanced"] %}
+          <button type="button"
+                  class="koda-pill-btn {% if level == profile_fitness_level %}active{% endif %}"
+                  data-group="fitness_level" data-value="{{ level }}">
+            {{ level | capitalize }}
+          </button>
+          {% endfor %}
+        </div>
+        <input type="hidden" id="fitnessLevel" value="{{ profile_fitness_level }}">
+      </div>
+
+      {# Error message #}
+      <div id="previewError" style="display:none;" class="koda-flash koda-flash--error mb-3"></div>
+
+      {# Preview button #}
+      <button id="previewBtn" type="button" class="koda-btn koda-btn--primary" style="min-width:180px;">
+        <span class="koda-btn-label">Preview Program →</span>
+      </button>
+
+    </div>
+  </div>{# /#wizardForm #}
+
+
+  {# ------------------------------------------------------------------ #}
+  {#  STATE 2 — PREVIEW                                                  #}
+  {# ------------------------------------------------------------------ #}
+  <div id="wizardPreview" style="display:none;">
+
+    {# Program name + actions header #}
+    <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap mb-4">
+      <div style="flex:1;min-width:240px;">
+        <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);display:block;margin-bottom:6px;">
+          Program Name
+        </label>
+        <input id="programName" type="text" class="form-control koda-input" maxlength="200"
+               style="font-size:18px;font-weight:700;max-width:480px;">
+      </div>
+      <div class="d-flex gap-2">
+        <button id="backToFormBtn" type="button" class="koda-btn koda-btn--ghost">← Back</button>
+        <button id="saveBtn" type="button" class="koda-btn koda-btn--primary">
+          <span class="koda-btn-label">Save Program</span>
+        </button>
+      </div>
+    </div>
+
+    {# Phase legend #}
+    <div id="phaseLegend" class="d-flex gap-3 flex-wrap mb-3"
+         style="font-size:12px;color:var(--text-secondary);"></div>
+
+    {# Week grid #}
+    <div class="koda-card" style="overflow-x:auto;padding:0;">
+      <table id="weekGrid" class="koda-table" style="min-width:480px;margin:0;">
+        <thead id="weekGridHead"></thead>
+        <tbody id="weekGridBody"></tbody>
+      </table>
+    </div>
+
+    {# Session detail panel #}
+    <div id="sessionDetail" class="koda-card mt-3" style="display:none;">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+          <div id="sessionDetailTitle"
+               style="font-weight:700;font-size:15px;color:var(--text-primary);"></div>
+          <div id="sessionDetailMeta"
+               style="font-size:12px;color:var(--text-muted);margin-top:2px;"></div>
+        </div>
+        <button id="closeDetailBtn" type="button"
+                style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;line-height:1;padding:0 4px;">×</button>
+      </div>
+      <div id="sessionDetailExercises"></div>
+    </div>
+
+    {# Save error #}
+    <div id="saveError" style="display:none;" class="koda-flash koda-flash--error mt-3"></div>
+
+  </div>{# /#wizardPreview #}
+
+</div>{# /.container-xl #}
+
+{% endblock %}
+
+
+{% block scripts %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+
+<style>
+.koda-pill-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1.5px solid var(--border-color, #333);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all .15s;
+}
+.koda-pill-btn.active {
+  background: var(--accent-violet, #7c3aed);
+  border-color: var(--accent-violet, #7c3aed);
+  color: #fff;
+}
+.koda-pill-btn:hover:not(.active) {
+  border-color: var(--accent-violet, #7c3aed);
+  color: var(--text-primary);
+}
+#weekGrid td {
+  cursor: pointer;
+  vertical-align: top;
+  min-width: 120px;
+  padding: 10px 12px;
+}
+#weekGrid td:hover { background: var(--bg-card-hover, rgba(255,255,255,.04)); }
+#weekGrid td.selected-cell {
+  background: rgba(124,58,237,.12);
+  border-left: 2px solid #7c3aed;
+}
+#weekGrid td.week-label { cursor: default; }
+.phase-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+</style>
+
+<script>
+(function() {
+  'use strict';
+
+  /* --------------------------------------------------------------------- */
+  /* Pill toggle groups                                                      */
+  /* --------------------------------------------------------------------- */
+  var PILL_TARGETS = {
+    duration_weeks:   'durationWeeks',
+    periodization:    'periodizationType',
+    weekly_days:      'weeklyDays',
+    session_duration: 'sessionDuration',
+    fitness_level:    'fitnessLevel',
+  };
+  var PERIOD_DESCS = {
+    linear:     'Gradual progression from high volume to high intensity over the program.',
+    undulating: 'Strength, hypertrophy, and endurance days rotate within each week.',
+    block:      'Distinct training blocks: accumulation → intensification → peak.',
+  };
+
+  document.querySelectorAll('.koda-pill-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var group = this.dataset.group;
+      var val   = this.dataset.value;
+      document.querySelectorAll('[data-group="' + group + '"]').forEach(function(b) {
+        b.classList.remove('active');
+      });
+      this.classList.add('active');
+      var inputId = PILL_TARGETS[group];
+      if (inputId) { document.getElementById(inputId).value = val; }
+      if (group === 'periodization') {
+        document.getElementById('periodizationDesc').textContent = PERIOD_DESCS[val] || '';
+      }
+    });
+  });
+
+  /* --------------------------------------------------------------------- */
+  /* TomSelect — Equipment                                                   */
+  /* --------------------------------------------------------------------- */
+  var tsEquipment = null;
+  if (document.getElementById('equipmentSelect')) {
+    tsEquipment = new TomSelect('#equipmentSelect', {
+      plugins: ['remove_button', 'clear_button'],
+      maxOptions: null,
+      onItemAdd: function(value) {
+        var self = this;
+        if (value === 'bodyweight') {
+          this.getValue().forEach(function(v) {
+            if (v !== 'bodyweight') { self.removeItem(v, true); }
+          });
+        } else {
+          this.removeItem('bodyweight', true);
+        }
+      },
+    });
+  }
+
+  function getEquipment() {
+    if (tsEquipment) { return tsEquipment.getValue(); }
+    return Array.from(document.getElementById('equipmentSelect').selectedOptions)
+      .map(function(o) { return o.value; });
+  }
+
+  /* --------------------------------------------------------------------- */
+  /* Flash helpers                                                           */
+  /* --------------------------------------------------------------------- */
+  function showError(elId, msg) {
+    var el = document.getElementById(elId);
+    el.textContent = msg;   // textContent — safe
+    el.style.display = 'block';
+  }
+  function hideError(elId) {
+    var el = document.getElementById(elId);
+    el.textContent = '';
+    el.style.display = 'none';
+  }
+
+  /* --------------------------------------------------------------------- */
+  /* Phase color map                                                         */
+  /* --------------------------------------------------------------------- */
+  var PHASE_COLORS = {
+    'Accumulation': '#60a5fa',
+    'Deload':       '#94a3b8',
+    'Intensification': '#a78bfa',
+    'Peak':         '#f472b6',
+    'Strength':     '#f472b6',
+    'Hypertrophy':  '#a78bfa',
+    'Endurance':    '#60a5fa',
+    'Training':     '#94a3b8',
+  };
+
+  /* --------------------------------------------------------------------- */
+  /* Preview state                                                           */
+  /* --------------------------------------------------------------------- */
+  var previewData = null;
+
+  /* --------------------------------------------------------------------- */
+  /* Preview button                                                          */
+  /* --------------------------------------------------------------------- */
+  document.getElementById('previewBtn').addEventListener('click', async function() {
+    hideError('previewError');
+    var btn = this;
+    btn.disabled = true;
+    btn.classList.add('is-loading');
+    btn.querySelector('.koda-btn-label').textContent = 'Generating\u2026';
+
+    var payload = {
+      goal:                document.getElementById('goalSelect').value,
+      equipment:           getEquipment(),
+      duration_weeks:      parseInt(document.getElementById('durationWeeks').value, 10),
+      weekly_workout_days: parseInt(document.getElementById('weeklyDays').value, 10),
+      duration_minutes:    parseInt(document.getElementById('sessionDuration').value, 10),
+      periodization_type:  document.getElementById('periodizationType').value,
+      fitness_level:       document.getElementById('fitnessLevel').value,
+    };
+
+    try {
+      var resp = await fetch('/my/programs/preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      var data = await resp.json();
+      if (!data.ok) { throw new Error(data.error || 'Generation failed'); }
+      previewData = data.program;
+      renderPreview(previewData);
+      document.getElementById('wizardForm').style.display    = 'none';
+      document.getElementById('wizardPreview').style.display = 'block';
+    } catch (err) {
+      showError('previewError', err.message || 'Something went wrong. Please try again.');
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove('is-loading');
+      btn.querySelector('.koda-btn-label').textContent = 'Preview Program \u2192';
+    }
+  });
+
+  /* --------------------------------------------------------------------- */
+  /* Render preview                                                          */
+  /* --------------------------------------------------------------------- */
+  function makeEl(tag, props) {
+    var el = document.createElement(tag);
+    Object.keys(props || {}).forEach(function(k) {
+      if (k === 'text')  { el.textContent = props[k]; }
+      else if (k === 'style') { el.style.cssText = props[k]; }
+      else if (k === 'cls')   { el.className = props[k]; }
+      else                    { el[k] = props[k]; }
+    });
+    return el;
+  }
+
+  function renderPreview(program) {
+    document.getElementById('programName').value = program.name;
+
+    var sessions  = program.sessions;
+    var numDays   = program.weekly_workout_days;
+    var numWeeks  = program.duration_weeks;
+
+    /* Phase legend */
+    var legend = document.getElementById('phaseLegend');
+    while (legend.firstChild) { legend.removeChild(legend.firstChild); }
+
+    var phasesSeen = [];
+    sessions.forEach(function(s) {
+      if (phasesSeen.indexOf(s.phase) === -1) { phasesSeen.push(s.phase); }
+    });
+    phasesSeen.forEach(function(phase) {
+      var color = PHASE_COLORS[phase] || '#94a3b8';
+      var span = document.createElement('span');
+      var dot = makeEl('span', { cls: 'phase-dot', style: 'background:' + color });
+      span.appendChild(dot);
+      span.appendChild(document.createTextNode(phase));
+      legend.appendChild(span);
+    });
+
+    /* Table header */
+    var thead = document.getElementById('weekGridHead');
+    while (thead.firstChild) { thead.removeChild(thead.firstChild); }
+    var hRow = document.createElement('tr');
+    hRow.appendChild(makeEl('th', { text: 'Week', style: 'min-width:70px;' }));
+    for (var d = 1; d <= numDays; d++) {
+      hRow.appendChild(makeEl('th', { text: 'Day ' + d }));
+    }
+    thead.appendChild(hRow);
+
+    /* Table body */
+    var tbody = document.getElementById('weekGridBody');
+    while (tbody.firstChild) { tbody.removeChild(tbody.firstChild); }
+
+    sessions.forEach(function(session) {
+      session._idx = sessions.indexOf(session);
+    });
+
+    for (var w = 1; w <= numWeeks; w++) {
+      var row = document.createElement('tr');
+
+      /* Week label cell */
+      var weekTd = makeEl('td', {
+        text: 'Wk ' + w,
+        cls: 'week-label',
+        style: 'font-weight:600;color:var(--text-muted);font-size:12px;',
+      });
+      row.appendChild(weekTd);
+
+      for (var day = 1; day <= numDays; day++) {
+        var session = null;
+        for (var si = 0; si < sessions.length; si++) {
+          if (sessions[si].week_num === w && sessions[si].day_num === day) {
+            session = sessions[si]; break;
+          }
+        }
+
+        var td = document.createElement('td');
+        if (session) {
+          var phaseColor = PHASE_COLORS[session.phase] || '#94a3b8';
+
+          var focusDiv = makeEl('div', {
+            text: session.focus,
+            style: 'font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:2px;',
+          });
+
+          var phaseDiv = makeEl('div', {
+            style: 'font-size:10px;color:' + phaseColor + ';margin-bottom:4px;',
+          });
+          phaseDiv.appendChild(document.createTextNode(
+            '\u25cf ' + session.phase +
+            ' \u00b7 ' + session.sets + '\u00d7' +
+            session.reps_low + '\u2013' + session.reps_high
+          ));
+
+          var top3 = session.exercises.slice(0, 3).map(function(e) { return e.label; }).join(', ');
+          var exDiv = makeEl('div', {
+            text: top3,
+            style: 'font-size:11px;color:var(--text-secondary);line-height:1.4;',
+          });
+
+          td.appendChild(focusDiv);
+          td.appendChild(phaseDiv);
+          td.appendChild(exDiv);
+
+          (function(idx) {
+            td.addEventListener('click', function() { openSession(idx); });
+          })(session._idx);
+        }
+        row.appendChild(td);
+      }
+      tbody.appendChild(row);
+    }
+  }
+
+  /* --------------------------------------------------------------------- */
+  /* Session detail panel                                                    */
+  /* --------------------------------------------------------------------- */
+  function openSession(idx) {
+    var s = previewData.sessions[idx];
+
+    /* Highlight cell */
+    document.querySelectorAll('#weekGrid td').forEach(function(td) {
+      td.classList.remove('selected-cell');
+    });
+    /* Find the cell that was clicked — match by week+day */
+    document.querySelectorAll('#weekGrid tbody tr').forEach(function(tr, rowIdx) {
+      tr.querySelectorAll('td:not(.week-label)').forEach(function(td, colIdx) {
+        if (s.week_num === rowIdx + 1 && s.day_num === colIdx + 1) {
+          td.classList.add('selected-cell');
+        }
+      });
+    });
+
+    document.getElementById('sessionDetailTitle').textContent = s.workout_name;
+    document.getElementById('sessionDetailMeta').textContent =
+      s.phase + ' \u00b7 ' + s.sets + ' sets \u00b7 ' +
+      s.reps_low + '\u2013' + s.reps_high + ' reps \u00b7 ' + s.rest_seconds + 's rest';
+
+    var container = document.getElementById('sessionDetailExercises');
+    while (container.firstChild) { container.removeChild(container.firstChild); }
+
+    var grid = makeEl('div', { style: 'display:grid;gap:6px;' });
+    s.exercises.forEach(function(ex, i) {
+      var row = makeEl('div', {
+        style: 'display:flex;align-items:center;gap:8px;padding:8px 10px;' +
+               'background:var(--bg-input,rgba(255,255,255,.04));border-radius:6px;',
+      });
+      row.appendChild(makeEl('span', {
+        text: String(i + 1),
+        style: 'font-size:11px;font-weight:700;color:var(--text-muted);min-width:18px;',
+      }));
+      row.appendChild(makeEl('span', {
+        text: ex.label,
+        style: 'font-size:13px;color:var(--text-primary);',
+      }));
+      grid.appendChild(row);
+    });
+    container.appendChild(grid);
+    document.getElementById('sessionDetail').style.display = 'block';
+  }
+
+  document.getElementById('closeDetailBtn').addEventListener('click', function() {
+    document.getElementById('sessionDetail').style.display = 'none';
+    document.querySelectorAll('#weekGrid td').forEach(function(td) {
+      td.classList.remove('selected-cell');
+    });
+  });
+
+  /* --------------------------------------------------------------------- */
+  /* Back to form                                                            */
+  /* --------------------------------------------------------------------- */
+  document.getElementById('backToFormBtn').addEventListener('click', function() {
+    document.getElementById('wizardPreview').style.display = 'none';
+    document.getElementById('wizardForm').style.display    = 'block';
+    document.getElementById('sessionDetail').style.display = 'none';
+  });
+
+  /* --------------------------------------------------------------------- */
+  /* Save program                                                            */
+  /* --------------------------------------------------------------------- */
+  document.getElementById('saveBtn').addEventListener('click', async function() {
+    if (!previewData) { return; }
+    hideError('saveError');
+    var btn = this;
+    btn.disabled = true;
+    btn.classList.add('is-loading');
+    btn.querySelector('.koda-btn-label').textContent = 'Saving\u2026';
+
+    var name = (document.getElementById('programName').value || '').trim() || previewData.name;
+    var payload = {
+      name:               name,
+      goal:               previewData.goal,
+      periodization_type: previewData.periodization_type,
+      duration_weeks:     previewData.duration_weeks,
+      equipment:          previewData.equipment,
+      sessions:           previewData.sessions,
+    };
+
+    try {
+      var resp = await fetch('/my/programs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      var data = await resp.json();
+      if (!data.ok) { throw new Error(data.error || 'Save failed'); }
+      window.location.href = '/my/programs/' + encodeURIComponent(data.id);
+    } catch (err) {
+      showError('saveError', err.message || 'Something went wrong. Please try again.');
+      btn.disabled = false;
+      btn.classList.remove('is-loading');
+      btn.querySelector('.koda-btn-label').textContent = 'Save Program';
+    }
+  });
+
+})();
+</script>
+{% endblock %}
