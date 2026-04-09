@@ -57,7 +57,7 @@ async def new_program_wizard(request: Request, db: Session = Depends(get_db)):
     profile_goals: list[str] = json.loads(user.fitness_goals_json or "[]")
     profile_goal = profile_goals[0] if profile_goals else "general_fitness"
     profile_weekly_days: int = user.weekly_workout_days or 3
-    profile_fitness_level: str = user.fitness_level or "intermediate"
+    profile_fitness_level: str = (user.fitness_level or "intermediate").lower()
 
     return render_template(
         "my_programs_new.html",
