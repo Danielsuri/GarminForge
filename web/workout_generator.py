@@ -372,10 +372,23 @@ _FULL_BODY_ORDER = ["squat", "push", "hinge", "pull", "lunge", "core", "arms_bi"
 _COMPOUND_TAGS = {"compound", "total_body"}
 
 
-def _available(equipment: list[str]) -> list[_ExTemplate]:
-    """Filter pool to exercises reachable with the given equipment."""
+def _available(
+    equipment: list[str],
+    muscle_groups: list[str] | None = None,
+) -> list[_ExTemplate]:
+    """Filter pool to exercises reachable with the given equipment.
+
+    Parameters
+    ----------
+    equipment:
+        Equipment tags available for the session.
+    muscle_groups:
+        When provided, only exercises whose ``muscle_group`` is in this list
+        are returned.  Pass ``None`` (default) to include all muscle groups.
+    """
     eq_set = set(equipment)
-    return [ex for ex in _POOL if eq_set.intersection(ex.equipment)]
+    pool = _POOL if muscle_groups is None else [ex for ex in _POOL if ex.muscle_group in muscle_groups]
+    return [ex for ex in pool if eq_set.intersection(ex.equipment)]
 
 
 def _num_exercises(duration_minutes: int, goal: str) -> int:
@@ -504,14 +517,19 @@ _LOCAL_VIDEO_MAP: dict[str, str] = {
 }
 
 
-def generate(
+def _generate_session(
     equipment: list[str],
     goal: str,
     duration_minutes: int,
     *,
+    muscle_groups: list[str] | None = None,
+    override_sets: int | None = None,
+    override_reps: int | None = None,
+    override_rest: int | None = None,
+    workout_name: str | None = None,
     seed: int | None = None,
 ) -> WorkoutPlan:
-    """Generate a balanced workout.
+    """Core session generation logic shared by ``generate()`` and ``generate_program()``.
 
     Parameters
     ----------
@@ -521,24 +539,36 @@ def generate(
         One of the ``GOALS`` keys.
     duration_minutes:
         Total session length including warmup/cooldown.
+    muscle_groups:
+        When provided, restricts exercise selection to these muscle groups.
+        Pass ``None`` to allow all muscle groups (default).
+    override_sets:
+        Override the sets count from ``GOALS``. Pass ``None`` to use goal default.
+    override_reps:
+        Override the reps count from ``GOALS``. Pass ``None`` to use goal default.
+    override_rest:
+        Override the rest seconds from ``GOALS``. Pass ``None`` to use goal default.
+    workout_name:
+        Override the generated workout name. Pass ``None`` to auto-generate.
     seed:
         Optional random seed for reproducible generation.
     """
     if seed is not None:
         random.seed(seed)
 
-    if goal not in GOALS:
-        raise ValueError(f"Unknown goal {goal!r}. Choose from: {list(GOALS)}")
-
     goal_cfg = GOALS[goal]
-    sets        = goal_cfg["sets"]
-    reps        = goal_cfg["reps"]
-    rest        = goal_cfg["rest_seconds"]
+    sets = override_sets if override_sets is not None else goal_cfg["sets"]
+    reps = override_reps if override_reps is not None else goal_cfg["reps"]
+    rest = override_rest if override_rest is not None else goal_cfg["rest_seconds"]
 
     # --- exercise selection -------------------------------------------------
-    available   = _available(equipment) if equipment else _available(["bodyweight"])
-    num         = _num_exercises(duration_minutes, goal)
-    templates   = _select_exercises(available, num, goal)
+    eq = equipment if equipment else ["bodyweight"]
+    available = _available(eq, muscle_groups=muscle_groups)
+    if not available:
+        # Muscle group filter too narrow — fall back to full equipment pool
+        available = _available(eq)
+    num       = _num_exercises(duration_minutes, goal)
+    templates = _select_exercises(available, num, goal)
 
     # For timed exercises (plank, etc.), convert reps to duration
     TIMED_EXERCISES = {
@@ -558,7 +588,7 @@ def generate(
     }
 
     # --- build ExerciseInfo list --------------------------------------------
-    _eq_label: dict[str, str] = {eq["tag"]: f"{eq['icon']} {eq['label']}" for eq in EQUIPMENT_OPTIONS}
+    _eq_label: dict[str, str] = {eq_opt["tag"]: f"{eq_opt['icon']} {eq_opt['label']}" for eq_opt in EQUIPMENT_OPTIONS}
 
     exercises: list[ExerciseInfo] = []
     for tmpl in templates:
@@ -589,7 +619,7 @@ def generate(
             sets=sets,
             reps=actual_reps,
             duration_sec=hold,
-            rest_seconds=rest,
+            rest_seconds=float(rest),
             link=link,
             description="",  # filled below from actual values
             required_equipment_labels=req_labels,
@@ -606,7 +636,7 @@ def generate(
 
     # --- build StrengthWorkout payload --------------------------------------
     date_str = datetime.now().strftime("%b %d")
-    workout_name = f"{goal_cfg['label']} — {duration_minutes}min ({date_str})"
+    name = workout_name or f"{goal_cfg['label']} — {duration_minutes}min ({date_str})"
     workout_desc = (
         f"{goal_cfg['description']} "
         f"Equipment: {', '.join(equipment) if equipment else 'bodyweight'}."
@@ -626,7 +656,7 @@ def generate(
     ]
 
     builder = (
-        StrengthWorkout(workout_name, description=workout_desc)
+        StrengthWorkout(name, description=workout_desc)
         .add_warmup(description="5 min general warm-up")
         .add_circuit(blocks, rounds=sets)
         .add_cooldown(description="Cool-down + stretch")
@@ -634,7 +664,7 @@ def generate(
     payload = builder.build(validate=False)
 
     return WorkoutPlan(
-        name=workout_name,
+        name=name,
         goal_label=goal_cfg["label"],
         goal_icon=goal_cfg["icon"],
         description=workout_desc,
@@ -642,6 +672,32 @@ def generate(
         exercises=exercises,
         garmin_payload=payload,
     )
+
+
+def generate(
+    equipment: list[str],
+    goal: str,
+    duration_minutes: int,
+    *,
+    seed: int | None = None,
+) -> WorkoutPlan:
+    """Generate a balanced workout.
+
+    Parameters
+    ----------
+    equipment:
+        List of equipment tags from ``EQUIPMENT_OPTIONS``.
+    goal:
+        One of the ``GOALS`` keys.
+    duration_minutes:
+        Total session length including warmup/cooldown.
+    seed:
+        Optional random seed for reproducible generation.
+    """
+    if goal not in GOALS:
+        raise ValueError(f"Unknown goal {goal!r}. Choose from: {list(GOALS)}")
+
+    return _generate_session(equipment, goal, duration_minutes, seed=seed)
 
 
 # ---------------------------------------------------------------------------
