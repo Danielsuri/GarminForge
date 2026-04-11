@@ -230,67 +230,52 @@ def _error_redirect(request: Request, message: str, back: str = "/") -> Redirect
 @app.get("/", response_class=HTMLResponse)
 async def index(
     request: Request,
-    error: str = "",
     db: Session = Depends(get_db),
-):
-    flash_error = request.session.pop("flash_error", None) or (error or None)
-    flash_success = request.session.pop("flash_success", None)
-
-    selected_goal = None
-    user_equipment: list[str] = []
-    today_session = None
-    today_program = None
+) -> RedirectResponse:
     forge_user = get_current_user(request, db)
-    if forge_user is not None:
-        if forge_user.fitness_goals_json:
-            goals_list: list[str] = json.loads(forge_user.fitness_goals_json)
-            selected_goal = goals_list[0] if goals_list else None
-        if forge_user.preferred_equipment_json:
-            user_equipment = json.loads(forge_user.preferred_equipment_json)
 
-        # Find today's session from an active program
-        active_program = (
-            db.query(Program)
-            .filter_by(user_id=forge_user.id, status="active")
-            .first()
-        )
-        if active_program:
-            today_program = active_program
-            today = date.today()
-            # Look for a session scheduled today (not yet completed)
-            sessions = active_program.program_sessions
-            today_session = next(
-                (s for s in sessions if s.scheduled_date == today and not s.completed_at),
-                None,
-            )
-            if today_session is None:
-                # Fall back to the next upcoming session
-                upcoming = sorted(
-                    [s for s in sessions if s.scheduled_date and s.scheduled_date >= today and not s.completed_at],
-                    key=lambda s: s.scheduled_date,  # type: ignore[return-value]
-                )
-                today_session = upcoming[0] if upcoming else None
+    # Unauthenticated → onboarding
+    if forge_user is None:
+        return RedirectResponse("/onboarding", status_code=303)
 
-            if today_session is not None:
-                return RedirectResponse(
-                    f"/my/programs/{active_program.id}/sessions/{today_session.id}",
-                    status_code=303,
-                )
+    # Authenticated but questionnaire not done → onboarding
+    if not forge_user.questionnaire_completed:
+        return RedirectResponse("/onboarding", status_code=303)
 
-    return _render(
-        "dashboard.html",
-        request,
-        db=db,
-        goals=GOALS,
-        equipment_options=EQUIPMENT_OPTIONS,
-        muscle_map_svg=_MUSCLE_MAP_SVG,
-        flash_error=flash_error,
-        flash_success=flash_success,
-        selected_goal=selected_goal,
-        user_equipment=user_equipment,
-        today_session=today_session,
-        today_program=today_program,
+    # Find active program
+    active_program = (
+        db.query(Program)
+        .filter_by(user_id=forge_user.id, status="active")
+        .first()
     )
+
+    # No active program → auto-generate one, then redirect
+    if active_program is None:
+        from web.program_generator import auto_generate_program
+        active_program = auto_generate_program(forge_user, db)
+
+    # Find today's or next upcoming session
+    today = date.today()
+    sessions = active_program.program_sessions
+    today_session = next(
+        (s for s in sessions if s.scheduled_date == today and not s.completed_at),
+        None,
+    )
+    if today_session is None:
+        upcoming = sorted(
+            [s for s in sessions if s.scheduled_date and s.scheduled_date >= today and not s.completed_at],
+            key=lambda s: s.scheduled_date,
+        )
+        today_session = upcoming[0] if upcoming else None
+
+    if today_session is not None:
+        return RedirectResponse(
+            f"/my/programs/{active_program.id}/sessions/{today_session.id}",
+            status_code=303,
+        )
+
+    # All sessions completed — redirect to program detail
+    return RedirectResponse(f"/my/programs/{active_program.id}", status_code=303)
 
 
 # ---------------------------------------------------------------------------

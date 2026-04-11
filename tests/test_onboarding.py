@@ -15,7 +15,6 @@ def test_onboarding_get_accessible_without_login():
     assert resp.status_code == 200
 
 
-@pytest.mark.xfail(reason="GET / redirect to /onboarding is implemented in Task 5", strict=True)
 def test_root_redirects_unauthenticated_to_onboarding():
     resp = client.get("/", follow_redirects=False)
     assert resp.status_code in (302, 303)
@@ -43,6 +42,25 @@ def _make_user(**kwargs):
     defaults.update(kwargs)
     u = User(**{k: v for k, v in defaults.items()})
     return u
+
+
+def test_root_authenticated_no_questionnaire_redirects_to_onboarding(monkeypatch):
+    """Authenticated user with questionnaire_completed=False → /onboarding."""
+    from unittest.mock import MagicMock
+    import web.app as app_module
+
+    fake_user = MagicMock()
+    fake_user.questionnaire_completed = False
+
+    orig_get_current_user = app_module.get_current_user
+    monkeypatch.setattr(app_module, "get_current_user", lambda req, db: fake_user)
+
+    try:
+        resp = client.get("/", follow_redirects=False)
+        assert resp.status_code in (302, 303)
+        assert "/onboarding" in resp.headers["location"]
+    finally:
+        monkeypatch.setattr(app_module, "get_current_user", orig_get_current_user)
 
 
 def test_auto_generate_program_creates_program_and_sessions():
