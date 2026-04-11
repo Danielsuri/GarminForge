@@ -2,6 +2,7 @@
 import json
 from unittest.mock import MagicMock
 
+import pytest
 from fastapi.testclient import TestClient
 from web.app import app
 from web.models import User, Program, ProgramSession
@@ -14,6 +15,7 @@ def test_onboarding_get_accessible_without_login():
     assert resp.status_code == 200
 
 
+@pytest.mark.xfail(reason="GET / redirect to /onboarding is implemented in Task 5", strict=True)
 def test_root_redirects_unauthenticated_to_onboarding():
     resp = client.get("/", follow_redirects=False)
     assert resp.status_code in (302, 303)

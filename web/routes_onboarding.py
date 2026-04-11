@@ -18,7 +18,7 @@ from web.db import get_db
 from web.models import Program, User
 from web.program_generator import auto_generate_program
 from web.rendering import render_template
-from web.workout_generator import EQUIPMENT_OPTIONS, GOALS
+from web.workout_generator import EQUIPMENT_OPTIONS
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -153,16 +153,19 @@ async def onboarding_post(request: Request, db: Session = Depends(get_db)):
         request.session["pending_q"] = {k: v for k, v in answers.items() if v is not None}
         return RedirectResponse("/register", status_code=303)
 
-    # Logged-in: persist to DB
+    # Logged-in: persist questionnaire answers to DB first
     _apply_answers(user, answers)
     user.questionnaire_completed = True  # type: ignore[assignment]
+    db.commit()
 
     # Auto-generate program if user has no active program
     active = db.query(Program).filter_by(user_id=user.id, status="active").first()
     if active is None:
-        auto_generate_program(user, db)
-    else:
-        db.commit()
+        try:
+            auto_generate_program(user, db)
+        except Exception:
+            logger.exception("Failed to auto-generate program for user %s", user.id)
+            request.session["flash_error"] = "Profile saved, but program generation failed. Try again from your profile."
 
     request.session["flash_success"] = "Profile updated."
     return RedirectResponse("/", status_code=303)
@@ -189,6 +192,7 @@ async def register_from_questionnaire(
     form = await request.form()
     email = str(form.get("email", "")).strip().lower()
     password = str(form.get("password", ""))
+    display_name = str(form.get("display_name", "")).strip() or None
 
     def _err(msg: str) -> HTMLResponse:
         pending = request.session.get("pending_q", {})
@@ -207,6 +211,7 @@ async def register_from_questionnaire(
     user = User(
         email=email,
         hashed_password=hash_password(password),
+        display_name=display_name,
         is_verified=False,
     )
     db.add(user)
@@ -223,6 +228,11 @@ async def register_from_questionnaire(
 
     maybe_migrate_file_token(user, db)
     login_session(request, user, db)
-    auto_generate_program(user, db)
+
+    try:
+        auto_generate_program(user, db)
+    except Exception:
+        logger.exception("Failed to auto-generate program on registration for user %s", user.id)
+        request.session["flash_error"] = "Account created! Program generation failed — visit your profile to set up your plan."
 
     return RedirectResponse("/", status_code=303)
