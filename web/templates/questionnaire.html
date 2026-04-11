@@ -53,9 +53,10 @@
 .age-card input { display: none; }
 
 /* ── Day picker ─────────────────────────────────────────────────── */
-.day-picker { display: flex; flex-wrap: wrap; gap: 8px; }
+.day-picker { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
 .day-pill { background: #13151f; border: 1.5px solid #252840; border-radius: 20px;
-  padding: 8px 16px; font-size: 13px; font-weight: 600; color: #aaa; cursor: pointer;
+  padding: 8px 4px; font-size: 13px; font-weight: 600; color: #aaa; cursor: pointer;
+  text-align: center;
   transition: border-color .18s, background .18s, color .18s; user-select: none; }
 .day-pill:has(input:checked) { border-color: #7c3aed; background: #7c3aed22; color: #fff; }
 .day-pill input { display: none; }
