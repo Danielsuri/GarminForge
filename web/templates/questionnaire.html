@@ -481,14 +481,7 @@
       });
     }
     document.getElementById('hDays').disabled = true;
-    // Fitness goals hidden field → multiple hidden input
-    const goalVal = document.getElementById('hGoals').value;
-    if (goalVal) {
-      const inp = document.createElement('input');
-      inp.type = 'hidden'; inp.name = 'fitness_goals'; inp.value = goalVal;
-      document.getElementById('wizForm').appendChild(inp);
-    }
-    document.getElementById('hGoals').disabled = true;
+    // hGoals already has name="fitness_goals" and value from collectCard(0) — no duplicate needed.
   }
 
   // ── Navigation ───────────────────────────────────────────────────
