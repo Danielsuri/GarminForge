@@ -360,14 +360,6 @@ _DAY_TO_WEEKDAY: dict[str, int] = {
 }
 
 
-def _next_weekday(from_date: date, weekday: int) -> date:
-    """Return the next occurrence of `weekday` (0=Mon) on or after `from_date`."""
-    days_ahead = weekday - from_date.weekday()
-    if days_ahead < 0:
-        days_ahead += 7
-    return from_date + timedelta(days=days_ahead)
-
-
 def auto_generate_program(user: User, db: Session) -> Program:
     """Create and persist an 8-week program derived from the user's questionnaire answers.
 
@@ -436,9 +428,7 @@ def auto_generate_program(user: User, db: Session) -> Program:
     # Otherwise fall back to even spacing.
     session_dates: list[date] = []
     if sorted_days:
-        weekday_nums = [_DAY_TO_WEEKDAY[d] for d in sorted_days if d in _DAY_TO_WEEKDAY]
-        if not weekday_nums:
-            weekday_nums = list(range(n_days))
+        weekday_nums = [_DAY_TO_WEEKDAY[d] for d in sorted_days]
         # Start from next Monday so the user has time to see their plan
         days_to_monday = today.weekday()
         this_monday = today - timedelta(days=days_to_monday)
