@@ -8,7 +8,7 @@ new architectural layer.
 
 ## ⭐⭐⭐ Do First — High Value / Low Effort
 
-### 1. Pre-fill dashboard goal from questionnaire data
+### ~~1. Pre-fill dashboard goal from questionnaire data~~ ✅ DONE (v2.0.0)
 **Location:** `web/app.py` GET `/` · `web/templates/dashboard.html`
 
 **What exists:**
@@ -30,7 +30,7 @@ required. Signals that the app "knows you."
 
 ---
 
-### 2. Equipment pre-selection for returning users
+### ~~2. Equipment pre-selection for returning users~~ ✅ DONE (v2.0.0)
 **Location:** `web/app.py` GET `/` · `web/templates/dashboard.html` Tom Select init
 
 **What exists:**
@@ -283,8 +283,8 @@ category names. If `SLIDING_DISC` (or its correct alias) is now valid, re-add th
 
 | Rank | Item | Value | Effort | Priority |
 |------|------|-------|--------|----------|
-| 1 | Equipment pre-selection | High | 1 hr | ⭐⭐⭐ |
-| 2 | Pre-fill goal from questionnaire | High | 1–2 hrs | ⭐⭐⭐ |
+| ~~1~~ | ~~Equipment pre-selection~~ | ~~High~~ | ~~1 hr~~ | ✅ v2.0.0 |
+| ~~2~~ | ~~Pre-fill goal from questionnaire~~ | ~~High~~ | ~~1–2 hrs~~ | ✅ v2.0.0 |
 | 3 | Workout naming with Week/Day prefix | Medium | 30 min | ⭐⭐⭐ |
 | 4 | Health-condition exercise filtering | High | 4–6 hrs | ⭐⭐⭐ |
 | 5 | Scheduling date suggestions | High | 3–4 hrs | ⭐⭐⭐ |
@@ -299,7 +299,7 @@ category names. If `SLIDING_DISC` (or its correct alias) is now valid, re-add th
 ### Grouping by time investment
 
 **Do in a single session (< 2 hrs total):**
-Items 2, 3, 7, 9, 11 — can all be shipped in one focused sitting.
+Items ~~2~~, 3, 7, 9, 11 — can all be shipped in one focused sitting.
 
 **Do next sprint (2–6 hrs each):**
 Items 1, 4, 5, 6 — each is self-contained, can be tackled in any order.
