@@ -4,7 +4,7 @@ build-backend = "setuptools.backends.legacy:build"
 
 [project]
 name = "garminforge"
-version = "0.2.0"
+dynamic = ["version"]
 description = "Python toolkit for creating, uploading, and scheduling Garmin Connect workouts"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -39,6 +39,9 @@ dev = [
 [project.scripts]
 garminforge = "garminforge.cli:main"
 garminforge-web = "web.app:app"
+
+[tool.setuptools.dynamic]
+version = {file = "VERSION"}
 
 [tool.setuptools.packages.find]
 where = ["."]
