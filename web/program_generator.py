@@ -372,6 +372,11 @@ def auto_generate_program(user: User, db: Session) -> Program:
 
     Returns the created (and committed) Program instance.
     """
+    # Idempotent: don't create a second active program
+    existing = db.query(Program).filter_by(user_id=user.id, status="active").first()
+    if existing is not None:
+        return existing
+
     # Resolve goal
     goals: list[str] = json.loads(user.fitness_goals_json or "[]")
     goal = goals[0] if goals else "general_fitness"

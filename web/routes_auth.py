@@ -165,14 +165,17 @@ async def register_submit(
     pending = request.session.pop("pending_q", {})
     if pending:
         from web.routes_onboarding import _apply_answers
+        from web.program_generator import auto_generate_program
         _apply_answers(user, pending)
         user.questionnaire_completed = True  # type: ignore[assignment]
         db.commit()
-        from web.program_generator import auto_generate_program
         try:
             auto_generate_program(user, db)
         except Exception:
-            logger.exception("Failed to auto-generate program on /auth/register for user %s", user.id)
+            logger.exception(
+                "Failed to auto-generate program on /auth/register for user %s", user.id
+            )
+        return RedirectResponse("/", status_code=303)
 
     return RedirectResponse("/onboarding", status_code=303)
 
