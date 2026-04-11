@@ -66,7 +66,7 @@ run_migrations() {
             return 0
         fi
 
-        if grep -q "duplicate column name" "$tmp"; then
+        if grep -qE "duplicate column name|already exists" "$tmp"; then
             # Pull the 4-digit revision from the offending filename in the traceback
             # e.g. ".../0002_add_preferred_lang.py", line 21, in upgrade
             local rev
