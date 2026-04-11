@@ -1,430 +1,591 @@
 {% extends "base.html" %}
-{% block title %}Koda — {% if is_retake %}{{ t("q_page_title_retake") }}{% else %}{{ t("q_page_title_setup") }}{% endif %}{% endblock %}
+{% block title %}Koda — {% if is_retake %}Update Your Profile{% else %}Build Your Plan{% endif %}{% endblock %}
 
 {% block extra_head %}
 <style>
-.wizard-outer { max-width: 420px; margin: 0 auto; }
-.wizard-meta { display: flex; justify-content: space-between; font-size: 11px; color: #666; margin-bottom: 6px; }
+/* ── Wizard shell ───────────────────────────────────────────────── */
+.wizard-outer { max-width: 480px; margin: 0 auto; padding: 32px 16px 64px; }
+.wizard-meta  { display: flex; justify-content: space-between; font-size: 11px; color: #666; margin-bottom: 6px; }
 .wizard-track { height: 4px; background: #1e2030; border-radius: 2px; margin-bottom: 28px; }
 .wizard-fill  { height: 4px; background: #7c3aed; border-radius: 2px; transition: width .4s ease; }
+.wizard-stage { position: relative; min-height: 380px; }
 
-.wizard-stage { position: relative; min-height: 360px; }
-
+/* ── Cards ──────────────────────────────────────────────────────── */
 .wcard {
-  background: #1a1d2e;
-  border: 1px solid #2a2d40;
-  border-radius: 16px;
-  padding: 26px 24px;
-  position: absolute; top: 0; left: 0; right: 0;
-  opacity: 0;
-  transform: scale(.94) translateY(14px);
-  pointer-events: none;
-  transition: opacity .3s ease, transform .3s ease;
-  will-change: opacity, transform;
+  background: #1a1d2e; border: 1px solid #2a2d40; border-radius: 16px;
+  padding: 26px 24px; position: absolute; top: 0; left: 0; right: 0;
+  opacity: 0; transform: scale(.94) translateY(14px);
+  pointer-events: none; transition: opacity .3s ease, transform .3s ease;
 }
-.wcard.active {
-  opacity: 1; transform: none;
-  pointer-events: all;
-  position: relative;
-}
-.wcard.exiting {
-  opacity: 0;
-  transform: scale(.94) translateY(-10px);
-  position: absolute; top: 0; left: 0; right: 0;
-  pointer-events: none;
-}
+.wcard.active  { opacity: 1; transform: none; pointer-events: all; position: relative; }
+.wcard.exiting { opacity: 0; transform: scale(.94) translateY(-10px);
+  position: absolute; top: 0; left: 0; right: 0; pointer-events: none; }
+.wcard-label { font-size: 11px; font-weight: 600; color: #7c3aed;
+  text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
+.wcard-title { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 6px; line-height: 1.3; }
+.wcard-sub   { font-size: 13px; color: #666; margin-bottom: 20px; }
 
-.wcard-label { font-size: 11px; font-weight: 600; color: #7c3aed; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
-.wcard-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 20px; line-height: 1.3; }
+/* ── Goal image cards ───────────────────────────────────────────── */
+.goal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.goal-card { position: relative; border-radius: 12px; overflow: hidden;
+  cursor: pointer; border: 2px solid transparent;
+  transition: border-color .18s; aspect-ratio: 4/3; }
+.goal-card img { width: 100%; height: 100%; object-fit: cover; object-position: top;
+  display: block; filter: brightness(.75); transition: filter .18s; }
+.goal-card-label { position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 8px 10px; background: linear-gradient(transparent, rgba(0,0,0,.7));
+  font-size: 13px; font-weight: 600; color: #fff; }
+.goal-card:has(input:checked) { border-color: #7c3aed; }
+.goal-card:has(input:checked) img { filter: brightness(.9); }
+.goal-card:has(input:checked) .goal-card-label::after {
+  content: "✓"; float: right; color: #a78bfa; }
+.goal-card input { display: none; }
 
-/* Sliders */
-.slider-display { font-size: 42px; font-weight: 800; color: #7c3aed; text-align: center; margin-bottom: 10px; line-height: 1; }
-.slider-unit   { font-size: 14px; font-weight: 400; color: #666; }
-.slider-limits { display: flex; justify-content: space-between; font-size: 11px; color: #555; margin-top: 4px; }
-input[type=range].wrange { width: 100%; accent-color: #7c3aed; }
+/* ── Age range cards ────────────────────────────────────────────── */
+.age-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.age-card { background: #13151f; border: 2px solid #252840; border-radius: 12px;
+  padding: 20px 16px; text-align: center; cursor: pointer;
+  transition: border-color .18s, background .18s; }
+.age-card-range { font-size: 28px; font-weight: 800; color: #7c3aed; line-height: 1; }
+.age-card-label { font-size: 12px; color: #666; margin-top: 4px; }
+.age-card:has(input:checked) { border-color: #7c3aed; background: #7c3aed18; }
+.age-card:has(input:checked) .age-card-range { color: #a78bfa; }
+.age-card input { display: none; }
 
-/* Option cards — radio and checkbox styled as clickable cards */
+/* ── Day picker ─────────────────────────────────────────────────── */
+.day-picker { display: flex; flex-wrap: wrap; gap: 8px; }
+.day-pill { background: #13151f; border: 1.5px solid #252840; border-radius: 20px;
+  padding: 8px 16px; font-size: 13px; font-weight: 600; color: #aaa; cursor: pointer;
+  transition: border-color .18s, background .18s, color .18s; user-select: none; }
+.day-pill:has(input:checked) { border-color: #7c3aed; background: #7c3aed22; color: #fff; }
+.day-pill input { display: none; }
+
+/* ── Height/Weight ──────────────────────────────────────────────── */
+.unit-toggle { display: flex; gap: 0; margin-bottom: 20px; border-radius: 8px; overflow: hidden;
+  border: 1.5px solid #252840; width: fit-content; }
+.unit-btn { background: transparent; border: none; padding: 6px 18px; font-size: 12px;
+  font-weight: 600; color: #666; cursor: pointer; transition: background .18s, color .18s; }
+.unit-btn.active { background: #7c3aed; color: #fff; }
+.hw-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.hw-field label { display: block; font-size: 11px; color: #666;
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+.hw-input { width: 100%; background: #13151f; border: 1.5px solid #252840;
+  border-radius: 10px; padding: 10px 14px; font-size: 18px; font-weight: 700;
+  color: #fff; outline: none; transition: border-color .18s; }
+.hw-input:focus { border-color: #7c3aed; }
+.hw-unit { font-size: 12px; color: #666; margin-top: 4px; }
+
+/* ── Option cards (existing) ───────────────────────────────────── */
 .wopts       { display: flex; flex-direction: column; gap: 8px; }
 .wopts--row  { flex-direction: row; }
 .wopts--grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-
-.wopt {
-  display: flex; align-items: center;
-  background: #13151f; border: 1.5px solid #252840; border-radius: 10px;
-  padding: 11px 16px; font-size: 14px; color: #bbb; cursor: pointer;
-  transition: border-color .18s, background .18s, color .18s; user-select: none;
-}
+.wopt { display: flex; align-items: center; background: #13151f;
+  border: 1.5px solid #252840; border-radius: 10px; padding: 11px 16px;
+  font-size: 14px; color: #bbb; cursor: pointer;
+  transition: border-color .18s, background .18s, color .18s; user-select: none; }
 .wopts--row  .wopt { flex: 1; justify-content: center; }
 .wopts--grid .wopt { font-size: 13px; padding: 10px 12px; }
 .wopt:has(input:checked) { border-color: #7c3aed; background: #7c3aed18; color: #fff; }
 .wopt input { display: none; }
 
-/* Equipment tag cloud */
+/* ── Equipment tag cloud (existing) ───────────────────────────── */
 .wtags { display: flex; flex-wrap: wrap; gap: 7px; }
-.wtag {
-  display: inline-flex; align-items: center;
-  background: #13151f; border: 1.5px solid #252840; border-radius: 20px;
-  padding: 6px 14px; font-size: 13px; color: #bbb; cursor: pointer;
-  transition: border-color .18s, background .18s, color .18s; user-select: none;
-}
+.wtag { display: inline-flex; align-items: center; background: #13151f;
+  border: 1.5px solid #252840; border-radius: 20px; padding: 6px 14px;
+  font-size: 13px; color: #bbb; cursor: pointer;
+  transition: border-color .18s, background .18s, color .18s; user-select: none; }
 .wtag:has(input:checked) { border-color: #7c3aed; background: #7c3aed22; color: #fff; }
 .wtag input { display: none; }
 
-/* Nav buttons */
-.wnav      { display: flex; gap: 10px; margin-top: 22px; }
-.wnav-back { flex: 1; background: transparent; border: 1.5px solid #252840; border-radius: 10px; padding: 10px 14px; color: #666; font-size: 13px; cursor: pointer; transition: border-color .18s, color .18s; }
+/* ── Nav buttons ────────────────────────────────────────────────── */
+.wnav { display: flex; gap: 10px; margin-top: 22px; }
+.wnav-back { flex: 1; background: transparent; border: 1.5px solid #252840;
+  border-radius: 10px; padding: 10px 14px; color: #666; font-size: 13px;
+  cursor: pointer; transition: border-color .18s, color .18s; }
 .wnav-back:hover { border-color: #444; color: #aaa; }
-.wnav-next, .wnav-save { flex: 2.5; background: #7c3aed; border: none; border-radius: 10px; padding: 10px 14px; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .18s; }
-.wnav-next:hover { background: #6d28d9; }
-.wnav-save { background: #22863a; }
-.wnav-save:hover { background: #1a6b30; }
-.wnav-save:disabled { background: #1a2a1a; color: #445; cursor: default; }
+.wnav-next, .wnav-save { flex: 2.5; background: #7c3aed; border: none;
+  border-radius: 10px; padding: 10px 14px; color: #fff; font-size: 14px;
+  font-weight: 600; cursor: pointer; transition: background .18s; }
+.wnav-next:hover, .wnav-save:hover { background: #6d28d9; }
 
-/* Dot strip */
-.wdots { display: flex; gap: 7px; justify-content: center; margin-top: 20px; }
-.wdot { width: 7px; height: 7px; border-radius: 50%; background: #252840; transition: background .3s, transform .3s; }
-.wdot--active { background: #7c3aed; transform: scale(1.3); }
-.wdot--done   { background: #7c3aed55; }
+/* ── Login link (step 1 guest) ──────────────────────────────────── */
+.already-registered { text-align: center; margin-top: 14px; font-size: 13px; color: #555; }
+.already-registered a { color: #7c3aed; text-decoration: none; }
+.already-registered a:hover { text-decoration: underline; }
 
-/* Summary */
-.wsum-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; font-size: 13px; }
-.wsum-key { color: #666; width: 120px; flex-shrink: 0; padding-top: 3px; }
-.wbadge   { display: inline-block; background: #7c3aed22; border: 1px solid #7c3aed44; color: #c4b5fd; border-radius: 20px; padding: 3px 10px; font-size: 12px; margin: 2px 3px 2px 0; }
+/* ── Progress dots ──────────────────────────────────────────────── */
+.wdots { display: flex; justify-content: center; gap: 6px; margin-top: 20px; }
+.wdot { width: 6px; height: 6px; border-radius: 50%; background: #252840;
+  transition: background .3s, transform .3s; }
+.wdot.done    { background: #7c3aed88; }
+.wdot.current { background: #7c3aed; transform: scale(1.4); }
+
+/* ── Sign-up card ───────────────────────────────────────────────── */
+.signup-divider { display: flex; align-items: center; gap: 10px; margin: 16px 0; color: #444; font-size: 12px; }
+.signup-divider::before, .signup-divider::after { content: ""; flex: 1; height: 1px; background: #252840; }
+.google-btn { width: 100%; background: #fff; border: none; border-radius: 10px;
+  padding: 10px 14px; font-size: 14px; font-weight: 600; color: #222;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.google-btn:hover { background: #f0f0f0; }
+.wfield { margin-bottom: 14px; }
+.wfield label { display: block; font-size: 11px; color: #666;
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+.wfield input { width: 100%; background: #13151f; border: 1.5px solid #252840;
+  border-radius: 10px; padding: 10px 14px; font-size: 14px; color: #fff;
+  outline: none; transition: border-color .18s; }
+.wfield input:focus { border-color: #7c3aed; }
+.signup-fine { text-align: center; font-size: 12px; color: #555; margin-top: 12px; }
+.signup-fine a { color: #7c3aed; text-decoration: none; }
 </style>
-{% endblock extra_head %}
+{% endblock %}
 
 {% block content %}
 <div class="wizard-outer">
 
-  <div class="wizard-meta">
-    <span id="wStepLabel"></span>
-    <span id="wPctLabel">14%</span>
-  </div>
-  <div class="wizard-track">
-    <div class="wizard-fill" id="wFill" style="width:14%"></div>
-  </div>
-
-  <form method="post" action="/my/questionnaire" id="wForm">
-    <div class="wizard-stage" id="wStage">
-
-      <!-- Card 0: Age -->
-      <div class="wcard active" id="wc0">
-        <div class="wcard-label">{{ t("q_section_about") }}</div>
-        <div class="wcard-title">{{ t("q_age_title") }}</div>
-        <div class="slider-display" id="ageDisplay">
-          {{ existing_age if existing_age else 28 }}&nbsp;<span class="slider-unit">{{ t("q_years_old") }}</span>
-        </div>
-        <input type="range" class="wrange" name="age" id="ageRange"
-               min="13" max="80" value="{{ existing_age if existing_age else 28 }}" />
-        <div class="slider-limits"><span>13</span><span>80+</span></div>
-        <div class="wnav">
-          <button type="button" class="wnav-next" onclick="wNext()">{{ t("q_continue") }}</button>
-        </div>
-      </div>
-
-      <!-- Card 1: Fitness level -->
-      <div class="wcard" id="wc1">
-        <div class="wcard-label">{{ t("q_section_experience") }}</div>
-        <div class="wcard-title">{{ t("q_fitness_level_title") }}</div>
-        <div class="wopts wopts--row">
-          {% for level in fitness_levels %}
-          <label class="wopt">
-            <input type="radio" name="fitness_level" value="{{ level.value }}"
-                   {% if existing_fitness_level == level.value %}checked{% endif %}>
-            {{ t(level.key) }}
-          </label>
-          {% endfor %}
-        </div>
-        <div class="wnav">
-          <button type="button" class="wnav-back" onclick="wBack()">{{ t("q_back") }}</button>
-          <button type="button" class="wnav-next" onclick="wNext()">{{ t("q_continue") }}</button>
-        </div>
-      </div>
-
-      <!-- Card 2: Days per week -->
-      <div class="wcard" id="wc2">
-        <div class="wcard-label">{{ t("q_section_commitment") }}</div>
-        <div class="wcard-title">{{ t("q_days_title") }}</div>
-        <div class="slider-display" id="daysDisplay">
-          {{ existing_weekly_days if existing_weekly_days else 3 }}&nbsp;<span class="slider-unit" id="daysUnit">{{ t("q_day_week") if existing_weekly_days == 1 else t("q_days_week") }}</span>
-        </div>
-        <input type="range" class="wrange" name="weekly_workout_days" id="daysRange"
-               min="1" max="7" value="{{ existing_weekly_days if existing_weekly_days else 3 }}" />
-        <div class="slider-limits"><span>1</span><span>7</span></div>
-        <div class="wnav">
-          <button type="button" class="wnav-back" onclick="wBack()">{{ t("q_back") }}</button>
-          <button type="button" class="wnav-next" onclick="wNext()">{{ t("q_continue") }}</button>
-        </div>
-      </div>
-
-      <!-- Card 3: Fitness goals -->
-      <div class="wcard" id="wc3">
-        <div class="wcard-label">{{ t("q_section_goals") }}</div>
-        <div class="wcard-title">{{ t("q_goals_title") }}</div>
-        <div class="wopts">
-          {% for opt in goal_options %}
-          <label class="wopt">
-            <input type="checkbox" name="fitness_goals" value="{{ opt.value }}"
-                   {% if opt.value in existing_goals %}checked{% endif %}>
-            {{ t(opt.label) }}
-          </label>
-          {% endfor %}
-        </div>
-        <div class="wnav">
-          <button type="button" class="wnav-back" onclick="wBack()">{{ t("q_back") }}</button>
-          <button type="button" class="wnav-next" onclick="wNext()">{{ t("q_continue") }}</button>
-        </div>
-      </div>
-
-      <!-- Card 4: Equipment -->
-      <div class="wcard" id="wc4">
-        <div class="wcard-label">{{ t("q_section_equipment") }}</div>
-        <div class="wcard-title">{{ t("q_equipment_title") }}</div>
-        <div class="wtags">
-          {% for eq in equipment_options %}
-          <label class="wtag">
-            <input type="checkbox" name="equipment" value="{{ eq.tag }}"
-                   {% if eq.tag in existing_equipment %}checked{% endif %}>
-            {{ eq.icon }} {{ eq.label }}
-          </label>
-          {% endfor %}
-        </div>
-        <div class="wnav">
-          <button type="button" class="wnav-back" onclick="wBack()">{{ t("q_back") }}</button>
-          <button type="button" class="wnav-next" onclick="wNext()">{{ t("q_continue") }}</button>
-        </div>
-      </div>
-
-      <!-- Card 5: Diet -->
-      <div class="wcard" id="wc5">
-        <div class="wcard-label">{{ t("q_section_diet") }}</div>
-        <div class="wcard-title">{{ t("q_diet_title") }}</div>
-        <div class="wopts wopts--grid">
-          {% for opt in diet_options %}
-          <label class="wopt">
-            <input type="checkbox" name="diet" value="{{ opt.value }}"
-                   {% if opt.value in existing_diet %}checked{% endif %}>
-            {{ t(opt.label) }}
-          </label>
-          {% endfor %}
-        </div>
-        <div class="wnav">
-          <button type="button" class="wnav-back" onclick="wBack()">{{ t("q_back") }}</button>
-          <button type="button" class="wnav-next" onclick="wNext()">{{ t("q_continue") }}</button>
-        </div>
-      </div>
-
-      <!-- Card 6: Health conditions -->
-      <div class="wcard" id="wc6">
-        <div class="wcard-label">{{ t("q_section_health") }}</div>
-        <div class="wcard-title">{{ t("q_health_title") }}</div>
-        <div class="wopts wopts--grid">
-          {% for opt in health_options %}
-          <label class="wopt">
-            <input type="checkbox" name="health_conditions" value="{{ opt.value }}"
-                   {% if opt.value in existing_health %}checked{% endif %}>
-            {{ t(opt.label) }}
-          </label>
-          {% endfor %}
-        </div>
-        <div class="wnav">
-          <button type="button" class="wnav-back" onclick="wBack()">{{ t("q_back") }}</button>
-          <button type="button" class="wnav-next" onclick="wNext()">{{ t("q_continue") }}</button>
-        </div>
-      </div>
-
-      <!-- Card 7: Summary -->
-      <div class="wcard" id="wc7">
-        <div class="wcard-label">{{ t("q_section_summary") }}</div>
-        <div class="wcard-title" style="font-size:16px">{{ t("q_summary_title") }}</div>
-        <div id="wSummary"></div>
-        <div class="wnav">
-          <button type="button" class="wnav-back" onclick="wBack()">{{ t("q_edit_back") }}</button>
-          <button type="submit" class="wnav-save" id="wSaveBtn">{{ t("q_save_profile") }}</button>
-        </div>
-      </div>
-
-    </div>
-  </form>
-
-  {% if not is_retake %}
-  <div class="text-center mt-3">
-    <form method="post" action="/my/questionnaire/skip" style="display:inline">
-      <button type="submit" class="btn btn-link text-muted small p-0">{{ t("q_skip_now") }}</button>
-    </form>
-  </div>
-  {% else %}
-  <div class="text-center mt-3">
-    <a href="/my/profile" class="text-muted small">{{ t("q_cancel") }}</a>
+  {# Flash error #}
+  {% if flash_error %}
+  <div style="background:#2d1515;border:1px solid #7f1d1d;border-radius:10px;
+              padding:12px 16px;font-size:13px;color:#fca5a5;margin-bottom:20px;">
+    {{ flash_error }}
   </div>
   {% endif %}
 
-  <div class="wdots" id="wDots"></div>
+  {# Progress bar #}
+  <div class="wizard-meta">
+    <span id="stepLabel">Question 1 of {{ 9 if is_guest else 8 }}</span>
+    <span id="stepPct">0%</span>
+  </div>
+  <div class="wizard-track"><div class="wizard-fill" id="wizFill" style="width:0%"></div></div>
 
-</div>
-{% endblock %}
+  <form method="post" action="/onboarding" id="wizForm">
 
-{% block scripts %}
-<script>
-var WLANG = {
-  years_old:  "{{ t('q_years_old') | e }}",
-  day_week:   "{{ t('q_day_week') | e }}",
-  days_week:  "{{ t('q_days_week') | e }}",
-  q_prefix:   "{{ t('q_question_prefix') | e }}",
-  q_of:       "{{ t('q_question_of') | e }}",
-  q_review:   "{{ t('q_review') | e }}",
-  sum_age:    "{{ t('sum_age') | e }}",
-  sum_level:  "{{ t('sum_level') | e }}",
-  sum_days:   "{{ t('sum_days_week') | e }}",
-  sum_goals:  "{{ t('sum_goals') | e }}",
-  sum_equip:  "{{ t('sum_equipment') | e }}",
-  sum_diet:   "{{ t('sum_diet') | e }}",
-  sum_health: "{{ t('sum_health') | e }}",
-  saving:     "{{ t('q_saving') | e }}"
-};
-</script>
+  {# ── Hidden fields for collected answers ── #}
+  <input type="hidden" name="fitness_goals"   id="hGoals">
+  <input type="hidden" name="age_range"        id="hAgeRange">
+  <input type="hidden" name="fitness_level"    id="hFitnessLevel">
+  <input type="hidden" name="preferred_days"   id="hDays">
+  <input type="hidden" name="height_cm"        id="hHeightCm">
+  <input type="hidden" name="weight_kg"        id="hWeightKg">
+
+  <div class="wizard-stage" id="wizStage">
+
+    {# ───────────────────────────────── STEP 1: GOAL ── #}
+    <div class="wcard" id="card0">
+      <div class="wcard-label">Step 1</div>
+      <div class="wcard-title">What's your main goal?</div>
+      <div class="goal-grid">
+        {% for g in goal_options %}
+        <label class="goal-card">
+          <input type="radio" name="goal_pick" value="{{ g.value }}"
+            {% if g.value in existing_goals %}checked{% endif %}>
+          <img src="{{ g.image }}" alt="{{ g.label }}" loading="lazy">
+          <div class="goal-card-label">{{ g.label }}</div>
+        </label>
+        {% endfor %}
+      </div>
+      {% if is_guest %}
+      <div class="already-registered">
+        Already registered? <a href="/auth/login-forge">Log in</a>
+      </div>
+      {% endif %}
+      <div class="wnav">
+        <button type="button" class="wnav-next" onclick="nextStep()">Continue</button>
+      </div>
+    </div>
+
+    {# ───────────────────────────────── STEP 2: AGE RANGE ── #}
+    <div class="wcard" id="card1">
+      <div class="wcard-label">Step 2</div>
+      <div class="wcard-title">How old are you?</div>
+      <div class="age-grid">
+        {% for r in age_ranges %}
+        <label class="age-card">
+          <input type="radio" name="age_range_pick" value="{{ r }}"
+            {% if r == existing_age_range %}checked{% endif %}>
+          <div class="age-card-range">{{ r }}</div>
+          <div class="age-card-label">years</div>
+        </label>
+        {% endfor %}
+      </div>
+      <div class="wnav">
+        <button type="button" class="wnav-back" onclick="prevStep()">Back</button>
+        <button type="button" class="wnav-next" onclick="nextStep()">Continue</button>
+      </div>
+    </div>
+
+    {# ───────────────────────────────── STEP 3: FITNESS LEVEL ── #}
+    <div class="wcard" id="card2">
+      <div class="wcard-label">Step 3</div>
+      <div class="wcard-title">What's your fitness level?</div>
+      <div class="wopts wopts--row">
+        {% for lvl in fitness_levels %}
+        <label class="wopt">
+          <input type="radio" name="fitness_level_pick" value="{{ lvl.value }}"
+            {% if lvl.value == existing_fitness_level %}checked{% endif %}>
+          {{ lvl.label }}
+        </label>
+        {% endfor %}
+      </div>
+      <div class="wnav">
+        <button type="button" class="wnav-back" onclick="prevStep()">Back</button>
+        <button type="button" class="wnav-next" onclick="nextStep()">Continue</button>
+      </div>
+    </div>
+
+    {# ───────────────────────────────── STEP 4: TRAINING DAYS ── #}
+    <div class="wcard" id="card3">
+      <div class="wcard-label">Step 4</div>
+      <div class="wcard-title">Which days do you prefer to train?</div>
+      <div class="wcard-sub">Select all that apply</div>
+      <div class="day-picker">
+        {% for d in days_of_week %}
+        <label class="day-pill">
+          <input type="checkbox" name="days_pick" value="{{ d }}"
+            {% if d in existing_days %}checked{% endif %}>
+          {{ d }}
+        </label>
+        {% endfor %}
+      </div>
+      <div class="wnav">
+        <button type="button" class="wnav-back" onclick="prevStep()">Back</button>
+        <button type="button" class="wnav-next" onclick="nextStep()">Continue</button>
+      </div>
+    </div>
+
+    {# ───────────────────────────────── STEP 5: EQUIPMENT ── #}
+    <div class="wcard" id="card4">
+      <div class="wcard-label">Step 5</div>
+      <div class="wcard-title">What equipment do you have access to?</div>
+      <div class="wtags">
+        {% for eq in equipment_options %}
+        <label class="wtag">
+          <input type="checkbox" name="equipment_pick" value="{{ eq.tag }}"
+            {% if eq.tag in existing_equipment %}checked{% endif %}>
+          {{ eq.icon }} {{ eq.label }}
+        </label>
+        {% endfor %}
+      </div>
+      <div class="wnav">
+        <button type="button" class="wnav-back" onclick="prevStep()">Back</button>
+        <button type="button" class="wnav-next" onclick="nextStep()">Continue</button>
+      </div>
+    </div>
+
+    {# ───────────────────────────────── STEP 6: HEIGHT & WEIGHT ── #}
+    <div class="wcard" id="card5">
+      <div class="wcard-label">Step 6</div>
+      <div class="wcard-title">Your body stats</div>
+      <div class="wcard-sub">Used to personalise your plan. Optional.</div>
+
+      <div class="unit-toggle">
+        <button type="button" class="unit-btn active" id="btnMetric" onclick="setUnit('metric')">Metric</button>
+        <button type="button" class="unit-btn" id="btnImperial" onclick="setUnit('imperial')">Imperial</button>
+      </div>
+
+      <div class="hw-row">
+        <div class="hw-field">
+          <label id="heightLabel">Height</label>
+          <input class="hw-input" type="number" id="heightInput" placeholder="—" min="100" max="250" step="1"
+                 value="{{ existing_height_cm or '' }}">
+          <div class="hw-unit" id="heightUnit">cm</div>
+        </div>
+        <div class="hw-field">
+          <label id="weightLabel">Weight</label>
+          <input class="hw-input" type="number" id="weightInput" placeholder="—" min="30" max="300" step="0.5"
+                 value="{{ existing_weight_kg or '' }}">
+          <div class="hw-unit" id="weightUnit">kg</div>
+        </div>
+      </div>
+
+      <div class="wnav">
+        <button type="button" class="wnav-back" onclick="prevStep()">Back</button>
+        <button type="button" class="wnav-next" onclick="nextStep()">Continue</button>
+      </div>
+    </div>
+
+    {# ───────────────────────────────── STEP 7: DIET ── #}
+    <div class="wcard" id="card6">
+      <div class="wcard-label">Step 7</div>
+      <div class="wcard-title">Any dietary preferences?</div>
+      <div class="wopts wopts--grid">
+        {% for d in diet_options %}
+        <label class="wopt">
+          <input type="checkbox" name="diet_pick" value="{{ d.value }}"
+            {% if d.value in existing_diet %}checked{% endif %}>
+          {{ d.label }}
+        </label>
+        {% endfor %}
+      </div>
+      <div class="wnav">
+        <button type="button" class="wnav-back" onclick="prevStep()">Back</button>
+        <button type="button" class="wnav-next" onclick="nextStep()">Continue</button>
+      </div>
+    </div>
+
+    {# ───────────────────────────────── STEP 8: HEALTH CONDITIONS ── #}
+    <div class="wcard" id="card7">
+      <div class="wcard-label">Step 8</div>
+      <div class="wcard-title">Any health conditions we should know about?</div>
+      <div class="wopts wopts--grid">
+        {% for h in health_options %}
+        <label class="wopt">
+          <input type="checkbox" name="health_pick" value="{{ h.value }}"
+            {% if h.value in existing_health %}checked{% endif %}>
+          {{ h.label }}
+        </label>
+        {% endfor %}
+      </div>
+      <div class="wnav">
+        <button type="button" class="wnav-back" onclick="prevStep()">Back</button>
+        {% if is_guest %}
+        <button type="button" class="wnav-next" onclick="nextStep()">Continue</button>
+        {% else %}
+        <button type="button" class="wnav-save" onclick="submitForm()">Save Profile</button>
+        {% endif %}
+      </div>
+    </div>
+
+    {# ───────────────────────────────── STEP 9: SIGN-UP (guests only) ── #}
+    {% if is_guest %}
+    <div class="wcard" id="card8">
+      <div class="wcard-label">Almost There</div>
+      <div class="wcard-title">Your plan is ready.</div>
+      <div class="wcard-sub">Create a free account to unlock it.</div>
+
+      <a href="/auth/google" class="google-btn" style="display:flex;text-decoration:none;margin-bottom:4px;">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+        Continue with Google
+      </a>
+
+      <div class="signup-divider">or</div>
+
+      {# Email/password fields live inside the outer #wizForm — no nested form.
+         JS changes wizForm's action to /register when this step is active. #}
+      <input type="hidden" name="_from_questionnaire" value="1">
+      <div class="wfield">
+        <label>Email</label>
+        <input type="email" name="email" id="signupEmail" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="wfield">
+        <label>Password</label>
+        <input type="password" name="password" id="signupPassword" placeholder="8+ characters" autocomplete="new-password">
+      </div>
+      <button type="button" class="wnav-save" style="width:100%;border-radius:10px;padding:12px;"
+              onclick="submitSignup()">
+        Create account &amp; start training
+      </button>
+
+      <div class="signup-fine">Already have an account? <a href="/auth/login-forge">Log in</a></div>
+      <div class="wnav" style="margin-top:10px;">
+        <button type="button" class="wnav-back" onclick="prevStep()">Back</button>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>{# /wizard-stage #}
+  </form>
+
+  {# Progress dots #}
+  <div class="wdots" id="wizDots"></div>
+
+</div>{# /wizard-outer #}
+
 <script>
 (function () {
-  var QUESTIONS = 7;   /* number of question cards (wc0–wc6) */
-  var TOTAL     = QUESTIONS; /* summary lives at index QUESTIONS, outside dot range */
-  var cur = 0;
-  var transitioning = false;
+  const TOTAL = {{ 9 if is_guest else 8 }};
+  const START_AT = {{ (TOTAL - 1) if (start_at_signup is defined and start_at_signup) else 0 }};
+  let cur = START_AT;
 
-  function setProgress(step) {
-    var pct = Math.round(((step + 1) / (TOTAL + 1)) * 100);
-    document.getElementById('wFill').style.width = pct + '%';
-    document.getElementById('wPctLabel').textContent = pct + '%';
-    document.getElementById('wStepLabel').textContent =
-      step < QUESTIONS
-        ? WLANG.q_prefix + ' ' + (step + 1) + ' ' + WLANG.q_of + ' ' + QUESTIONS
-        : WLANG.q_review;
+  // ── DOM refs ────────────────────────────────────────────────────
+  const cards   = Array.from(document.querySelectorAll('.wcard'));
+  const fill    = document.getElementById('wizFill');
+  const label   = document.getElementById('stepLabel');
+  const pct     = document.getElementById('stepPct');
+  const dotsEl  = document.getElementById('wizDots');
+
+  // ── Build dots ──────────────────────────────────────────────────
+  for (let i = 0; i < TOTAL; i++) {
+    const d = document.createElement('span');
+    d.className = 'wdot';
+    dotsEl.appendChild(d);
   }
-
-  function renderDots(step) {
-    var wrap = document.getElementById('wDots');
-    while (wrap.firstChild) wrap.removeChild(wrap.firstChild);
-    for (var i = 0; i < TOTAL; i++) {
-      var d = document.createElement('div');
-      d.className = 'wdot' +
-        (i === step ? ' wdot--active' : (i < step ? ' wdot--done' : ''));
-      wrap.appendChild(d);
-    }
-  }
-
-  function transition(next) {
-    if (transitioning) return;
-    transitioning = true;
-    var outEl = document.getElementById('wc' + cur);
-    var inEl  = document.getElementById('wc' + next);
-    if (!outEl || !inEl) { transitioning = false; return; }
-
-    outEl.classList.remove('active');
-    outEl.classList.add('exiting');
-
-    cur = next;
-    setProgress(cur);
-    renderDots(cur);
-    if (cur === TOTAL) buildSummary();
-
-    inEl.style.position = 'absolute';
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () {
-        /* Two rAFs force the browser to compute layout with inEl at
-           position:absolute (its initial state) before we switch it to
-           position:relative via .active. Without this, the CSS transition
-           has no starting keyframe and the card snaps in instead of fading. */
-        inEl.style.position = '';
-        inEl.classList.add('active');
-      });
+  function updateDots() {
+    dotsEl.querySelectorAll('.wdot').forEach((d, i) => {
+      d.className = 'wdot' + (i < cur ? ' done' : i === cur ? ' current' : '');
     });
-
-    setTimeout(function () {
-      outEl.classList.remove('exiting');
-      transitioning = false;
-    }, 380);
   }
 
-  window.wNext = function () { if (cur < QUESTIONS) transition(cur + 1); };
-  window.wBack = function () { if (cur > 0)     transition(cur - 1); };
+  // ── Progress bar ─────────────────────────────────────────────────
+  function updateProgress() {
+    const p = Math.round((cur / (TOTAL - 1)) * 100);
+    fill.style.width = p + '%';
+    label.textContent = `Question ${cur + 1} of ${TOTAL}`;
+    pct.textContent = p + '%';
+    updateDots();
+  }
 
-  document.getElementById('ageRange').addEventListener('input', function () {
-    var d = document.getElementById('ageDisplay');
-    while (d.firstChild) d.removeChild(d.firstChild);
-    d.appendChild(document.createTextNode(this.value + '\u00a0'));
-    var s = document.createElement('span');
-    s.className = 'slider-unit';
-    s.textContent = WLANG.years_old;
-    d.appendChild(s);
-  });
+  // ── Show card ────────────────────────────────────────────────────
+  function showCard(idx) {
+    cards.forEach((c, i) => {
+      if (i === idx) { c.classList.add('active'); c.classList.remove('exiting'); }
+      else           { c.classList.remove('active'); }
+    });
+    updateProgress();
+  }
 
-  document.getElementById('daysRange').addEventListener('input', function () {
-    var v = parseInt(this.value, 10);
-    var d = document.getElementById('daysDisplay');
-    while (d.firstChild) d.removeChild(d.firstChild);
-    d.appendChild(document.createTextNode(v + '\u00a0'));
-    var s = document.createElement('span');
-    s.className = 'slider-unit';
-    s.textContent = v === 1 ? WLANG.day_week : WLANG.days_week;
-    d.appendChild(s);
-  });
-
-  function getCheckedText(fieldName) {
-    var inputs = document.querySelectorAll('input[name="' + fieldName + '"]:checked');
-    var texts = [];
-    for (var i = 0; i < inputs.length; i++) {
-      texts.push(inputs[i].closest('label').textContent.trim());
+  // ── Collect current card answers ─────────────────────────────────
+  function collectCard(idx) {
+    const card = cards[idx];
+    switch (idx) {
+      case 0: // goal
+        const gPick = card.querySelector('input[name="goal_pick"]:checked');
+        if (gPick) document.getElementById('hGoals').name = 'fitness_goals';
+        document.getElementById('hGoals').value = gPick ? gPick.value : '';
+        break;
+      case 1: // age range
+        const aPick = card.querySelector('input[name="age_range_pick"]:checked');
+        document.getElementById('hAgeRange').value = aPick ? aPick.value : '';
+        break;
+      case 2: // fitness level
+        const lvPick = card.querySelector('input[name="fitness_level_pick"]:checked');
+        document.getElementById('hFitnessLevel').value = lvPick ? lvPick.value : '';
+        break;
+      case 3: // days
+        const dayChecked = Array.from(card.querySelectorAll('input[name="days_pick"]:checked')).map(x => x.value);
+        document.getElementById('hDays').value = dayChecked.join(',');
+        break;
+      case 4: // equipment — checkbox inputs submit directly via name="equipment"
+        break;
+      case 5: // height/weight — stored via collectHeightWeight()
+        collectHeightWeight();
+        break;
+      case 6: // diet — checkbox inputs submit directly via name="diet_pick" — rename
+        break;
+      case 7: // health — checkbox inputs submit directly
+        break;
     }
-    return texts;
   }
 
-  function getRadioText(fieldName) {
-    var inp = document.querySelector('input[name="' + fieldName + '"]:checked');
-    return inp ? [inp.closest('label').textContent.trim()] : [];
+  // ── Fix checkbox names before submit ─────────────────────────────
+  function fixCheckboxNames() {
+    document.querySelectorAll('input[name="equipment_pick"]').forEach(el => el.name = 'equipment');
+    document.querySelectorAll('input[name="diet_pick"]').forEach(el => el.name = 'diet');
+    document.querySelectorAll('input[name="health_pick"]').forEach(el => el.name = 'health_conditions');
+    // Convert days hidden field to multiple hidden inputs
+    const daysVal = document.getElementById('hDays').value;
+    if (daysVal) {
+      daysVal.split(',').forEach(d => {
+        const inp = document.createElement('input');
+        inp.type = 'hidden'; inp.name = 'preferred_days'; inp.value = d;
+        document.getElementById('wizForm').appendChild(inp);
+      });
+    }
+    document.getElementById('hDays').disabled = true;
+    // Fitness goals hidden field → multiple hidden input
+    const goalVal = document.getElementById('hGoals').value;
+    if (goalVal) {
+      const inp = document.createElement('input');
+      inp.type = 'hidden'; inp.name = 'fitness_goals'; inp.value = goalVal;
+      document.getElementById('wizForm').appendChild(inp);
+    }
+    document.getElementById('hGoals').disabled = true;
   }
 
-  function makeBadge(text) {
-    var s = document.createElement('span');
-    s.className = 'wbadge';
-    s.textContent = text;
-    return s;
+  // ── Navigation ───────────────────────────────────────────────────
+  window.nextStep = function () {
+    collectCard(cur);
+    const exiting = cards[cur];
+    exiting.classList.add('exiting');
+    setTimeout(() => exiting.classList.remove('exiting', 'active'), 320);
+    cur = Math.min(cur + 1, TOTAL - 1);
+    showCard(cur);
+    // If entering the sign-up step, point the form to /register
+    const isGuest = {{ 'true' if is_guest else 'false' }};
+    if (isGuest && cur === TOTAL - 1) {
+      document.getElementById('wizForm').action = '/register';
+    }
+  };
+
+  window.prevStep = function () {
+    const exiting = cards[cur];
+    exiting.classList.add('exiting');
+    setTimeout(() => exiting.classList.remove('exiting', 'active'), 320);
+    cur = Math.max(cur - 1, 0);
+    showCard(cur);
+  };
+
+  window.submitForm = function () {
+    // Collect all cards first
+    for (let i = 0; i < TOTAL; i++) collectCard(i);
+    fixCheckboxNames();
+    document.getElementById('wizForm').submit();
+  };
+
+  // Sign-up submit (guests, step 9)
+  window.submitSignup = function () {
+    const email = document.getElementById('signupEmail').value.trim();
+    const pwd   = document.getElementById('signupPassword').value;
+    if (!email || !email.includes('@')) { alert('Please enter a valid email.'); return; }
+    if (pwd.length < 8) { alert('Password must be at least 8 characters.'); return; }
+    // Collect all previous steps' answers
+    for (let i = 0; i < TOTAL - 1; i++) collectCard(i);
+    fixCheckboxNames();
+    const form = document.getElementById('wizForm');
+    form.action = '/register';
+    form.submit();
+  };
+
+  // ── Height / Weight unit handling ────────────────────────────────
+  let currentUnit = 'metric';
+  let heightCm = null;
+  let weightKg = null;
+
+  window.setUnit = function (unit) {
+    currentUnit = unit;
+    const hInput = document.getElementById('heightInput');
+    const wInput = document.getElementById('weightInput');
+    document.getElementById('btnMetric').classList.toggle('active', unit === 'metric');
+    document.getElementById('btnImperial').classList.toggle('active', unit === 'imperial');
+
+    if (unit === 'imperial') {
+      document.getElementById('heightUnit').textContent = 'ft / in';
+      document.getElementById('weightUnit').textContent = 'lbs';
+      hInput.placeholder = '5.9';
+      hInput.step = '0.1';
+      if (heightCm) hInput.value = (heightCm / 30.48).toFixed(1);
+      if (weightKg) wInput.value = (weightKg * 2.2046).toFixed(1);
+    } else {
+      document.getElementById('heightUnit').textContent = 'cm';
+      document.getElementById('weightUnit').textContent = 'kg';
+      hInput.placeholder = '175';
+      hInput.step = '1';
+      if (heightCm) hInput.value = Math.round(heightCm);
+      if (weightKg) wInput.value = weightKg.toFixed(1);
+    }
+  };
+
+  function collectHeightWeight() {
+    const hVal = parseFloat(document.getElementById('heightInput').value);
+    const wVal = parseFloat(document.getElementById('weightInput').value);
+    if (!isNaN(hVal)) {
+      heightCm = currentUnit === 'imperial' ? hVal * 30.48 : hVal;
+    }
+    if (!isNaN(wVal)) {
+      weightKg = currentUnit === 'imperial' ? wVal / 2.2046 : wVal;
+    }
+    document.getElementById('hHeightCm').value = heightCm ? heightCm.toFixed(1) : '';
+    document.getElementById('hWeightKg').value = weightKg ? weightKg.toFixed(1) : '';
   }
 
-  function makeRow(key, texts) {
-    var row = document.createElement('div');
-    row.className = 'wsum-row';
-    var k = document.createElement('span');
-    k.className = 'wsum-key';
-    k.textContent = key;
-    row.appendChild(k);
-    var v = document.createElement('span');
-    var items = texts.length ? texts : ['\u2014'];
-    items.forEach(function (t) { v.appendChild(makeBadge(t)); });
-    row.appendChild(v);
-    return row;
-  }
+  // ── Init ─────────────────────────────────────────────────────────
+  showCard(cur);
 
-  function buildSummary() {
-    var wrap = document.getElementById('wSummary');
-    while (wrap.firstChild) wrap.removeChild(wrap.firstChild);
-    wrap.appendChild(makeRow(WLANG.sum_age,
-      [document.getElementById('ageRange').value + '\u00a0' + WLANG.years_old]));
-    wrap.appendChild(makeRow(WLANG.sum_level,    getRadioText('fitness_level')));
-    wrap.appendChild(makeRow(WLANG.sum_days,
-      [document.getElementById('daysRange').value]));
-    wrap.appendChild(makeRow(WLANG.sum_goals,    getCheckedText('fitness_goals')));
-    wrap.appendChild(makeRow(WLANG.sum_equip,    getCheckedText('equipment')));
-    wrap.appendChild(makeRow(WLANG.sum_diet,     getCheckedText('diet')));
-    wrap.appendChild(makeRow(WLANG.sum_health,   getCheckedText('health_conditions')));
-  }
+  // Pre-populate height/weight from server values
+  const initH = {{ existing_height_cm or 'null' }};
+  const initW = {{ existing_weight_kg or 'null' }};
+  if (initH) { heightCm = initH; document.getElementById('heightInput').value = Math.round(initH); }
+  if (initW) { weightKg = initW; document.getElementById('weightInput').value = initW.toFixed(1); }
 
-  document.getElementById('wForm').addEventListener('submit', function () {
-    var btn = document.getElementById('wSaveBtn');
-    btn.disabled = true;
-    btn.textContent = WLANG.saving;
-  });
-
-  setProgress(0);
-  renderDots(0);
-}());
+})();
 </script>
 {% endblock %}
