@@ -2,6 +2,53 @@
 {% block title %}Koda — {{ session.focus }} · W{{ session.week_num }}D{{ session.day_num }}{% endblock %}
 {% block main_class %}{% endblock %}
 
+{% block extra_head %}
+<style>
+/* ── Exercise thumbnail rows ───────────────────────────────────── */
+.exercise-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid #1e2030;
+}
+.exercise-row:last-child { border-bottom: none; }
+.exercise-thumb {
+  width: 44px; height: 44px; border-radius: 8px; flex-shrink: 0;
+  background: linear-gradient(135deg, #1e2030 0%, #252840 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: #3a3d58; overflow: hidden;
+}
+.exercise-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+.exercise-row-info { flex: 1; min-width: 0; }
+.exercise-row-name { font-size: 14px; font-weight: 600; color: #e2e8f0;
+  display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.exercise-row-meta { display: flex; gap: 4px; margin-top: 4px; align-items: center; }
+.set-pip { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; flex-shrink: 0; }
+.set-pip--rest { background: #3b82f6; }
+.exercise-row-sets { font-size: 11px; color: #666; margin-left: 4px; }
+
+/* ── Nutrition coming-soon card ────────────────────────────────── */
+.nutrition-card {
+  background: #1a1d2e; border: 1px dashed #2a2d40; border-radius: 16px;
+  padding: 24px; text-align: center; position: relative; overflow: hidden;
+}
+.nutrition-card::before {
+  content: ""; position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    45deg, transparent, transparent 8px,
+    rgba(42,45,64,.3) 8px, rgba(42,45,64,.3) 9px
+  );
+}
+.nutrition-card > * { position: relative; z-index: 1; }
+.coming-soon-badge {
+  display: inline-block; background: #252840; border: 1px solid #3a3d58;
+  border-radius: 20px; padding: 3px 12px; font-size: 11px; font-weight: 600;
+  color: #666; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 12px;
+}
+.nutrition-placeholder-row {
+  height: 12px; border-radius: 6px; background: #1e2030; margin: 8px auto;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 
 {# ===== Page hero ===== #}
@@ -64,6 +111,36 @@
     <div class="col-12 col-lg-8">
 
       <div class="koda-card koda-card--active" id="workoutCard">
+
+        {# ── Mini exercise preview (first 5) ── #}
+        <div class="mb-4">
+          <div class="koda-section-label mb-2">Exercises</div>
+          {% for ex in exercises[:5] %}
+          <div class="exercise-row">
+            <div class="exercise-thumb">
+              {% if ex.video_url and ex.video_url.startswith('/static') %}
+                <span style="font-size:10px;color:#555;">▶</span>
+              {% else %}
+                <span>🏋️</span>
+              {% endif %}
+            </div>
+            <div class="exercise-row-info">
+              <span class="exercise-row-name">{{ ex.label }}</span>
+              <div class="exercise-row-meta">
+                {% for _ in range(ex.sets) %}<span class="set-pip"></span>{% endfor %}
+                <span class="exercise-row-sets">
+                  {{ ex.sets }}×{% if ex.reps %}{{ ex.reps }}{% else %}{{ (ex.duration_sec|int) }}s{% endif %}
+                </span>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+          {% if exercises|length > 5 %}
+          <div style="text-align:center;font-size:12px;color:#555;margin-top:8px;">
+            +{{ exercises|length - 5 }} more exercises
+          </div>
+          {% endif %}
+        </div>
 
         {# Stats row #}
         {% set ex_count = exercises | length %}
@@ -240,6 +317,18 @@
                              background:rgb(245,191,42);margin-right:4px;"></span>Secondary</span>
         </div>
       </div>
+
+        {# ── Today's Nutrition — Coming Soon ── #}
+        <div class="nutrition-card mt-4">
+          <div class="coming-soon-badge">Coming Soon</div>
+          <h3 style="font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:6px;">Today's Nutrition</h3>
+          <p style="font-size:13px;color:#555;margin-bottom:16px;">
+            Personalised meal plan based on your goals.
+          </p>
+          <div class="nutrition-placeholder-row" style="width:80%;"></div>
+          <div class="nutrition-placeholder-row" style="width:65%;"></div>
+          <div class="nutrition-placeholder-row" style="width:72%;"></div>
+        </div>
     </div>
     {% endif %}
 
