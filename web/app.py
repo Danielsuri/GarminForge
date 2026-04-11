@@ -53,6 +53,7 @@ from web.models import Program, User
 from web.rendering import render_template
 from web.routes_auth import router as forge_auth_router
 from web.routes_my import router as my_router
+from web.routes_onboarding import router as onboarding_router
 from web.routes_programs import router as programs_router
 from web.translations import SUPPORTED_LANGS
 from web.workout_generator import (
@@ -135,6 +136,7 @@ app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 # Register routers
 app.include_router(forge_auth_router)
 app.include_router(my_router)
+app.include_router(onboarding_router)
 app.include_router(programs_router)
 
 

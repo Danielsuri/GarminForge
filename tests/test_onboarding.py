@@ -2,7 +2,22 @@
 import json
 from unittest.mock import MagicMock
 
+from fastapi.testclient import TestClient
+from web.app import app
 from web.models import User, Program, ProgramSession
+
+client = TestClient(app, raise_server_exceptions=False)
+
+
+def test_onboarding_get_accessible_without_login():
+    resp = client.get("/onboarding", follow_redirects=False)
+    assert resp.status_code == 200
+
+
+def test_root_redirects_unauthenticated_to_onboarding():
+    resp = client.get("/", follow_redirects=False)
+    assert resp.status_code in (302, 303)
+    assert resp.headers["location"] in ("/onboarding", "http://testserver/onboarding")
 
 
 def test_user_has_new_fields():
