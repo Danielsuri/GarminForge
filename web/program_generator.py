@@ -334,3 +334,154 @@ def _block_phase_key(week_num: int, duration_weeks: int) -> str:
     if week_num <= int_end:
         return "int"
     return "peak"
+
+
+# ---------------------------------------------------------------------------
+# Auto-generate program from user questionnaire data
+# ---------------------------------------------------------------------------
+
+import json as _json
+from datetime import date as _date, timedelta as _timedelta
+
+from web.models import Program as _Program, ProgramSession as _ProgramSession
+
+_GOAL_PERIODIZATION: dict[str, str] = {
+    "burn_fat":       "linear",
+    "lose_weight":    "linear",
+    "build_muscle":   "block",
+    "build_strength": "block",
+    "general_fitness": "undulating",
+    "endurance":      "undulating",
+}
+
+_DAY_TO_WEEKDAY: dict[str, int] = {
+    "Mon": 0, "Tue": 1, "Wed": 2, "Thu": 3,
+    "Fri": 4, "Sat": 5, "Sun": 6,
+}
+
+
+def _next_weekday(from_date: _date, weekday: int) -> _date:
+    """Return the next occurrence of `weekday` (0=Mon) on or after `from_date`."""
+    days_ahead = weekday - from_date.weekday()
+    if days_ahead < 0:
+        days_ahead += 7
+    return from_date + _timedelta(days=days_ahead)
+
+
+def auto_generate_program(user, db) -> _Program:  # type: ignore[return]
+    """Create and persist an 8-week program derived from the user's questionnaire answers.
+
+    Parameters
+    ----------
+    user:
+        User instance with questionnaire fields populated.
+    db:
+        SQLAlchemy Session.
+
+    Returns the created (and committed) Program instance.
+    """
+    # Resolve goal
+    goals: list[str] = _json.loads(user.fitness_goals_json or "[]")
+    goal = goals[0] if goals else "general_fitness"
+    if goal not in GOALS:
+        goal = "general_fitness"
+
+    periodization = _GOAL_PERIODIZATION.get(goal, "undulating")
+
+    # Resolve equipment
+    equipment: list[str] = _json.loads(user.preferred_equipment_json or '["bodyweight"]')
+    if not equipment:
+        equipment = ["bodyweight"]
+
+    # Resolve training days
+    raw_days: list[str] = _json.loads(user.preferred_days_json or "[]")
+    # Clamp to supported split sizes (2–5); prefer the actual count
+    n_days = max(2, min(5, len(raw_days))) if raw_days else 3
+    # Keep only the first n_days entries (sorted by calendar order)
+    sorted_days = sorted(raw_days[:n_days], key=lambda d: _DAY_TO_WEEKDAY.get(d, 9))
+
+    fitness_level = (user.fitness_level or "intermediate").lower()
+    duration_weeks = 8
+    duration_minutes = 45
+
+    plan = generate_program(
+        goal=goal,
+        equipment=equipment,
+        duration_weeks=duration_weeks,
+        weekly_workout_days=n_days,
+        duration_minutes=duration_minutes,
+        periodization_type=periodization,
+        fitness_level=fitness_level,
+    )
+
+    goal_cfg = GOALS[goal]
+    program = _Program(
+        user_id=user.id,
+        name=plan.name,
+        goal=goal,
+        periodization_type=periodization,
+        duration_weeks=duration_weeks,
+        equipment_json=_json.dumps(equipment),
+        status="active",
+    )
+    db.add(program)
+    db.flush()  # populate program.id
+
+    today = _date.today()
+
+    # Build a list of calendar dates for each session.
+    # If the user chose specific days, schedule on those actual weekdays.
+    # Otherwise fall back to even spacing.
+    session_dates: list[_date] = []
+    if sorted_days:
+        weekday_nums = [_DAY_TO_WEEKDAY[d] for d in sorted_days if d in _DAY_TO_WEEKDAY]
+        if not weekday_nums:
+            weekday_nums = list(range(n_days))
+        # Start from next Monday so the user has time to see their plan
+        days_to_monday = today.weekday()
+        this_monday = today - _timedelta(days=days_to_monday)
+        next_monday = this_monday + _timedelta(weeks=1)
+        for week in range(duration_weeks):
+            week_monday = next_monday + _timedelta(weeks=week)
+            for wd in weekday_nums:
+                session_dates.append(week_monday + _timedelta(days=wd))
+    else:
+        day_spacing = max(1, 7 // n_days)
+        for i in range(duration_weeks * n_days):
+            session_dates.append(today + _timedelta(days=i * day_spacing))
+
+    for idx, session_plan in enumerate(plan.sessions):
+        scheduled = session_dates[idx] if idx < len(session_dates) else None
+        ps = _ProgramSession(
+            program_id=program.id,
+            week_num=session_plan.week_num,
+            day_num=session_plan.day_num,
+            focus=session_plan.focus,
+            garmin_payload_json=_json.dumps(session_plan.garmin_payload),
+            exercises_json=_json.dumps(
+                [
+                    {
+                        "category": e.category,
+                        "name": e.name,
+                        "label": e.label,
+                        "sets": e.sets,
+                        "reps": e.reps,
+                        "duration_sec": e.duration_sec,
+                        "rest_seconds": e.rest_seconds,
+                        "muscle_group": e.muscle_group,
+                        "primary_muscles": e.primary_muscles,
+                        "secondary_muscles": e.secondary_muscles,
+                        "video_url": e.video_url,
+                    }
+                    for e in session_plan.exercises
+                ]
+            ),
+            scheduled_date=scheduled,
+        )
+        db.add(ps)
+
+    # Update user.weekly_workout_days for backward compat
+    user.weekly_workout_days = n_days  # type: ignore[assignment]
+    db.commit()
+    db.refresh(program)
+    return program
