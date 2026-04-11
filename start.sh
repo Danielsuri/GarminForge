@@ -47,43 +47,53 @@ cd "$SCRIPT_DIR"
 # that multiple consecutive untracked migrations are all resolved in one go.
 run_migrations() {
     local attempt=0
-    local max_attempts=20   # safety valve against infinite loops
+    local max_attempts=20
+    local tmp
+    tmp=$(mktemp)
 
     while [[ $attempt -lt $max_attempts ]]; do
         attempt=$((attempt + 1))
-        local output exit_code
-        output=$("$VENV_BIN/alembic" upgrade head 2>&1)
-        exit_code=$?
+
+        # Capture output WITHOUT triggering set -e on non-zero exit
+        set +e
+        "$VENV_BIN/alembic" upgrade head >"$tmp" 2>&1
+        local exit_code=$?
+        set -e
 
         if [[ $exit_code -eq 0 ]]; then
             echo "Migrations OK."
+            rm -f "$tmp"
             return 0
         fi
 
-        if echo "$output" | grep -q "duplicate column name"; then
+        if grep -q "duplicate column name" "$tmp"; then
             # Pull the 4-digit revision from the offending filename in the traceback
-            # e.g. ".../0002_add_preferred_lang.py, line 21, in upgrade"
+            # e.g. ".../0002_add_preferred_lang.py", line 21, in upgrade
             local rev
-            rev=$(echo "$output" | grep -oP '(?<=/)\d{4}(?=_[^/]+\.py.*in upgrade)' | head -1)
+            rev=$(grep -oP '(?<=/)\d{4}(?=_[^/]+\.py)' "$tmp" | tail -1)
             if [[ -n "$rev" ]]; then
                 echo "Migration $rev already applied without tracking — stamping and retrying..."
                 "$VENV_BIN/alembic" stamp "$rev"
             else
-                echo "ERROR: duplicate column but could not parse revision. Full output:" >&2
-                echo "$output" >&2
+                echo "ERROR: duplicate column but could not parse revision. Output:" >&2
+                cat "$tmp" >&2
+                rm -f "$tmp"
                 return 1
             fi
         else
             echo "ERROR: migration failed:" >&2
-            echo "$output" >&2
+            cat "$tmp" >&2
+            rm -f "$tmp"
             return 1
         fi
     done
 
     echo "ERROR: migration loop did not converge after $max_attempts attempts." >&2
+    rm -f "$tmp"
     return 1
 }
 
+echo "Running database migrations..."
 run_migrations
 
 echo "Starting GarminForge on port $PORT..."
