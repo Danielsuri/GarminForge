@@ -3,7 +3,7 @@ Koda Web Application — FastAPI entry point.
 
 Routes
 ------
-GET  /                    Dashboard (workout generator) or login page
+GET  /                    Redirect to /onboarding or active program session
 POST /auth/login          Handle Garmin Connect credential login
 POST /auth/token          Handle base64 token paste
 POST /auth/mfa            Handle MFA code submission
@@ -72,7 +72,6 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 BASE_DIR = Path(__file__).parent
-_MUSCLE_MAP_SVG: str = (BASE_DIR / "static" / "img" / "muscle_map.svg").read_text(encoding="utf-8")
 
 # ---------------------------------------------------------------------------
 # In-process MFA state store (legacy, kept for MFA route).
@@ -227,7 +226,7 @@ def _error_redirect(request: Request, message: str, back: str = "/") -> Redirect
 # ---------------------------------------------------------------------------
 
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/")
 async def index(
     request: Request,
     db: Session = Depends(get_db),
