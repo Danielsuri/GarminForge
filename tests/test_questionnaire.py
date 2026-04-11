@@ -1,32 +1,15 @@
 """
-Regression tests for the questionnaire wizard template.
-Verifies that the rendered HTML contains all form field names
-the backend handler expects — guarding against accidental renames.
+Tests for /my/questionnaire redirect behaviour.
+
+The questionnaire has moved to /onboarding.  These routes now simply
+redirect callers to the new location — no auth required, no DB access.
 """
 from __future__ import annotations
-
-from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
 
 from web.app import app
-from web.models import User
-
-
-def _make_user() -> User:
-    return User(
-        id="test-qx-001",
-        email="wizard@test.com",
-        questionnaire_completed=False,
-        age=None,
-        diet_json=None,
-        health_conditions_json=None,
-        preferred_equipment_json=None,
-        fitness_level=None,
-        fitness_goals_json=None,
-        weekly_workout_days=None,
-    )
 
 
 @pytest.fixture(scope="module")
@@ -35,43 +18,18 @@ def client():
         yield c
 
 
-class TestQuestionnaireTemplate:
-    def _get_page(self, client):
-        user = _make_user()
-        with patch("web.routes_my.get_current_user", return_value=user):
-            return client.get("/my/questionnaire")
+class TestQuestionnaireRedirects:
+    def test_get_questionnaire_redirects_to_onboarding(self, client):
+        resp = client.get("/my/questionnaire", follow_redirects=False)
+        assert resp.status_code == 301
+        assert resp.headers["location"] in ("/onboarding", "http://testserver/onboarding")
 
-    def test_returns_200(self, client):
-        assert self._get_page(client).status_code == 200
+    def test_post_questionnaire_redirects_to_onboarding(self, client):
+        resp = client.post("/my/questionnaire", follow_redirects=False)
+        assert resp.status_code == 303
+        assert resp.headers["location"] in ("/onboarding", "http://testserver/onboarding")
 
-    def test_has_age_field(self, client):
-        assert 'name="age"' in self._get_page(client).text
-
-    def test_has_fitness_level_field(self, client):
-        assert 'name="fitness_level"' in self._get_page(client).text
-
-    def test_has_weekly_workout_days_field(self, client):
-        assert 'name="weekly_workout_days"' in self._get_page(client).text
-
-    def test_has_fitness_goals_field(self, client):
-        assert 'name="fitness_goals"' in self._get_page(client).text
-
-    def test_has_equipment_field(self, client):
-        assert 'name="equipment"' in self._get_page(client).text
-
-    def test_has_diet_field(self, client):
-        assert 'name="diet"' in self._get_page(client).text
-
-    def test_has_health_conditions_field(self, client):
-        assert 'name="health_conditions"' in self._get_page(client).text
-
-    def test_form_posts_to_questionnaire(self, client):
-        assert 'action="/my/questionnaire"' in self._get_page(client).text
-
-    def test_skip_posts_to_skip_route(self, client):
-        assert 'action="/my/questionnaire/skip"' in self._get_page(client).text
-
-    def test_seven_wcard_elements(self, client):
-        """One card per question (not counting summary)."""
-        html = self._get_page(client).text
-        assert html.count('class="wcard') >= 7
+    def test_skip_endpoint_gone(self, client):
+        """POST /my/questionnaire/skip was removed; expect 404 or 405."""
+        resp = client.post("/my/questionnaire/skip", follow_redirects=False)
+        assert resp.status_code in (404, 405)
