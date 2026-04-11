@@ -160,7 +160,21 @@ async def register_submit(
 
     maybe_migrate_file_token(user, db)
     login_session(request, user, db)
-    return RedirectResponse("/my/questionnaire", status_code=303)
+
+    # Consume any pending questionnaire answers captured before sign-up
+    pending = request.session.pop("pending_q", {})
+    if pending:
+        from web.routes_onboarding import _apply_answers
+        _apply_answers(user, pending)
+        user.questionnaire_completed = True  # type: ignore[assignment]
+        db.commit()
+        from web.program_generator import auto_generate_program
+        try:
+            auto_generate_program(user, db)
+        except Exception:
+            logger.exception("Failed to auto-generate program on /auth/register for user %s", user.id)
+
+    return RedirectResponse("/onboarding", status_code=303)
 
 
 # ---------------------------------------------------------------------------
@@ -251,7 +265,7 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
     maybe_migrate_file_token(user, db)
     login_session(request, user, db)
     if not user.questionnaire_completed:
-        return RedirectResponse("/my/questionnaire", status_code=303)
+        return RedirectResponse("/onboarding", status_code=303)
     return RedirectResponse("/", status_code=303)
 
 
@@ -434,5 +448,5 @@ async def apple_callback(request: Request, db: Session = Depends(get_db)):
     maybe_migrate_file_token(user, db)
     login_session(request, user, db)
     if not user.questionnaire_completed:
-        return RedirectResponse("/my/questionnaire", status_code=303)
+        return RedirectResponse("/onboarding", status_code=303)
     return RedirectResponse("/", status_code=303)
