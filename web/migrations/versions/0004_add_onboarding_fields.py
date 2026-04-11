@@ -19,7 +19,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     op.add_column("users", sa.Column("age_range", sa.String(10), nullable=True))
-    op.add_column("users", sa.Column("preferred_days_json", sa.Text, nullable=True))
+    op.add_column("users", sa.Column("preferred_days_json", sa.Text(), nullable=True))
     op.add_column("users", sa.Column("height_cm", sa.Float, nullable=True))
     op.add_column("users", sa.Column("weight_kg", sa.Float, nullable=True))
 
