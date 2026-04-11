@@ -6,7 +6,7 @@ from __future__ import annotations
 import uuid
 from datetime import date, datetime
 
-from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, String, Text, func
+from sqlalchemy import Boolean, Date, DateTime, Float, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from web.db import Base
@@ -32,6 +32,10 @@ class User(Base):
     # Onboarding questionnaire
     questionnaire_completed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     age: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    age_range: Mapped[str | None] = mapped_column(String(10), nullable=True)      # "18-29" | "30-39" | "40-49" | "50+"
+    preferred_days_json: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON list e.g. '["Mon","Wed","Fri"]'
+    height_cm: Mapped[float | None] = mapped_column(Float, nullable=True)
+    weight_kg: Mapped[float | None] = mapped_column(Float, nullable=True)
     diet_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     health_conditions_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     preferred_equipment_json: Mapped[str | None] = mapped_column(Text, nullable=True)
