@@ -4,7 +4,7 @@
 {% block extra_head %}
 <style>
 /* ── Wizard shell ───────────────────────────────────────────────── */
-.wizard-outer { max-width: 480px; margin: 0 auto; padding: 24px 16px 32px; }
+.wizard-outer { max-width: 480px; margin: 0 auto; padding: 24px 16px 32px; overflow-x: hidden; }
 .wizard-meta  { display: flex; justify-content: space-between; font-size: 11px; color: #666; margin-bottom: 6px; }
 .wizard-track { height: 4px; background: #1e2030; border-radius: 2px; margin-bottom: 28px; }
 .wizard-fill  { height: 4px; background: #7c3aed; border-radius: 2px; transition: width .4s ease; }
@@ -84,7 +84,8 @@
   border: 1.5px solid #252840; border-radius: 10px; padding: 11px 16px;
   font-size: 14px; color: #bbb; cursor: pointer;
   transition: border-color .18s, background .18s, color .18s; user-select: none; }
-.wopts--row  .wopt { flex: 1; justify-content: center; }
+.wopts--row  .wopt { flex: 1; justify-content: center; min-width: 0;
+  font-size: 13px; padding: 11px 8px; }
 .wopts--grid .wopt { font-size: 13px; padding: 10px 12px; }
 .wopt:has(input:checked) { border-color: #7c3aed; background: #7c3aed18; color: #fff; }
 .wopt input { display: none; }
