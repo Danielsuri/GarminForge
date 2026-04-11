@@ -3,7 +3,6 @@ Shared Jinja2 template renderer used by app.py and the route modules.
 """
 from __future__ import annotations
 
-import subprocess
 from pathlib import Path
 
 from fastapi import Request
@@ -18,17 +17,14 @@ templates = Jinja2Templates(directory=_BASE_DIR / "templates")
 
 
 def _detect_version() -> str:
+    version_file = _BASE_DIR.parent / "VERSION"
     try:
-        result = subprocess.run(
-            ["git", "describe", "--tags", "--abbrev=0"],
-            capture_output=True,
-            text=True,
-            cwd=_BASE_DIR.parent,
-        )
-        v = result.stdout.strip()
-        return v if v else "dev"
+        v = version_file.read_text().strip()
+        if v:
+            return v
     except Exception:
-        return "dev"
+        pass
+    return "dev"
 
 
 APP_VERSION: str = _detect_version()
