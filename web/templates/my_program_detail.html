@@ -105,7 +105,7 @@
                           padding:16px 20px;display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
                 <div style="flex:1;min-width:200px;">
                   <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;
-                               color:var(--text-muted);margin-bottom:10px;">Exercises</div>
+                               color:var(--text-muted);margin-bottom:10px;">{{ t("preview_exercises") }}</div>
                   {% if exes %}
                   <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;">
                     {% for ex in exes %}
@@ -118,7 +118,7 @@
                     {% endfor %}
                   </ul>
                   {% else %}
-                  <span style="color:var(--text-muted);font-size:13px;">No exercise data</span>
+                  <span style="color:var(--text-muted);font-size:13px;">{{ t("programs_no_exercises") }}</span>
                   {% endif %}
                 </div>
                 <div style="flex-shrink:0;align-self:center;">
@@ -126,7 +126,7 @@
                      class="btn-koda-primary"
                      style="text-decoration:none;font-size:13px;padding:8px 16px;"
                      onclick="event.stopPropagation()">
-                    <i class="bi bi-play-fill" style="font-size:11px;"></i> Start Session
+                    <i class="bi bi-play-fill" style="font-size:11px;"></i> {{ t("session_start") }}
                   </a>
                 </div>
               </div>

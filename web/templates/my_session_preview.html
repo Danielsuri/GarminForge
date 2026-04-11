@@ -71,7 +71,7 @@
         <div class="koda-section-label">{{ goal_icon }} {{ goal_label }}</div>
         <h1 style="font-family:'Syne',sans-serif;font-weight:800;font-size:26px;
                    color:var(--text-primary);margin:0 0 4px 0;line-height:1.2;">
-          Week {{ session.week_num }} · Day {{ session.day_num }} — {{ session.focus }}
+          {{ t("programs_detail_week") }} {{ session.week_num }} · {{ t("programs_detail_day") }} {{ session.day_num }} — {{ session.focus }}
         </h1>
         <div class="d-flex flex-wrap gap-2 mt-2">
           {% if session.scheduled_date %}
@@ -81,7 +81,7 @@
           {% endif %}
           {% if session.completed_at %}
           <span class="koda-badge koda-badge--green">
-            <i class="bi bi-check-lg" style="font-size:9px;"></i> Completed
+            <i class="bi bi-check-lg" style="font-size:9px;"></i> {{ t("session_completed_badge") }}
           </span>
           {% endif %}
         </div>
@@ -95,7 +95,7 @@
           </svg>
         </button>
         <span class="koda-badge koda-badge--violet">
-          <i class="bi bi-clock me-1"></i>{{ duration_minutes }} min
+          <i class="bi bi-clock me-1"></i>{{ duration_minutes }} {{ t("form_min") }}
         </span>
       </div>
     </div>
@@ -114,7 +114,7 @@
 
         {# ── Mini exercise preview (first 5) ── #}
         <div class="mb-4">
-          <div class="koda-section-label mb-2">Exercises</div>
+          <div class="koda-section-label mb-2">{{ t("preview_exercises") }}</div>
           {% for ex in exercises[:5] %}
           <div class="exercise-row">
             <div class="exercise-thumb">
@@ -137,7 +137,7 @@
           {% endfor %}
           {% if exercises|length > 5 %}
           <div style="text-align:center;font-size:12px;color:#555;margin-top:8px;">
-            +{{ exercises|length - 5 }} more exercises
+            +{{ exercises|length - 5 }} {{ t("session_more_exercises") }}
           </div>
           {% endif %}
         </div>
@@ -150,19 +150,19 @@
           <div class="col-4">
             <div class="koda-stat-card">
               <div class="koda-stat-value">{{ ex_count }}</div>
-              <div class="koda-stat-label">Exercises</div>
+              <div class="koda-stat-label">{{ t("preview_exercises") }}</div>
             </div>
           </div>
           <div class="col-4">
             <div class="koda-stat-card">
               <div class="koda-stat-value">{{ sets_val }}</div>
-              <div class="koda-stat-label">Sets each</div>
+              <div class="koda-stat-label">{{ t("preview_sets_each") }}</div>
             </div>
           </div>
           <div class="col-4">
             <div class="koda-stat-card">
               <div class="koda-stat-value">{{ reps_val }}</div>
-              <div class="koda-stat-label">Reps / set</div>
+              <div class="koda-stat-label">{{ t("preview_reps_per_set") }}</div>
             </div>
           </div>
         </div>
@@ -172,10 +172,10 @@
 
           {# Warm-up #}
           <div class="d-flex align-items-center gap-2 mb-3">
-            <span class="koda-badge koda-badge--slate">WARM-UP</span>
+            <span class="koda-badge koda-badge--slate">{{ t("badge_warmup") }}</span>
             <div class="exercise-item flex-grow-1" style="padding:8px 12px;">
               <div class="step-number flex-shrink-0">W</div>
-              <span style="font-size:13px;color:var(--text-secondary);">5 min general warm-up</span>
+              <span style="font-size:13px;color:var(--text-secondary);">{{ t("preview_warmup_label") }}</span>
             </div>
           </div>
 
@@ -184,10 +184,10 @@
             <div class="koda-circuit-header justify-content-between">
               <div class="d-flex align-items-center gap-2">
                 <span class="koda-badge koda-badge--violet" style="text-transform:uppercase;letter-spacing:.08em;">
-                  CIRCUIT
+                  {{ t("badge_circuit") }}
                 </span>
                 <span style="font-size:12px;color:var(--text-secondary);">
-                  — do all {{ ex_count }} exercises, then repeat
+                  &mdash; {{ t("preview_circuit_desc_pre") }}{{ ex_count }}{{ t("preview_circuit_desc_post") }}
                 </span>
               </div>
               <span class="koda-badge koda-badge--violet" style="font-size:13px;font-weight:700;">
@@ -217,30 +217,30 @@
                       <button type="button"
                               class="btn btn-outline-secondary btn-sm py-0 px-2"
                               onclick="openVideoTutorial('{{ ex.video_url | e }}', '{{ (ex.label or ex.name) | e }}')"
-                              title="Tutorial">
-                        <i class="bi bi-play-circle me-1"></i>Tutorial
+                              title="{{ t('preview_tutorial') }}">
+                        <i class="bi bi-play-circle me-1"></i>{{ t("preview_tutorial") }}
                       </button>
                       {% elif ex.link %}
                       <a href="{{ ex.link }}" target="_blank" rel="noopener noreferrer"
-                         class="btn btn-outline-secondary btn-sm py-0 px-2" title="Tutorial">
-                        <i class="bi bi-play-circle me-1"></i>Tutorial
+                         class="btn btn-outline-secondary btn-sm py-0 px-2" title="{{ t('preview_tutorial') }}">
+                        <i class="bi bi-play-circle me-1"></i>{{ t("preview_tutorial") }}
                       </a>
                       {% endif %}
                     </div>
                   </div>
                   <div class="text-muted small mt-1">
                     {% if ex.reps %}
-                      <i class="bi bi-repeat me-1"></i>{{ ex.reps }} reps
+                      <i class="bi bi-repeat me-1"></i>{{ ex.reps }} {{ t("preview_reps") }}
                     {% elif ex.duration_sec %}
-                      <i class="bi bi-stopwatch me-1"></i>{{ ex.duration_sec | int }}s hold
+                      <i class="bi bi-stopwatch me-1"></i>{{ ex.duration_sec | int }}{{ t("preview_hold") }}
                     {% endif %}
                     &nbsp;·&nbsp;
-                    <i class="bi bi-hourglass-split me-1"></i>{{ ex.rest_seconds | int }}s rest
+                    <i class="bi bi-hourglass-split me-1"></i>{{ ex.rest_seconds | int }}{{ t("preview_rest") }}
                   </div>
                   {% if ex.required_equipment_labels %}
                   <div class="mt-1" style="font-size:.72rem;">
                     <i class="bi bi-tools text-warning me-1"></i>
-                    <span class="text-warning">Needs:</span>
+                    <span class="text-warning">{{ t("preview_needs") }}</span>
                     <span class="text-muted">{{ ex.required_equipment_labels | join(' / ') }}</span>
                   </div>
                   {% endif %}
@@ -254,17 +254,17 @@
                  style="background:rgba(124,58,237,0.06);border-top:1px dashed rgba(124,58,237,0.2);">
               <i class="bi bi-arrow-counterclockwise" style="color:var(--color-brand-light);"></i>
               <span style="font-size:12px;font-weight:600;color:var(--color-brand-light);">
-                Rest {{ (exercises[0].rest_seconds or 60) | int }}s, then repeat from exercise 1 — {{ sets_val }} rounds total
+                {{ t("session_rest_before") }}{{ (exercises[0].rest_seconds or 60) | int }}{{ t("session_rest_middle") }}{{ sets_val }}{{ t("session_rounds_suffix") }}
               </span>
             </div>
           </div>
 
           {# Cool-down #}
           <div class="d-flex align-items-center gap-2 pt-1">
-            <span class="koda-badge koda-badge--slate">COOL-DOWN</span>
+            <span class="koda-badge koda-badge--slate">{{ t("badge_cooldown") }}</span>
             <div class="exercise-item flex-grow-1" style="padding:8px 12px;">
               <div class="step-number flex-shrink-0">C</div>
-              <span style="font-size:13px;color:var(--text-secondary);">Cool-down + stretch</span>
+              <span style="font-size:13px;color:var(--text-secondary);">{{ t("preview_cooldown_label") }}</span>
             </div>
           </div>
 
@@ -276,7 +276,7 @@
           <input type="hidden" name="payload_json" id="payloadJsonInput" value="{{ payload_json | e }}" />
           <div class="mb-3">
             <label for="schedule_date" class="koda-section-label d-block mb-1">
-              <i class="bi bi-calendar3 me-1"></i>Schedule for
+              <i class="bi bi-calendar3 me-1"></i>{{ t("session_schedule_for") }}
             </label>
             <input type="date" class="koda-input" id="schedule_date" name="schedule_date"
                    value="{{ session.scheduled_date.strftime('%Y-%m-%d') if session.scheduled_date else '' }}" />
@@ -286,15 +286,15 @@
                          d-inline-flex align-items-center justify-content-center gap-2">
             <span class="koda-spinner" aria-hidden="true"></span>
             <span class="koda-btn-label">
-              <i class="bi bi-cloud-arrow-up me-1"></i>Upload to Garmin Connect
+              <i class="bi bi-cloud-arrow-up me-1"></i>{{ t("preview_upload_garmin") }}
             </span>
           </button>
         </form>
         {% else %}
         <div class="koda-flash koda-flash--info" style="font-size:13px;">
           <i class="bi bi-info-circle me-2"></i>
-          Connect your Garmin account to upload this session.
-          <a href="/" style="color:inherit;text-decoration:underline;">Go to dashboard</a>
+          {{ t("session_connect_session") }}
+          <a href="/" style="color:inherit;text-decoration:underline;">{{ t("session_go_dashboard") }}</a>
         </div>
         {% endif %}
 
@@ -306,24 +306,24 @@
     <div class="col-12 col-lg-4">
       <div class="koda-card" style="position:sticky;top:80px;">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;
-                    color:var(--text-muted);margin-bottom:12px;">Muscle Map</div>
+                    color:var(--text-muted);margin-bottom:12px;">{{ t("session_muscle_map") }}</div>
         <div id="muscleMapContainer">
           {{ muscle_map_svg | safe }}
         </div>
         <div class="d-flex gap-3 mt-3" style="font-size:11px;color:var(--text-muted);">
           <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;
-                             background:rgb(194,21,21);margin-right:4px;"></span>Primary</span>
+                             background:rgb(194,21,21);margin-right:4px;"></span>{{ t("session_muscle_primary") }}</span>
           <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;
-                             background:rgb(245,191,42);margin-right:4px;"></span>Secondary</span>
+                             background:rgb(245,191,42);margin-right:4px;"></span>{{ t("session_muscle_secondary") }}</span>
         </div>
       </div>
 
         {# ── Today's Nutrition — Coming Soon ── #}
         <div class="nutrition-card mt-4">
-          <div class="coming-soon-badge">Coming Soon</div>
-          <h3 style="font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:6px;">Today's Nutrition</h3>
+          <div class="coming-soon-badge">{{ t("session_coming_soon") }}</div>
+          <h3 style="font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:6px;">{{ t("session_nutrition_title") }}</h3>
           <p style="font-size:13px;color:#555;margin-bottom:16px;">
-            Personalised meal plan based on your goals.
+            {{ t("session_nutrition_desc") }}
           </p>
           <div class="nutrition-placeholder-row" style="width:80%;"></div>
           <div class="nutrition-placeholder-row" style="width:65%;"></div>
@@ -432,7 +432,7 @@ document.getElementById('uploadForm')?.addEventListener('submit', function() {
     btn.disabled = true;
     btn.classList.add('is-loading');
     var label = btn.querySelector('.koda-btn-label');
-    if (label) { label.textContent = 'Uploading…'; }
+    if (label) { label.textContent = {{ t("session_uploading") | tojson }}; }
   }
 });
 

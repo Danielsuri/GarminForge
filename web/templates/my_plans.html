@@ -17,7 +17,7 @@
       {% if plans %}
       <div class="d-flex align-items-center gap-3 flex-wrap">
         <div class="koda-badge koda-badge--slate">
-          {{ plans|length }} {{ "plan" if plans|length == 1 else "plans" }}
+          {{ plans|length }} {{ t("plans_plan_singular") if plans|length == 1 else t("plans_plan_plural") }}
         </div>
         <a href="/" class="btn-koda-secondary">
           <span style="font-size:15px;">+</span>{{ t("plans_generate_new") }}
@@ -69,11 +69,11 @@
             {# Status badge #}
             {% if plan.program_session %}
               <span class="koda-badge koda-badge--amber">
-                <i class="bi bi-collection me-1" style="font-size:9px;"></i>Program
+                <i class="bi bi-collection me-1" style="font-size:9px;"></i>{{ t("plans_badge_program") }}
               </span>
             {% else %}
               <span class="koda-badge koda-badge--green">
-                Standalone
+                {{ t("plans_badge_standalone") }}
               </span>
             {% endif %}
           </div>
@@ -83,7 +83,7 @@
             {% set ps = plan.program_session %}
             <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;line-height:1.4;">
               <a href="/my/programs/{{ ps.program.id }}" style="color:var(--color-brand-light);text-decoration:none;">
-                Week {{ ps.week_num }} Day {{ ps.day_num }} · {{ ps.focus }}
+                {{ t("programs_detail_week") }} {{ ps.week_num }} {{ t("programs_detail_day") }} {{ ps.day_num }} · {{ ps.focus }}
               </a>
             </div>
           {% endif %}

@@ -15,9 +15,9 @@
         <div class="koda-greeting-day"><span id="greetingDay"></span></div>
         <h1 class="koda-greeting">
           {%- if forge_user and forge_user.display_name -%}
-            Good to see you, {{ forge_user.display_name.split()[0] }}. Build today&#8217;s plan.
+            {{ t("dashboard_greeting", name=forge_user.display_name.split()[0]) }}
           {%- else -%}
-            Build today&#8217;s plan.
+            {{ t("dashboard_build_plan") }}
           {%- endif -%}
         </h1>
       </div>
@@ -25,15 +25,15 @@
       <div class="d-flex gap-2 flex-wrap">
         <div class="koda-stat-pill">
           <div class="koda-stat-pill-value">{{ plan_count|default(0) }}</div>
-          <div class="koda-stat-pill-label">Plans</div>
+          <div class="koda-stat-pill-label">{{ t("dashboard_stat_plans") }}</div>
         </div>
         <div class="koda-stat-pill">
           <div class="koda-stat-pill-value">{{ completion_rate|default('—') }}</div>
-          <div class="koda-stat-pill-label">Completion</div>
+          <div class="koda-stat-pill-label">{{ t("dashboard_stat_completion") }}</div>
         </div>
         <div class="koda-stat-pill">
           <div class="koda-stat-pill-value">{{ program_count|default(0) }}</div>
-          <div class="koda-stat-pill-label">Programs</div>
+          <div class="koda-stat-pill-label">{{ t("nav_programs") }}</div>
         </div>
       </div>
 
@@ -49,12 +49,12 @@
     <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
       <div>
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;
-                    color:var(--accent-violet);margin-bottom:4px;">Active Program</div>
+                    color:var(--accent-violet);margin-bottom:4px;">{{ t("dashboard_active_program") }}</div>
         <div style="font-weight:700;font-size:16px;color:var(--text-primary);margin-bottom:2px;">
           {{ today_program.name }}
         </div>
         <div style="font-size:13px;color:var(--text-secondary);">
-          Week {{ today_session.week_num }} · Day {{ today_session.day_num }} —
+          {{ t("programs_detail_week") }} {{ today_session.week_num }} · {{ t("programs_detail_day") }} {{ today_session.day_num }} —
           <strong>{{ today_session.focus }}</strong>
           {% if today_session.scheduled_date %}
             <span style="color:var(--text-muted);margin-left:8px;">
@@ -65,7 +65,7 @@
       </div>
       <a href="/my/programs/{{ today_program.id }}/sessions/{{ today_session.id }}"
          class="btn-koda-primary" style="text-decoration:none;flex-shrink:0;">
-        <i class="bi bi-play-fill" style="font-size:12px;"></i> Start Session
+        <i class="bi bi-play-fill" style="font-size:12px;"></i> {{ t("session_start") }}
       </a>
     </div>
   </div>

@@ -23,45 +23,53 @@ from web.workout_generator import EQUIPMENT_OPTIONS
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
-# Goal options aligned with workout_generator.GOALS keys (used for image cards)
+# Goal options — label field is a translation key resolved in the template via t()
 GOAL_OPTIONS = [
-    {"value": "burn_fat",        "label": "Burn Fat",           "image": "/static/img/burn-fat.png"},
-    {"value": "lose_weight",     "label": "Lose Weight",        "image": "/static/img/lose-weight.png"},
-    {"value": "build_muscle",    "label": "Build Muscle",       "image": "/static/img/build-mucsle.png"},
-    {"value": "build_strength",  "label": "Build Strength",     "image": "/static/img/build-strength.png"},
-    {"value": "general_fitness", "label": "General Fitness",    "image": "/static/img/general-fitness.png"},
-    {"value": "endurance",       "label": "Muscular Endurance", "image": "/static/img/muscular-endurance.png"},
+    {"value": "burn_fat",        "label": "goal_label_burn_fat",       "image": "/static/img/burn-fat.png"},
+    {"value": "lose_weight",     "label": "goal_label_lose_weight",    "image": "/static/img/lose-weight.png"},
+    {"value": "build_muscle",    "label": "goal_label_build_muscle",   "image": "/static/img/build-mucsle.png"},
+    {"value": "build_strength",  "label": "goal_label_build_strength", "image": "/static/img/build-strength.png"},
+    {"value": "general_fitness", "label": "goal_label_general_fitness","image": "/static/img/general-fitness.png"},
+    {"value": "endurance",       "label": "goal_label_endurance",      "image": "/static/img/muscular-endurance.png"},
 ]
 
 AGE_RANGES = ["18-29", "30-39", "40-49", "50+"]
 
 DIET_OPTIONS = [
-    {"value": "general",       "label": "General"},
-    {"value": "vegetarian",    "label": "Vegetarian"},
-    {"value": "vegan",         "label": "Vegan"},
-    {"value": "keto",          "label": "Keto"},
-    {"value": "paleo",         "label": "Paleo"},
-    {"value": "mediterranean", "label": "Mediterranean"},
-    {"value": "gluten_free",   "label": "Gluten-Free"},
-    {"value": "high_protein",  "label": "High Protein"},
+    {"value": "general",       "label": "diet_general"},
+    {"value": "vegetarian",    "label": "diet_vegetarian"},
+    {"value": "vegan",         "label": "diet_vegan"},
+    {"value": "keto",          "label": "diet_keto"},
+    {"value": "paleo",         "label": "diet_paleo"},
+    {"value": "mediterranean", "label": "diet_mediterranean"},
+    {"value": "gluten_free",   "label": "diet_gluten_free"},
+    {"value": "high_protein",  "label": "diet_high_protein"},
 ]
 
 HEALTH_OPTIONS = [
-    {"value": "heart_condition",     "label": "Heart Condition"},
-    {"value": "diabetes",            "label": "Diabetes"},
-    {"value": "high_blood_pressure", "label": "High Blood Pressure"},
-    {"value": "joint_problems",      "label": "Joint Problems"},
-    {"value": "back_pain",           "label": "Back Pain"},
-    {"value": "asthma",              "label": "Asthma"},
+    {"value": "heart_condition",     "label": "health_heart_condition"},
+    {"value": "diabetes",            "label": "health_diabetes"},
+    {"value": "high_blood_pressure", "label": "health_high_blood_pressure"},
+    {"value": "joint_problems",      "label": "health_joint_problems"},
+    {"value": "back_pain",           "label": "health_back_pain"},
+    {"value": "asthma",              "label": "health_asthma"},
 ]
 
 FITNESS_LEVELS = [
-    {"value": "Beginner",     "label": "Beginner"},
-    {"value": "Intermediate", "label": "Intermediate"},
-    {"value": "Advanced",     "label": "Advanced"},
+    {"value": "Beginner",     "label": "fitness_beginner"},
+    {"value": "Intermediate", "label": "fitness_intermediate"},
+    {"value": "Advanced",     "label": "fitness_advanced"},
 ]
 
-DAYS_OF_WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+DAYS_OF_WEEK = [
+    {"value": "Sun", "label": "day_sun"},
+    {"value": "Mon", "label": "day_mon"},
+    {"value": "Tue", "label": "day_tue"},
+    {"value": "Wed", "label": "day_wed"},
+    {"value": "Thu", "label": "day_thu"},
+    {"value": "Fri", "label": "day_fri"},
+    {"value": "Sat", "label": "day_sat"},
+]
 
 
 def _decode(val: str | None) -> list:  # type: ignore[type-arg]

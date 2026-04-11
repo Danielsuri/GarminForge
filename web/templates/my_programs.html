@@ -11,18 +11,18 @@
   <div class="container-xl px-3 px-lg-4" style="position:relative;z-index:1;">
     <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
       <div>
-        <div class="koda-eyebrow">Training Architecture</div>
+        <div class="koda-eyebrow">{{ t("programs_eyebrow") }}</div>
         <h1 class="koda-page-title">{{ t("nav_programs") }}</h1>
       </div>
       <div class="d-flex align-items-center gap-3 flex-wrap">
         {% if programs %}
         <div class="koda-badge koda-badge--slate">
-          {{ programs|length }} {{ "program" if programs|length == 1 else "programs" }}
+          {{ programs|length }} {{ t("programs_count_singular") if programs|length == 1 else t("programs_count_plural") }}
         </div>
         {% endif %}
         <a href="{{ url_for('new_program_wizard') }}" class="btn-koda-primary"
            style="font-size:13px;padding:8px 16px;text-decoration:none;">
-          <span style="font-size:15px;">+</span>New Program
+          <span style="font-size:15px;">+</span>{{ t("programs_new") }}
         </a>
       </div>
     </div>

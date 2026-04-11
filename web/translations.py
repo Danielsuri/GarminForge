@@ -27,6 +27,11 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
 
         # --- Dashboard ---
         "dashboard_greeting":      "Good to see you, {name}. Build today\u2019s plan.",
+        "dashboard_build_plan":    "Build today\u2019s plan.",
+        "dashboard_stat_plans":    "Plans",
+        "dashboard_stat_completion": "Completion",
+        "dashboard_active_program": "Active Program",
+        "session_start":           "Start Session",
 
         # --- Generator form ---
         "form_build_workout":      "Build Your Workout",
@@ -136,6 +141,10 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "muscle_calves":     "calves",
 
         # --- My Plans ---
+        "plans_plan_singular":  "plan",
+        "plans_plan_plural":    "plans",
+        "plans_badge_program":  "Program",
+        "plans_badge_standalone": "Standalone",
         "plans_title":        "My Plans",
         "plans_generate_new": "Generate New",
         "plans_saved":        "Saved",
@@ -147,6 +156,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "plans_delete_error":   "Could not delete plan. Please try again.",
 
         # --- My Progress ---
+        "progress_eyebrow":     "Performance Tracking",
         "progress_title":       "My Progress",
         "progress_sessions":    "Sessions",
         "progress_completed":   "Completed",
@@ -164,6 +174,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "progress_generate_btn": "Generate a Workout",
 
         # --- Auth ---
+        "auth_new_account":     "New here?",
+        "auth_create_account":  "Create Account",
+        "auth_name_placeholder": "Your name",
         "auth_tagline":         "Structure your training. Push to Garmin Connect.",
         "auth_sign_in_heading": "Sign In",
         "auth_register_heading": "Create Account",
@@ -183,6 +196,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "auth_create_free":     "Create a free account",
         "auth_have_account":    "Already have an account?",
         "auth_sign_in_link":    "Sign in",
+
+        # --- Workout preview ---
+        "preview_play_btn":       "Start workout",
 
         # --- Workout editor ---
         "edit_drag_to_reorder":   "Drag to reorder",
@@ -211,6 +227,48 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
 
         # --- Navbar (profile) ---
         "nav_profile": "Profile",
+
+        # --- Questionnaire wizard ---
+        "q_step":               "Step",
+        "q_almost_there":       "Almost There",
+        "q_what_goal":          "What\u2019s your main goal?",
+        "q_how_old":            "How old are you?",
+        "q_fitness_level_q":    "What\u2019s your fitness level?",
+        "q_training_days":      "Which days do you prefer to train?",
+        "q_select_all":         "Select all that apply",
+        "q_equipment_q":        "What equipment do you have access to?",
+        "q_body_stats_title":   "Your body stats",
+        "q_body_stats_sub":     "Used to personalise your plan. Optional.",
+        "q_metric":             "Metric",
+        "q_imperial":           "Imperial",
+        "q_height":             "Height",
+        "q_weight":             "Weight",
+        "q_cm":                 "cm",
+        "q_kg":                 "kg",
+        "q_dietary_prefs":      "Any dietary preferences?",
+        "q_health_conds":       "Any health conditions we should know about?",
+        "q_plan_ready_title":   "Your plan is ready.",
+        "q_plan_ready_sub":     "Create a free account to unlock it.",
+        "q_google_btn":         "Continue with Google",
+        "q_signup_or":          "or",
+        "q_signup_email_label": "Email",
+        "q_signup_password_label": "Password",
+        "q_signup_chars":       "8+ characters",
+        "q_signup_create":      "Create account \u0026 start training",
+        "q_already_have":       "Already have an account?",
+        "q_login":              "Log in",
+        "q_already_registered": "Already registered?",
+        "q_btn_continue":       "Continue",
+        "q_btn_back":           "Back",
+        "q_btn_save":           "Save Profile",
+        "q_years":              "years",
+        "day_mon":              "Mon",
+        "day_tue":              "Tue",
+        "day_wed":              "Wed",
+        "day_thu":              "Thu",
+        "day_fri":              "Fri",
+        "day_sat":              "Sat",
+        "day_sun":              "Sun",
 
         # --- Questionnaire page ---
         "q_page_title_setup":   "Set Up Your Profile",
@@ -277,6 +335,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "fitness_advanced":    "Advanced",
 
         # --- Programs list page ---
+        "programs_eyebrow":            "Training Architecture",
+        "programs_count_singular":     "program",
+        "programs_count_plural":       "programs",
         "programs_title":              "My Programs",
         "programs_new":                "New Program",
         "programs_new_coming_soon":    "Program generation coming soon",
@@ -306,8 +367,10 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "programs_detail_done":        "Done",
         "programs_detail_no_sessions": "No sessions yet",
         "programs_detail_no_sessions_desc": "Sessions will appear here once program generation is available.",
+        "programs_no_exercises":       "No exercise data",
 
         # --- Profile page ---
+        "profile_heading":        "{name}\u2019s Profile",
         "profile_title":          "My Profile",
         "profile_retake":         "Retake Questionnaire",
         "profile_complete_q":     "Complete Questionnaire",
@@ -326,6 +389,23 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "profile_no_profile":     "No profile yet",
         "profile_no_profile_desc": "Complete the questionnaire so we can personalise your workouts.",
         "profile_take_q":         "Take the questionnaire",
+
+        # --- Session preview page ---
+        "session_completed_badge":    "Completed",
+        "session_schedule_for":       "Schedule for",
+        "session_go_dashboard":       "Go to dashboard",
+        "session_muscle_map":         "Muscle Map",
+        "session_muscle_primary":     "Primary",
+        "session_muscle_secondary":   "Secondary",
+        "session_coming_soon":        "Coming Soon",
+        "session_nutrition_title":    "Today\u2019s Nutrition",
+        "session_nutrition_desc":     "Personalised meal plan based on your goals.",
+        "session_more_exercises":     "more exercises",
+        "session_connect_session":    "Connect your Garmin account to upload this session.",
+        "session_rest_before":        "Rest ",
+        "session_rest_middle":        "s, then repeat from exercise 1 \u2014 ",
+        "session_rounds_suffix":      " rounds total",
+        "session_uploading":          "Uploading\u2026",
     },
 
     "he": {
@@ -342,6 +422,11 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
 
         # --- Dashboard ---
         "dashboard_greeting":      "\u05d8\u05d5\u05d1 \u05dc\u05e8\u05d0\u05d5\u05ea\u05da, {name}. \u05d1\u05e0\u05d4 \u05d0\u05ea \u05ea\u05d5\u05db\u05e0\u05d9\u05ea \u05d4\u05d9\u05d5\u05dd.",
+        "dashboard_build_plan":    "\u05d1\u05e0\u05d4 \u05d0\u05ea \u05ea\u05d5\u05db\u05e0\u05d9\u05ea \u05d4\u05d9\u05d5\u05dd.",
+        "dashboard_stat_plans":    "\u05ea\u05d5\u05db\u05e0\u05d9\u05d5\u05ea",
+        "dashboard_stat_completion": "\u05d0\u05d7\u05d5\u05d6 \u05d4\u05e9\u05dc\u05de\u05d4",
+        "dashboard_active_program": "\u05ea\u05d5\u05db\u05e0\u05d9\u05ea \u05e4\u05e2\u05d9\u05dc\u05d4",
+        "session_start":           "\u05d4\u05ea\u05d7\u05dc \u05d0\u05d9\u05de\u05d5\u05df",
 
         # --- Generator form ---
         "form_build_workout":      "\u05d1\u05e0\u05d4 \u05d0\u05d9\u05de\u05d5\u05df",
@@ -451,6 +536,10 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "muscle_calves":     "\u05e9\u05d5\u05e7\u05d9\u05d9\u05dd",
 
         # --- My Plans ---
+        "plans_plan_singular":  "\u05ea\u05d5\u05db\u05e0\u05d9\u05ea",
+        "plans_plan_plural":    "\u05ea\u05d5\u05db\u05e0\u05d9\u05d5\u05ea",
+        "plans_badge_program":  "\u05ea\u05d5\u05db\u05e0\u05d9\u05ea",
+        "plans_badge_standalone": "\u05e2\u05e6\u05de\u05d0\u05d9",
         "plans_title":        "\u05d4\u05ea\u05d5\u05db\u05e0\u05d9\u05d5\u05ea \u05e9\u05dc\u05d9",
         "plans_generate_new": "\u05e6\u05d5\u05e8 \u05d7\u05d3\u05e9",
         "plans_saved":        "\u05e0\u05e9\u05de\u05e8",
@@ -462,6 +551,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "plans_delete_error":   "\u05dc\u05d0 \u05e0\u05d9\u05ea\u05df \u05dc\u05de\u05d7\u05d5\u05e7 \u05ea\u05d5\u05db\u05e0\u05d9\u05ea. \u05e0\u05e1\u05d4 \u05e9\u05d5\u05d1.",
 
         # --- My Progress ---
+        "progress_eyebrow":     "\u05de\u05e2\u05e7\u05d1 \u05d1\u05d9\u05e6\u05d5\u05e2\u05d9\u05dd",
         "progress_title":       "\u05d4\u05d4\u05ea\u05e7\u05d3\u05de\u05d5\u05ea \u05e9\u05dc\u05d9",
         "progress_sessions":    "\u05d0\u05d9\u05de\u05d5\u05e0\u05d9\u05dd",
         "progress_completed":   "\u05d4\u05d5\u05e9\u05dc\u05de\u05d5",
@@ -479,6 +569,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "progress_generate_btn": "\u05e6\u05d5\u05e8 \u05d0\u05d9\u05de\u05d5\u05df",
 
         # --- Auth ---
+        "auth_new_account":     "\u05d7\u05d3\u05e9 \u05db\u05d0\u05df?",
+        "auth_create_account":  "\u05d9\u05e6\u05d9\u05e8\u05ea \u05d7\u05e9\u05d1\u05d5\u05df",
+        "auth_name_placeholder": "\u05e9\u05de\u05da",
         "auth_tagline":         "\u05e1\u05d3\u05e8 \u05d0\u05ea \u05d4\u05d4\u05db\u05e9\u05e8\u05d5\u05ea \u05e9\u05dc\u05da. \u05d3\u05d7\u05d5\u05e3 \u05dc-Garmin Connect.",
         "auth_sign_in_heading": "\u05db\u05e0\u05d9\u05e1\u05d4",
         "auth_register_heading": "\u05d9\u05e6\u05d9\u05e8\u05ea \u05d7\u05e9\u05d1\u05d5\u05df",
@@ -500,6 +593,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "auth_sign_in_link":    "\u05db\u05e0\u05d9\u05e1\u05d4",
 
         # --- Workout editor ---
+        "preview_play_btn":       "\u05d4\u05ea\u05d7\u05dc \u05d0\u05d9\u05de\u05d5\u05df",
         "edit_drag_to_reorder":   "\u05d2\u05e8\u05d5\u05e8 \u05dc\u05e1\u05d9\u05d3\u05d5\u05e8 \u05de\u05d7\u05d3\u05e9",
         "edit_replace":           "\u05d4\u05d7\u05dc\u05e4\u05d4",
         "edit_remove":            "\u05d4\u05e1\u05e8\u05d4",
@@ -528,6 +622,46 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "nav_profile": "\u05e4\u05e8\u05d5\u05e4\u05d9\u05dc",
 
         # --- Questionnaire page ---
+        "q_step":               "\u05e9\u05dc\u05d1",
+        "q_almost_there":       "\u05db\u05de\u05e2\u05d8 \u05e9\u05dd",
+        "q_what_goal":          "\u05de\u05d4 \u05d4\u05de\u05d8\u05e8\u05d4 \u05d4\u05e2\u05d9\u05e7\u05e8\u05d9\u05ea \u05e9\u05dc\u05da?",
+        "q_how_old":            "\u05d1\u05df \u05db\u05de\u05d4 \u05d0\u05ea\u05d4?",
+        "q_fitness_level_q":    "\u05de\u05d4 \u05e8\u05de\u05ea \u05d4\u05db\u05d5\u05e9\u05e8 \u05e9\u05dc\u05da?",
+        "q_training_days":      "\u05d0\u05d9\u05dc\u05d5 \u05d9\u05de\u05d9\u05dd \u05d0\u05ea\u05d4 \u05de\u05e2\u05d3\u05d9\u05e3 \u05dc\u05d4\u05ea\u05d0\u05de\u05df?",
+        "q_select_all":         "\u05d1\u05d7\u05e8 \u05d0\u05ea \u05db\u05dc \u05d4\u05de\u05ea\u05d0\u05d9\u05de\u05d9\u05dd",
+        "q_equipment_q":        "\u05dc\u05d0\u05d9\u05d6\u05d4 \u05e6\u05d9\u05d5\u05d3 \u05d9\u05e9 \u05dc\u05da \u05d2\u05d9\u05e9\u05d4?",
+        "q_body_stats_title":   "\u05e0\u05ea\u05d5\u05e0\u05d9 \u05d4\u05d2\u05d5\u05e3 \u05e9\u05dc\u05da",
+        "q_body_stats_sub":     "\u05dc\u05e9\u05d9\u05de\u05d5\u05e9 \u05d1\u05d4\u05ea\u05d0\u05de\u05ea \u05d4\u05ea\u05d5\u05db\u05e0\u05d9\u05ea. \u05d0\u05d5\u05e4\u05e6\u05d9\u05d5\u05e0\u05dc\u05d9.",
+        "q_metric":             "\u05de\u05d8\u05e8\u05d9",
+        "q_imperial":           "\u05d0\u05de\u05e4\u05e8\u05d9\u05d0\u05dc\u05d9",
+        "q_height":             "\u05d2\u05d5\u05d1\u05d4",
+        "q_weight":             "\u05de\u05e9\u05e7\u05dc",
+        "q_cm":                 "\u05e1\u05de",
+        "q_kg":                 "\u05e7\u05d2",
+        "q_dietary_prefs":      "\u05d9\u05e9 \u05dc\u05da \u05d4\u05e2\u05d3\u05e4\u05d5\u05ea \u05ea\u05d6\u05d5\u05e0\u05d4?",
+        "q_health_conds":       "\u05d9\u05e9 \u05de\u05e6\u05d1\u05d9\u05dd \u05d1\u05e8\u05d9\u05d0\u05d5\u05ea\u05d9\u05d9\u05dd \u05e9\u05db\u05d3\u05d0\u05d9 \u05dc\u05d3\u05e2\u05ea?",
+        "q_plan_ready_title":   "\u05d4\u05ea\u05d5\u05db\u05e0\u05d9\u05ea \u05e9\u05dc\u05da \u05de\u05d5\u05db\u05e0\u05d4.",
+        "q_plan_ready_sub":     "\u05e6\u05d5\u05e8 \u05d7\u05e9\u05d1\u05d5\u05df \u05d7\u05d9\u05e0\u05de\u05d9 \u05db\u05d3\u05d9 \u05dc\u05e4\u05ea\u05d5\u05d7 \u05d0\u05d5\u05ea\u05d4.",
+        "q_google_btn":         "\u05d4\u05de\u05e9\u05da \u05e2\u05dd Google",
+        "q_signup_or":          "\u05d0\u05d5",
+        "q_signup_email_label": "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc",
+        "q_signup_password_label": "\u05e1\u05d9\u05e1\u05de\u05d0",
+        "q_signup_chars":       "8+ \u05ea\u05d5\u05d5\u05d9\u05dd",
+        "q_signup_create":      "\u05e6\u05d5\u05e8 \u05d7\u05e9\u05d1\u05d5\u05df \u05d5\u05d4\u05ea\u05d7\u05dc \u05d0\u05d9\u05de\u05d5\u05df",
+        "q_already_have":       "\u05db\u05d1\u05e8 \u05d9\u05e9 \u05dc\u05da \u05d7\u05e9\u05d1\u05d5\u05df?",
+        "q_login":              "\u05db\u05e0\u05d9\u05e1\u05d4",
+        "q_already_registered": "\u05db\u05d1\u05e8 \u05e8\u05e9\u05d5\u05dd?",
+        "q_btn_continue":       "\u05d4\u05de\u05e9\u05da",
+        "q_btn_back":           "\u05d7\u05d6\u05d5\u05e8",
+        "q_btn_save":           "\u05e9\u05de\u05d5\u05e8 \u05e4\u05e8\u05d5\u05e4\u05d9\u05dc",
+        "q_years":              "\u05e9\u05e0\u05d9\u05dd",
+        "day_mon":              "\u05e9\u05e0\u05d9",
+        "day_tue":              "\u05e9\u05dc\u05d9\u05e9\u05d9",
+        "day_wed":              "\u05e8\u05d1\u05d9\u05e2\u05d9",
+        "day_thu":              "\u05d7\u05de\u05d9\u05e9\u05d9",
+        "day_fri":              "\u05e9\u05d9\u05e9\u05d9",
+        "day_sat":              "\u05e9\u05d1\u05ea",
+        "day_sun":              "\u05e8\u05d0\u05e9\u05d5\u05df",
         "q_page_title_setup":   "\u05d4\u05d2\u05d3\u05e8 \u05d0\u05ea \u05d4\u05e4\u05e8\u05d5\u05e4\u05d9\u05dc \u05e9\u05dc\u05da",
         "q_page_title_retake":  "\u05e2\u05d3\u05db\u05df \u05e4\u05e8\u05d5\u05e4\u05d9\u05dc",
         "q_section_about":      "\u05e2\u05dc\u05d9\u05da",
@@ -592,6 +726,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "fitness_advanced":    "\u05de\u05ea\u05e7\u05d3\u05dd",
 
         # --- Programs list page ---
+        "programs_eyebrow":            "\u05d0\u05d3\u05e8\u05d9\u05db\u05dc\u05ea \u05d0\u05d9\u05de\u05d5\u05df",
+        "programs_count_singular":     "\u05ea\u05d5\u05db\u05e0\u05d9\u05ea",
+        "programs_count_plural":       "\u05ea\u05d5\u05db\u05e0\u05d9\u05d5\u05ea",
         "programs_title":              "\u05d4\u05ea\u05d5\u05db\u05e0\u05d9\u05d5\u05ea \u05e9\u05dc\u05d9",
         "programs_new":                "\u05ea\u05d5\u05db\u05e0\u05d9\u05ea \u05d7\u05d3\u05e9\u05d4",
         "programs_new_coming_soon":    "\u05d9\u05e6\u05d9\u05e8\u05ea \u05ea\u05d5\u05db\u05e0\u05d9\u05d5\u05ea \u05d1\u05e7\u05e8\u05d5\u05d1",
@@ -621,8 +758,10 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "programs_detail_done":        "\u05d4\u05d5\u05e9\u05dc\u05dd",
         "programs_detail_no_sessions": "\u05d0\u05d9\u05df \u05d0\u05d9\u05de\u05d5\u05e0\u05d9\u05dd \u05e2\u05d3\u05d9\u05d9\u05df",
         "programs_detail_no_sessions_desc": "\u05d0\u05d9\u05de\u05d5\u05e0\u05d9\u05dd \u05d9\u05d5\u05e4\u05d9\u05e2\u05d5 \u05db\u05d0\u05df \u05db\u05d0\u05e9\u05e8 \u05d9\u05e6\u05d9\u05e8\u05ea \u05d4\u05ea\u05d5\u05db\u05e0\u05d9\u05d5\u05ea \u05ea\u05d4\u05d9\u05d4 \u05d6\u05de\u05d9\u05e0\u05d4.",
+        "programs_no_exercises":       "\u05d0\u05d9\u05df \u05e0\u05ea\u05d5\u05e0\u05d9 \u05ea\u05e8\u05d2\u05d9\u05dc\u05d9\u05dd",
 
         # --- Profile page ---
+        "profile_heading":        "\u05d4\u05e4\u05e8\u05d5\u05e4\u05d9\u05dc \u05e9\u05dc {name}",
         "profile_title":          "\u05d4\u05e4\u05e8\u05d5\u05e4\u05d9\u05dc \u05e9\u05dc\u05d9",
         "profile_retake":         "\u05de\u05dc\u05d0 \u05e9\u05d0\u05dc\u05d5\u05df \u05de\u05d7\u05d3\u05e9",
         "profile_complete_q":     "\u05de\u05dc\u05d0 \u05e9\u05d0\u05dc\u05d5\u05df",
@@ -641,6 +780,23 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "profile_no_profile":     "\u05d0\u05d9\u05df \u05e4\u05e8\u05d5\u05e4\u05d9\u05dc \u05e2\u05d3\u05d9\u05d9\u05df",
         "profile_no_profile_desc": "\u05de\u05dc\u05d0 \u05d0\u05ea \u05d4\u05e9\u05d0\u05dc\u05d5\u05df \u05db\u05d3\u05d9 \u05e9\u05e0\u05d5\u05db\u05dc \u05dc\u05d4\u05ea\u05d0\u05d9\u05dd \u05d0\u05ea \u05d4\u05d0\u05d9\u05de\u05d5\u05e0\u05d9\u05dd \u05e9\u05dc\u05da.",
         "profile_take_q":         "\u05de\u05dc\u05d0 \u05e9\u05d0\u05dc\u05d5\u05df",
+
+        # --- Session preview page ---
+        "session_completed_badge":    "\u05d4\u05d5\u05e9\u05dc\u05dd",
+        "session_schedule_for":       "\u05ea\u05d6\u05de\u05df \u05dc",
+        "session_go_dashboard":       "\u05dc\u05d3\u05e3 \u05d4\u05d1\u05d9\u05ea",
+        "session_muscle_map":         "\u05de\u05e4\u05ea \u05e9\u05e8\u05d9\u05e8\u05d9\u05dd",
+        "session_muscle_primary":     "\u05e8\u05d0\u05e9\u05d9",
+        "session_muscle_secondary":   "\u05de\u05e9\u05e0\u05d9",
+        "session_coming_soon":        "\u05d1\u05e7\u05e8\u05d5\u05d1",
+        "session_nutrition_title":    "\u05ea\u05d6\u05d5\u05e0\u05d4 \u05d4\u05d9\u05d5\u05dd",
+        "session_nutrition_desc":     "\u05ea\u05e4\u05e8\u05d9\u05d8 \u05d0\u05d9\u05e9\u05d9 \u05d1\u05d4\u05ea\u05d0\u05dd \u05dc\u05d9\u05e2\u05d3\u05d9\u05dd \u05e9\u05dc\u05da.",
+        "session_more_exercises":     "\u05ea\u05e8\u05d2\u05d9\u05dc\u05d9\u05dd \u05e0\u05d5\u05e1\u05e4\u05d9\u05dd",
+        "session_connect_session":    "\u05d7\u05d1\u05e8 \u05d0\u05ea \u05d7\u05e9\u05d1\u05d5\u05df Garmin \u05e9\u05dc\u05da \u05dc\u05d4\u05e2\u05dc\u05d0\u05ea \u05d4\u05d0\u05d9\u05de\u05d5\u05df.",
+        "session_rest_before":        "\u05de\u05e0\u05d5\u05d7\u05d4 ",
+        "session_rest_middle":        "\u05e9\u05e0\u05d9\u05d5\u05ea, \u05d5\u05d0\u05d6 \u05d7\u05d6\u05d5\u05e8 \u05dc\u05ea\u05e8\u05d2\u05d9\u05dc 1 \u2014 ",
+        "session_rounds_suffix":      " \u05e1\u05d9\u05d1\u05d5\u05d1\u05d9\u05dd \u05e1\u05da \u05d4\u05db\u05dc",
+        "session_uploading":          "\u05de\u05e2\u05dc\u05d4\u2026",
     },
 }
 
@@ -651,13 +807,13 @@ def t(key: str, lang: str = "en", **kwargs: str) -> str:
     return text.format(**kwargs) if kwargs else text
 
 
-def make_t(lang: str) -> Callable[[str], str]:
-    """Return a single-argument translate function bound to *lang*.
+def make_t(lang: str) -> Callable[..., str]:
+    """Return a translate function bound to *lang*.
 
     The returned callable is injected into Jinja2 template context as ``t``.
-    Templates call ``{{ t('key') }}`` — no ``lang`` argument needed.
-    For dynamic substitutions templates use Jinja2 string concatenation directly.
+    Templates call ``{{ t('key') }}`` or ``{{ t('key', name=value) }}`` for
+    strings with ``{name}`` placeholders.
     """
-    def _t(key: str) -> str:
-        return t(key, lang)
+    def _t(key: str, **kwargs: str) -> str:
+        return t(key, lang, **kwargs)
     return _t

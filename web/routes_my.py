@@ -90,7 +90,7 @@ def _decode_json_field(val: str | None) -> list[Any]:
 
 
 @router.get("/questionnaire")
-async def questionnaire_redirect_get(request: Request):
+async def questionnaire_page(request: Request):
     return RedirectResponse("/onboarding", status_code=301)
 
 
