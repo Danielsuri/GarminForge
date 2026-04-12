@@ -372,7 +372,11 @@ async def rank_feedback(
     delta = _RANK_DELTAS[key]
 
     if body.session_id is not None:
-        session_exists = db.get(WorkoutSession, body.session_id)
+        session_exists = (
+            db.query(WorkoutSession)
+            .filter_by(id=body.session_id, user_id=user.id)
+            .first()
+        )
         if session_exists is None:
             raise HTTPException(status_code=400, detail="session_id not found")
 
