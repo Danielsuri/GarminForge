@@ -584,8 +584,22 @@ async def workout_generate(
     if duration < 15 or duration > 120:
         return _error_redirect(request, "Duration must be between 15 and 120 minutes.")
 
+    # Gather user profile for personalised generation
+    fitness_rank: float | None = None
+    health_conditions: list[str] = []
+    forge_user = get_current_user(request, db)
+    if forge_user is not None:
+        fitness_rank = forge_user.fitness_rank
+        health_conditions = json.loads(forge_user.health_conditions_json or "[]")
+
     try:
-        plan = generate(equipment=equipment, goal=goal, duration_minutes=duration)
+        plan = generate(
+            equipment=equipment,
+            goal=goal,
+            duration_minutes=duration,
+            fitness_rank=fitness_rank,
+            health_conditions=health_conditions or None,
+        )
     except Exception as exc:
         logger.exception("Workout generation failed")
         return _error_redirect(request, f"Generation error: {exc}")
