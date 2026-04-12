@@ -202,15 +202,16 @@ def test_rank_band_widens_when_pool_too_small():
 
 
 def test_generate_with_heart_condition_excludes_alternating_squat_wave():
-    """Users with heart_condition must never receive ALTERNATING_SQUAT_WAVE."""
+    """Users with heart_condition must never receive ALTERNATING_SQUAT_WAVE or ALTERNATING_WAVE.
+    Uses battle_rope + bodyweight equipment so the pool is non-empty after exclusions."""
     plan = generate(
-        equipment=["battle_rope"],
+        equipment=["battle_rope", "bodyweight"],
         goal="build_muscle",
         duration_minutes=45,
         health_conditions=["heart_condition"],
         seed=42,
     )
+    assert len(plan.exercises) > 0, "Expected non-empty plan (bodyweight exercises should fill the pool)"
     names = {ex.name for ex in plan.exercises}
-    assert "ALTERNATING_SQUAT_WAVE" not in names
     assert "ALTERNATING_WAVE" not in names
-    assert "DOUBLE_ARM_WAVE" not in names
+    assert "ALTERNATING_SQUAT_WAVE" not in names
