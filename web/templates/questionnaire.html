@@ -89,6 +89,9 @@
 .wopts--grid .wopt { font-size: 13px; padding: 10px 12px; }
 .wopt:has(input:checked) { border-color: #7c3aed; background: #7c3aed18; color: #fff; }
 .wopt input { display: none; }
+.wopt--with-desc { flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 14px; }
+.wopt-title      { font-weight: 600; font-size: 14px; }
+.wopt-desc       { font-size: 12px; color: var(--text-secondary, #888); line-height: 1.4; }
 
 /* ── Equipment tag cloud (existing) ───────────────────────────── */
 .wtags { display: flex; flex-wrap: wrap; gap: 7px; }
@@ -219,12 +222,13 @@
     <div class="wcard" id="card2">
       <div class="wcard-label">{{ t("q_step") }} 3</div>
       <div class="wcard-title">{{ t("q_fitness_level_q") }}</div>
-      <div class="wopts wopts--row">
+      <div class="wopts wopts--col">
         {% for lvl in fitness_levels %}
-        <label class="wopt">
+        <label class="wopt wopt--with-desc">
           <input type="radio" name="fitness_level_pick" value="{{ lvl.value }}"
             {% if lvl.value == existing_fitness_level %}checked{% endif %}>
-          {{ t(lvl.label) }}
+          <span class="wopt-title">{{ t(lvl.label) }}</span>
+          <span class="wopt-desc">{{ t(lvl.desc) }}</span>
         </label>
         {% endfor %}
       </div>

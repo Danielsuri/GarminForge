@@ -333,6 +333,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "fitness_beginner":    "Beginner",
         "fitness_intermediate": "Intermediate",
         "fitness_advanced":    "Advanced",
+        "fitness_beginner_desc":    "New to exercise, or returning after a long break. Working out less than 2× / week.",
+        "fitness_intermediate_desc": "Working out regularly, 2–4× / week for at least 6 months.",
+        "fitness_advanced_desc":    "Training consistently 4+ times per week. Comfortable with compound lifts and free weights.",
 
         # --- Programs list page ---
         "programs_eyebrow":            "Training Architecture",
@@ -724,6 +727,9 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "fitness_beginner":    "\u05de\u05ea\u05d7\u05d9\u05dc",
         "fitness_intermediate": "\u05d1\u05d9\u05e0\u05d5\u05e0\u05d9",
         "fitness_advanced":    "\u05de\u05ea\u05e7\u05d3\u05dd",
+        "fitness_beginner_desc":    "New to exercise, or returning after a long break. Working out less than 2× / week.",
+        "fitness_intermediate_desc": "Working out regularly, 2–4× / week for at least 6 months.",
+        "fitness_advanced_desc":    "Training consistently 4+ times per week. Comfortable with compound lifts and free weights.",
 
         # --- Programs list page ---
         "programs_eyebrow":            "\u05d0\u05d3\u05e8\u05d9\u05db\u05dc\u05ea \u05d0\u05d9\u05de\u05d5\u05df",

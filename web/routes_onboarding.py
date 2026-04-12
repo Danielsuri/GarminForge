@@ -56,9 +56,9 @@ HEALTH_OPTIONS = [
 ]
 
 FITNESS_LEVELS = [
-    {"value": "Beginner",     "label": "fitness_beginner"},
-    {"value": "Intermediate", "label": "fitness_intermediate"},
-    {"value": "Advanced",     "label": "fitness_advanced"},
+    {"value": "Beginner",     "label": "fitness_beginner",     "desc": "fitness_beginner_desc"},
+    {"value": "Intermediate", "label": "fitness_intermediate", "desc": "fitness_intermediate_desc"},
+    {"value": "Advanced",     "label": "fitness_advanced",     "desc": "fitness_advanced_desc"},
 ]
 
 DAYS_OF_WEEK = [
