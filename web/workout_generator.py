@@ -367,10 +367,37 @@ _POOL: list[_ExTemplate] = [
 # ---------------------------------------------------------------------------
 
 # Desired muscle group order for a full-body session
-_FULL_BODY_ORDER = ["squat", "push", "hinge", "pull", "lunge", "core", "arms_bi", "arms_tri", "shoulders"]
+_FULL_BODY_ORDER = ["squat", "push", "hinge", "pull", "total_body", "lunge", "core", "arms_bi", "arms_tri", "shoulders"]
 
 # Tags that count as "compound" for strength/burn goals
 _COMPOUND_TAGS = {"compound", "total_body"}
+
+# ---------------------------------------------------------------------------
+# Health-condition exercise exclusions
+# Keys match exact DB values stored in User.health_conditions_json
+# ---------------------------------------------------------------------------
+_HEALTH_EXCLUSIONS: dict[str, set[str]] = {
+    "joint_problems": {
+        "BOX_JUMP", "JUMP_SQUAT", "BODY_WEIGHT_JUMP_SQUAT",
+        "ALTERNATING_JUMP_LUNGE", "DEPTH_JUMP", "LATERAL_PLYO_SQUATS",
+        "BURPEE", "PLYOMETRIC_PUSH_UP",
+    },
+    "back_pain": {
+        "BARBELL_DEADLIFT", "SUMO_DEADLIFT", "STIFF_LEG_DEADLIFT",
+        "GOOD_MORNING", "BACK_EXTENSION", "REVERSE_HYPEREXTENSION",
+    },
+    "heart_condition": {
+        "BATTLE_ROPE", "ALTERNATING_WAVE", "DOUBLE_ARM_WAVE",
+        "BURPEE", "JUMP_SQUAT",
+    },
+    "asthma": {
+        "BATTLE_ROPE", "ALTERNATING_WAVE", "DOUBLE_ARM_WAVE",
+    },
+    "high_blood_pressure": {
+        "BARBELL_DEADLIFT", "BARBELL_BACK_SQUAT", "CLEAN", "POWER_CLEAN",
+    },
+    "diabetes": set(),  # no movement exclusions
+}
 
 
 def _available(
@@ -524,6 +551,8 @@ def _generate_session(
     duration_minutes: int,
     *,
     muscle_groups: list[str] | None = None,
+    fitness_rank: float | None = None,
+    health_conditions: list[str] | None = None,
     override_sets: int | None = None,
     override_reps: int | None = None,
     override_rest: int | None = None,
@@ -543,6 +572,12 @@ def _generate_session(
     muscle_groups:
         When provided, restricts exercise selection to these muscle groups.
         Pass ``None`` to allow all muscle groups (default).
+    fitness_rank:
+        User's current fitness rank (1.0–10.0). Exercises are biased toward
+        this difficulty. When ``None``, the full pool is used.
+    health_conditions:
+        List of condition strings from User.health_conditions_json.
+        Exercises in ``_HEALTH_EXCLUSIONS`` for each condition are removed.
     override_sets:
         Override the sets count from ``GOALS``. Pass ``None`` to use goal default.
     override_reps:
@@ -564,11 +599,30 @@ def _generate_session(
 
     # --- exercise selection -------------------------------------------------
     eq = equipment if equipment else ["bodyweight"]
+    num = _num_exercises(duration_minutes, goal)
+
+    # 1. Filter by equipment
     available = _available(eq, muscle_groups=muscle_groups)
     if not available:
         # Muscle group filter too narrow — fall back to full equipment pool
         available = _available(eq)
-    num       = _num_exercises(duration_minutes, goal)
+
+    # 2. Apply health-condition hard exclusions
+    if health_conditions:
+        excluded_names: set[str] = set()
+        for condition in health_conditions:
+            excluded_names |= _HEALTH_EXCLUSIONS.get(condition, set())
+        available = [ex for ex in available if ex.name not in excluded_names]
+
+    # 3. Apply rank band (exercises within ±2 of fitness_rank, widen if needed)
+    if fitness_rank is not None:
+        for band in (2, 3, 4):
+            band_pool = [ex for ex in available if abs(ex.difficulty - fitness_rank) <= band]
+            if len(band_pool) >= num:
+                available = band_pool
+                break
+        # If still short after band=4, keep full available pool (already set above)
+
     templates = _select_exercises(available, num, goal)
 
     # For timed exercises (plank, etc.), convert reps to duration
@@ -680,6 +734,8 @@ def generate(
     goal: str,
     duration_minutes: int,
     *,
+    fitness_rank: float | None = None,
+    health_conditions: list[str] | None = None,
     seed: int | None = None,
 ) -> WorkoutPlan:
     """Generate a balanced workout.
@@ -692,13 +748,26 @@ def generate(
         One of the ``GOALS`` keys.
     duration_minutes:
         Total session length including warmup/cooldown.
+    fitness_rank:
+        User's current fitness rank (1.0–10.0). Exercises are biased toward
+        this difficulty. When ``None``, the full pool is used.
+    health_conditions:
+        List of condition strings from User.health_conditions_json.
+        Exercises in ``_HEALTH_EXCLUSIONS`` for each condition are removed.
     seed:
         Optional random seed for reproducible generation.
     """
     if goal not in GOALS:
         raise ValueError(f"Unknown goal {goal!r}. Choose from: {list(GOALS)}")
 
-    return _generate_session(equipment, goal, duration_minutes, seed=seed)
+    return _generate_session(
+        equipment,
+        goal,
+        duration_minutes,
+        fitness_rank=fitness_rank,
+        health_conditions=health_conditions,
+        seed=seed,
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -92,3 +92,80 @@ def test_all_pool_exercises_have_difficulty():
     for ex in _POOL:
         assert hasattr(ex, "difficulty"), f"{ex.name} missing difficulty"
         assert 1 <= ex.difficulty <= 10, f"{ex.name} difficulty {ex.difficulty} out of range"
+
+
+from web.workout_generator import generate, _HEALTH_EXCLUSIONS
+
+
+def test_health_exclusions_dict_exists():
+    assert "joint_problems" in _HEALTH_EXCLUSIONS
+    assert "back_pain" in _HEALTH_EXCLUSIONS
+    assert "heart_condition" in _HEALTH_EXCLUSIONS
+
+
+def test_joint_problems_excludes_box_jump():
+    excluded = _HEALTH_EXCLUSIONS["joint_problems"]
+    assert "BOX_JUMP" in excluded
+    assert "JUMP_SQUAT" in excluded
+    assert "BURPEE" in excluded
+
+
+def test_back_pain_excludes_deadlift():
+    excluded = _HEALTH_EXCLUSIONS["back_pain"]
+    assert "BARBELL_DEADLIFT" in excluded
+    assert "GOOD_MORNING" in excluded
+
+
+def test_generate_with_joint_problems_has_no_box_jump():
+    plan = generate(
+        equipment=["bodyweight", "box"],
+        goal="general_fitness",
+        duration_minutes=45,
+        health_conditions=["joint_problems"],
+        seed=42,
+    )
+    names = [ex.name for ex in plan.exercises]
+    assert "BOX_JUMP" not in names
+    assert "JUMP_SQUAT" not in names
+
+
+def test_generate_with_rank_band_stays_within_range():
+    plan = generate(
+        equipment=["bodyweight", "dumbbell", "barbell", "cable", "machine"],
+        goal="general_fitness",
+        duration_minutes=45,
+        fitness_rank=3.0,
+        seed=42,
+    )
+    # All exercises must be within rank ± 4 (widest fallback band)
+    for ex in plan.exercises:
+        pool_ex = next(p for p in _POOL if p.name == ex.name)
+        assert abs(pool_ex.difficulty - 3.0) <= 4, (
+            f"{ex.name} difficulty {pool_ex.difficulty} too far from rank 3.0"
+        )
+
+
+def test_generate_without_rank_uses_full_pool():
+    plan = generate(
+        equipment=["bodyweight"],
+        goal="general_fitness",
+        duration_minutes=45,
+        seed=42,
+    )
+    assert len(plan.exercises) > 0
+
+
+def test_generate_no_health_conditions_allows_box_jump():
+    # Without conditions, high-impact exercises can appear
+    found = False
+    for seed in range(50):
+        plan = generate(
+            equipment=["bodyweight", "box"],
+            goal="general_fitness",
+            duration_minutes=45,
+            seed=seed,
+        )
+        if any(ex.name == "BOX_JUMP" for ex in plan.exercises):
+            found = True
+            break
+    assert found, "BOX_JUMP never appeared without health restrictions (check equipment filter)"
