@@ -366,6 +366,16 @@
           </button>
         </div>
 
+        {# Mid-workout difficulty feedback #}
+        <div class="d-flex gap-2 mt-1" id="midWorkoutFeedback" style="opacity:.6;">
+          <button type="button" class="btn btn-sm btn-outline-warning px-3" id="midTooEasyBtn">
+            <i class="bi bi-chevron-double-up me-1"></i>Too easy
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-danger px-3" id="midTooHardBtn">
+            <i class="bi bi-chevron-double-down me-1"></i>Too hard
+          </button>
+        </div>
+
       </div>
     </div>
   </div>
@@ -1234,12 +1244,49 @@ document.getElementById('playerSkipBtn').addEventListener('click', () => {
   playerAdvance();
 });
 
+// ── Mid-workout difficulty feedback ──────────────────────────────────
+let midFeedbackUsed = false;
+
+function applyMidWorkoutRepScale(factor) {
+  if (midFeedbackUsed) return;
+  midFeedbackUsed = true;
+
+  document.getElementById('midTooEasyBtn').disabled = true;
+  document.getElementById('midTooHardBtn').disabled = true;
+  document.getElementById('midWorkoutFeedback').style.opacity = '0.3';
+
+  // Scale reps for all remaining exercise steps (from playerIndex+1 onward)
+  for (let i = playerIndex + 1; i < playerQueue.length; i++) {
+    const step = playerQueue[i];
+    if (step.type === 'exercise' && step.ex && step.ex.reps) {
+      step.ex.reps = Math.max(1, Math.round(step.ex.reps * factor));
+    }
+  }
+
+  fetch('/my/rank-feedback', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      trigger: 'mid_workout',
+      feedback: factor > 1 ? 'too_easy' : 'too_hard',
+    }),
+  }).catch(() => {}); // fire-and-forget
+}
+
+document.getElementById('midTooEasyBtn').addEventListener('click', () => applyMidWorkoutRepScale(1.2));
+document.getElementById('midTooHardBtn').addEventListener('click', () => applyMidWorkoutRepScale(0.8));
+
 // ── Teardown on any modal close (backdrop, Escape, or close button) ───
 document.getElementById('workoutPlayerModal').addEventListener('hide.bs.modal', () => {
   clearInterval(playerInterval);
   playerInterval = null;
   playerReleaseWakeLock();
   if (window.speechSynthesis) window.speechSynthesis.cancel();
+  document.getElementById('midWorkoutFeedback').style.display  = 'flex';
+  document.getElementById('midWorkoutFeedback').style.opacity  = '0.6';
+  document.getElementById('midTooEasyBtn').disabled = false;
+  document.getElementById('midTooHardBtn').disabled = false;
+  midFeedbackUsed = false;
 });
 
 // ── Launch ────────────────────────────────────────────────────────────
@@ -1253,6 +1300,11 @@ document.getElementById('playBtn').addEventListener('click', () => {
   document.getElementById('playerPauseIcon').className   = 'bi bi-pause-fill';
   document.getElementById('playerPauseLabel').textContent = 'Pause';
   document.getElementById('playerSkipBtn').disabled       = false;
+
+  midFeedbackUsed = false;
+  document.getElementById('midTooEasyBtn').disabled = false;
+  document.getElementById('midTooHardBtn').disabled = false;
+  document.getElementById('midWorkoutFeedback').style.opacity = '0.6';
 
   playerAcquireWakeLock();
   bootstrap.Modal.getOrCreateInstance(
