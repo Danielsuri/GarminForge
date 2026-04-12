@@ -90,6 +90,25 @@ def _parse_float(val: str | None) -> float | None:
         return None
 
 
+_FITNESS_RANK_BASE: dict[str, float] = {
+    "beginner":     2.0,
+    "intermediate": 5.0,
+    "advanced":     8.0,
+}
+
+
+def compute_initial_rank(
+    fitness_level: str | None,
+    age_range: str | None,
+    health_conditions: list[str],
+) -> float:
+    """Compute the starting fitness rank (1.0–10.0) from questionnaire answers."""
+    base = _FITNESS_RANK_BASE.get((fitness_level or "").lower(), 3.0)
+    age_penalty = -1.0 if age_range == "50+" else 0.0
+    health_penalty = -0.5 if health_conditions else 0.0
+    return max(1.0, min(10.0, base + age_penalty + health_penalty))
+
+
 def _apply_answers(user: User, answers: dict) -> None:  # type: ignore[type-arg]
     """Write parsed questionnaire answers onto a User ORM object (does not commit)."""
     user.fitness_goals_json = answers.get("fitness_goals_json")            # type: ignore[assignment]
@@ -101,6 +120,12 @@ def _apply_answers(user: User, answers: dict) -> None:  # type: ignore[type-arg]
     user.weight_kg = answers.get("weight_kg")                               # type: ignore[assignment]
     user.diet_json = answers.get("diet_json")                               # type: ignore[assignment]
     user.health_conditions_json = answers.get("health_conditions_json")     # type: ignore[assignment]
+
+    # Compute fitness rank from questionnaire (always recompute on questionnaire save/retake)
+    _conditions = json.loads(user.health_conditions_json or "[]")
+    user.fitness_rank = compute_initial_rank(  # type: ignore[assignment]
+        user.fitness_level, user.age_range, _conditions
+    )
 
 
 def _questionnaire_context(user: User | None, pending: dict) -> dict:  # type: ignore[type-arg]

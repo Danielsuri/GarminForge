@@ -43,3 +43,43 @@ def test_rank_feedback_stores_delta(db):
     assert rf.rank_after == 3.5
     assert rf.trigger == "post_workout"
     assert rf.feedback == "too_easy"
+
+
+from web.routes_onboarding import compute_initial_rank
+
+
+def test_beginner_gets_low_rank():
+    assert compute_initial_rank("Beginner", "18-29", []) == 2.0
+
+
+def test_intermediate_base():
+    assert compute_initial_rank("Intermediate", "30-39", []) == 5.0
+
+
+def test_advanced_base():
+    assert compute_initial_rank("Advanced", "40-49", []) == 8.0
+
+
+def test_50_plus_penalty():
+    assert compute_initial_rank("Intermediate", "50+", []) == 4.0
+
+
+def test_health_penalty():
+    assert compute_initial_rank("Intermediate", "30-39", ["joint_problems"]) == 4.5
+
+
+def test_50_plus_beginner_with_health():
+    # 2.0 - 1.0 - 0.5 = 0.5, clamped to 1.0
+    assert compute_initial_rank("Beginner", "50+", ["back_pain"]) == 1.0
+
+
+def test_advanced_no_penalty():
+    assert compute_initial_rank("Advanced", "18-29", []) == 8.0
+
+
+def test_none_fitness_level_falls_back():
+    assert compute_initial_rank(None, None, []) == 3.0
+
+
+def test_rank_clamped_at_10():
+    assert compute_initial_rank("Advanced", "18-29", []) <= 10.0
