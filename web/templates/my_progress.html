@@ -143,6 +143,21 @@
               {% endif %}
             </td>
           </tr>
+          {% if s.id not in rated_session_ids %}
+          <tr id="feedback-row-{{ s.id }}">
+            <td colspan="5" style="padding:4px 20px 12px;">
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span style="font-size:12px;color:var(--text-muted);">How did it feel?</span>
+                <button class="btn btn-sm btn-outline-warning py-0 px-2"
+                        onclick="submitProgressFeedback('{{ s.id }}','too_easy',this)">Too easy</button>
+                <button class="btn btn-sm btn-outline-success py-0 px-2"
+                        onclick="submitProgressFeedback('{{ s.id }}','just_right',this)">Just right</button>
+                <button class="btn btn-sm btn-outline-danger py-0 px-2"
+                        onclick="submitProgressFeedback('{{ s.id }}','too_hard',this)">Too hard</button>
+              </div>
+            </td>
+          </tr>
+          {% endif %}
           {% endfor %}
         </tbody>
       </table>
@@ -185,5 +200,18 @@
   showQuote();
   setInterval(showQuote, 6000);
 })();
+
+function submitProgressFeedback(sessionId, feedback, btn) {
+  const row = document.getElementById('feedback-row-' + sessionId);
+  row.querySelectorAll('button').forEach(b => b.disabled = true);
+
+  fetch('/my/rank-feedback', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ trigger: 'post_workout', feedback, session_id: sessionId }),
+  })
+  .then(() => { row.style.display = 'none'; })
+  .catch(() => { row.querySelectorAll('button').forEach(b => b.disabled = false); });
+}
 </script>
 {% endblock %}

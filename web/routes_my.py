@@ -273,7 +273,23 @@ async def my_progress(request: Request, db: Session = Depends(get_db)):
         .limit(100)
         .all()
     )
-    return render_template("my_progress.html", request, db=db, sessions=sessions)
+    rated_session_ids: set[str] = {
+        rf.session_id
+        for rf in db.query(RankFeedback)
+        .filter(
+            RankFeedback.user_id == user.id,
+            RankFeedback.trigger == "post_workout",
+            RankFeedback.session_id.isnot(None),
+        )
+        .all()
+    }
+    return render_template(
+        "my_progress.html",
+        request,
+        db=db,
+        sessions=sessions,
+        rated_session_ids=rated_session_ids,
+    )
 
 
 @router.post("/sessions")
