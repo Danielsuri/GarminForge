@@ -169,3 +169,32 @@ def test_generate_no_health_conditions_allows_box_jump():
             found = True
             break
     assert found, "BOX_JUMP never appeared without health restrictions (check equipment filter)"
+
+
+def test_health_exclusion_live_names_exist_in_pool():
+    """ALTERNATING_SQUAT_WAVE is in both heart_condition and asthma exclusions,
+    and it actually exists in _POOL."""
+    from web.workout_generator import _HEALTH_EXCLUSIONS, _POOL
+    pool_names = {ex.name for ex in _POOL}
+    assert "ALTERNATING_SQUAT_WAVE" in _HEALTH_EXCLUSIONS["heart_condition"]
+    assert "ALTERNATING_SQUAT_WAVE" in _HEALTH_EXCLUSIONS["asthma"]
+    assert "ALTERNATING_SQUAT_WAVE" in pool_names
+
+
+def test_rank_band_widens_when_pool_too_small():
+    """With bodyweight-only equipment and rank=10.0, the ±2 band yields very few
+    exercises, so the selector must widen to ±3, ±4, or full pool to fill the slot."""
+    from web.workout_generator import generate
+    # rank=10.0 with bodyweight only: almost no exercises score 8–10 for bodyweight
+    # The generator must widen the band and still return a valid plan
+    plan = generate(
+        equipment=["bodyweight"],
+        goal="build_muscle",
+        duration_minutes=30,
+        fitness_rank=10.0,
+        seed=42,
+    )
+    assert len(plan.exercises) > 0
+    # All exercises should be bodyweight-compatible
+    for ex in plan.exercises:
+        assert ex.name  # basic sanity

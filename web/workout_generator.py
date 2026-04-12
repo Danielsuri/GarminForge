@@ -378,23 +378,35 @@ _COMPOUND_TAGS = {"compound", "total_body"}
 # ---------------------------------------------------------------------------
 _HEALTH_EXCLUSIONS: dict[str, set[str]] = {
     "joint_problems": {
-        "BOX_JUMP", "JUMP_SQUAT", "BODY_WEIGHT_JUMP_SQUAT",
-        "ALTERNATING_JUMP_LUNGE", "DEPTH_JUMP", "LATERAL_PLYO_SQUATS",
-        "BURPEE", "PLYOMETRIC_PUSH_UP",
+        "BOX_JUMP", "JUMP_SQUAT",
+        "BODY_WEIGHT_JUMP_SQUAT",  # not currently in pool
+        "ALTERNATING_JUMP_LUNGE",
+        "DEPTH_JUMP",              # not currently in pool
+        "LATERAL_PLYO_SQUATS",     # not currently in pool
+        "BURPEE",
+        "PLYOMETRIC_PUSH_UP",      # not currently in pool
     },
     "back_pain": {
-        "BARBELL_DEADLIFT", "SUMO_DEADLIFT", "STIFF_LEG_DEADLIFT",
-        "GOOD_MORNING", "BACK_EXTENSION", "REVERSE_HYPEREXTENSION",
+        "BARBELL_DEADLIFT", "SUMO_DEADLIFT",
+        "STIFF_LEG_DEADLIFT",      # not currently in pool
+        "GOOD_MORNING", "BACK_EXTENSION",
+        "REVERSE_HYPEREXTENSION",  # not currently in pool
     },
     "heart_condition": {
-        "BATTLE_ROPE", "ALTERNATING_WAVE", "DOUBLE_ARM_WAVE",
+        "BATTLE_ROPE",             # not currently in pool
+        "ALTERNATING_WAVE", "ALTERNATING_SQUAT_WAVE",
+        "DOUBLE_ARM_WAVE",         # not currently in pool
         "BURPEE", "JUMP_SQUAT",
     },
     "asthma": {
-        "BATTLE_ROPE", "ALTERNATING_WAVE", "DOUBLE_ARM_WAVE",
+        "BATTLE_ROPE",             # not currently in pool
+        "ALTERNATING_WAVE", "ALTERNATING_SQUAT_WAVE",
+        "DOUBLE_ARM_WAVE",         # not currently in pool
     },
     "high_blood_pressure": {
-        "BARBELL_DEADLIFT", "BARBELL_BACK_SQUAT", "CLEAN", "POWER_CLEAN",
+        "BARBELL_DEADLIFT", "BARBELL_BACK_SQUAT",
+        "CLEAN",                   # not currently in pool
+        "POWER_CLEAN",             # not currently in pool
     },
     "diabetes": set(),  # no movement exclusions
 }
