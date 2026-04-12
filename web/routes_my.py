@@ -13,7 +13,7 @@ import dataclasses
 import json
 import logging
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
@@ -334,8 +334,8 @@ _RANK_DELTAS: dict[tuple[str, str], float] = {
 
 
 class RankFeedbackRequest(BaseModel):
-    trigger: str
-    feedback: str
+    trigger: Literal["mid_workout", "post_workout"]
+    feedback: Literal["too_easy", "just_right", "too_hard"]
     session_id: str | None = None
 
 
@@ -344,20 +344,26 @@ async def rank_feedback(
     body: RankFeedbackRequest,
     request: Request,
     db: Session = Depends(get_db),
-):
+) -> dict[str, float]:
     user = _require_user(request, db)
     if user is None:
-        return RedirectResponse("/auth/login-forge", status_code=303)
+        raise HTTPException(status_code=401, detail="Not authenticated")
 
     key = (body.trigger, body.feedback)
     if key not in _RANK_DELTAS:
-        raise HTTPException(status_code=400, detail=f"Invalid trigger/feedback: {key}")
+        raise HTTPException(status_code=400, detail="'just_right' feedback is only valid for post_workout")
 
     delta = _RANK_DELTAS[key]
+
+    if body.session_id is not None:
+        session_exists = db.get(WorkoutSession, body.session_id)
+        if session_exists is None:
+            raise HTTPException(status_code=400, detail="session_id not found")
+
     rank_before = user.fitness_rank if user.fitness_rank is not None else 3.0
     rank_after = max(1.0, min(10.0, rank_before + delta))
 
-    user.fitness_rank = rank_after  # type: ignore[assignment]
+    user.fitness_rank = rank_after
 
     rf = RankFeedback(
         user_id=user.id,

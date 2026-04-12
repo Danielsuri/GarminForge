@@ -278,6 +278,13 @@ def _make_test_client(fitness_rank: float):
     return client, user_id, SessionLocal, _routes_my, _original
 
 
+def _cleanup_test_client(original_require_user):
+    """Restore patched state after a test."""
+    import web.routes_my as _rm
+    _rm._require_user = original_require_user
+    app.dependency_overrides.pop(get_db, None)
+
+
 def test_rank_feedback_too_easy_post_increases_rank():
     client, user_id, SL, routes_my, orig = _make_test_client(3.0)
     try:
@@ -287,13 +294,11 @@ def test_rank_feedback_too_easy_post_increases_rank():
         assert data["rank_before"] == 3.0
         assert data["rank_after"] == 3.5
         db = SL()
-        from web.models import User as _U
-        u = db.get(_U, user_id)
+        u = db.get(User, user_id)
         assert u.fitness_rank == 3.5
         db.close()
     finally:
-        routes_my._require_user = orig
-        app.dependency_overrides.pop(get_db, None)
+        _cleanup_test_client(orig)
 
 
 def test_rank_feedback_too_hard_post_decreases_rank():
@@ -303,8 +308,7 @@ def test_rank_feedback_too_hard_post_decreases_rank():
         assert resp.status_code == 200
         assert resp.json()["rank_after"] == 4.5
     finally:
-        routes_my._require_user = orig
-        app.dependency_overrides.pop(get_db, None)
+        _cleanup_test_client(orig)
 
 
 def test_rank_feedback_just_right_no_change():
@@ -314,8 +318,7 @@ def test_rank_feedback_just_right_no_change():
         assert resp.status_code == 200
         assert resp.json()["rank_after"] == 5.0
     finally:
-        routes_my._require_user = orig
-        app.dependency_overrides.pop(get_db, None)
+        _cleanup_test_client(orig)
 
 
 def test_rank_feedback_mid_workout_too_easy():
@@ -323,11 +326,9 @@ def test_rank_feedback_mid_workout_too_easy():
     try:
         resp = client.patch("/my/rank-feedback", json={"trigger": "mid_workout", "feedback": "too_easy"})
         assert resp.status_code == 200
-        import pytest as _pytest
-        assert resp.json()["rank_after"] == _pytest.approx(5.1)
+        assert resp.json()["rank_after"] == pytest.approx(5.1)
     finally:
-        routes_my._require_user = orig
-        app.dependency_overrides.pop(get_db, None)
+        _cleanup_test_client(orig)
 
 
 def test_rank_feedback_clamped_at_max():
@@ -337,8 +338,7 @@ def test_rank_feedback_clamped_at_max():
         assert resp.status_code == 200
         assert resp.json()["rank_after"] == 10.0
     finally:
-        routes_my._require_user = orig
-        app.dependency_overrides.pop(get_db, None)
+        _cleanup_test_client(orig)
 
 
 def test_rank_feedback_clamped_at_min():
@@ -348,8 +348,7 @@ def test_rank_feedback_clamped_at_min():
         assert resp.status_code == 200
         assert resp.json()["rank_after"] == 1.0
     finally:
-        routes_my._require_user = orig
-        app.dependency_overrides.pop(get_db, None)
+        _cleanup_test_client(orig)
 
 
 def test_rank_feedback_mid_just_right_invalid():
@@ -358,5 +357,4 @@ def test_rank_feedback_mid_just_right_invalid():
         resp = client.patch("/my/rank-feedback", json={"trigger": "mid_workout", "feedback": "just_right"})
         assert resp.status_code == 400
     finally:
-        routes_my._require_user = orig
-        app.dependency_overrides.pop(get_db, None)
+        _cleanup_test_client(orig)
