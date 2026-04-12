@@ -44,6 +44,8 @@ class User(Base):
     weekly_workout_days: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    fitness_rank: Mapped[float | None] = mapped_column(Float, nullable=True)
+    # 1.0–10.0, null until questionnaire is completed. Updated via /my/rank-feedback.
 
     plans: Mapped[list[SavedPlan]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
@@ -100,6 +102,26 @@ class WorkoutSession(Base):
 
     user: Mapped[User] = relationship(back_populates="sessions")
     plan: Mapped[SavedPlan | None] = relationship(back_populates="sessions")
+
+
+class RankFeedback(Base):
+    __tablename__ = "rank_feedbacks"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    session_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("workout_sessions.id", ondelete="SET NULL"), nullable=True
+    )
+    trigger: Mapped[str] = mapped_column(String(20), nullable=False)
+    # "mid_workout" | "post_workout"
+    feedback: Mapped[str] = mapped_column(String(20), nullable=False)
+    # "too_easy" | "just_right" | "too_hard"
+    delta: Mapped[float] = mapped_column(Float, nullable=False)
+    rank_before: Mapped[float] = mapped_column(Float, nullable=False)
+    rank_after: Mapped[float] = mapped_column(Float, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
 
 class Program(Base):
