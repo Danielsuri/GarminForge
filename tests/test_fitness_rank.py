@@ -174,7 +174,6 @@ def test_generate_no_health_conditions_allows_box_jump():
 def test_health_exclusion_live_names_exist_in_pool():
     """ALTERNATING_SQUAT_WAVE is in both heart_condition and asthma exclusions,
     and it actually exists in _POOL."""
-    from web.workout_generator import _HEALTH_EXCLUSIONS, _POOL
     pool_names = {ex.name for ex in _POOL}
     assert "ALTERNATING_SQUAT_WAVE" in _HEALTH_EXCLUSIONS["heart_condition"]
     assert "ALTERNATING_SQUAT_WAVE" in _HEALTH_EXCLUSIONS["asthma"]
@@ -182,11 +181,9 @@ def test_health_exclusion_live_names_exist_in_pool():
 
 
 def test_rank_band_widens_when_pool_too_small():
-    """With bodyweight-only equipment and rank=10.0, the ±2 band yields very few
-    exercises, so the selector must widen to ±3, ±4, or full pool to fill the slot."""
-    from web.workout_generator import generate
-    # rank=10.0 with bodyweight only: almost no exercises score 8–10 for bodyweight
-    # The generator must widen the band and still return a valid plan
+    """With bodyweight-only equipment and rank=10.0, the ±2 band has < num exercises,
+    so the selector must widen to ±3 or beyond. At least one returned exercise must
+    have difficulty < 8 (proving the band widened past the ±2 threshold)."""
     plan = generate(
         equipment=["bodyweight"],
         goal="build_muscle",
@@ -195,6 +192,25 @@ def test_rank_band_widens_when_pool_too_small():
         seed=42,
     )
     assert len(plan.exercises) > 0
-    # All exercises should be bodyweight-compatible
-    for ex in plan.exercises:
-        assert ex.name  # basic sanity
+    pool_by_name = {ex.name: ex for ex in _POOL}
+    # At rank=10 with band=2 only difficulty>=8 is in-band.
+    # If any returned exercise has difficulty<8, the widening path fired.
+    difficulties = [pool_by_name[ex.name].difficulty for ex in plan.exercises if ex.name in pool_by_name]
+    assert any(d < 8 for d in difficulties), (
+        f"Expected at least one difficulty<8 exercise (band-widening proof), got difficulties={difficulties}"
+    )
+
+
+def test_generate_with_heart_condition_excludes_alternating_squat_wave():
+    """Users with heart_condition must never receive ALTERNATING_SQUAT_WAVE."""
+    plan = generate(
+        equipment=["battle_rope"],
+        goal="build_muscle",
+        duration_minutes=45,
+        health_conditions=["heart_condition"],
+        seed=42,
+    )
+    names = {ex.name for ex in plan.exercises}
+    assert "ALTERNATING_SQUAT_WAVE" not in names
+    assert "ALTERNATING_WAVE" not in names
+    assert "DOUBLE_ARM_WAVE" not in names
