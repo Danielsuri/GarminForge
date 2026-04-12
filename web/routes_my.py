@@ -15,13 +15,14 @@ import logging
 from datetime import datetime
 from typing import Any
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from pydantic import BaseModel
 from sqlalchemy.orm import Session, joinedload
 
 from web.auth_utils import require_user
 from web.db import get_db
-from web.models import ProgramSession, SavedPlan, WorkoutSession
+from web.models import ProgramSession, RankFeedback, SavedPlan, WorkoutSession
 from web.rendering import render_template
 from web.translations import make_t
 from web.workout_generator import EQUIPMENT_OPTIONS, GOALS, ExerciseInfo, WorkoutPlan, _LOCAL_VIDEO_MAP
@@ -317,6 +318,60 @@ async def log_session(request: Request, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(session_row)
     return {"ok": True, "id": session_row.id}
+
+
+# ---------------------------------------------------------------------------
+# Rank feedback
+# ---------------------------------------------------------------------------
+
+_RANK_DELTAS: dict[tuple[str, str], float] = {
+    ("mid_workout",  "too_easy"):   +0.1,
+    ("mid_workout",  "too_hard"):   -0.1,
+    ("post_workout", "too_easy"):   +0.5,
+    ("post_workout", "just_right"):  0.0,
+    ("post_workout", "too_hard"):   -0.5,
+}
+
+
+class RankFeedbackRequest(BaseModel):
+    trigger: str
+    feedback: str
+    session_id: str | None = None
+
+
+@router.patch("/rank-feedback")
+async def rank_feedback(
+    body: RankFeedbackRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    user = _require_user(request, db)
+    if user is None:
+        return RedirectResponse("/auth/login-forge", status_code=303)
+
+    key = (body.trigger, body.feedback)
+    if key not in _RANK_DELTAS:
+        raise HTTPException(status_code=400, detail=f"Invalid trigger/feedback: {key}")
+
+    delta = _RANK_DELTAS[key]
+    rank_before = user.fitness_rank if user.fitness_rank is not None else 3.0
+    rank_after = max(1.0, min(10.0, rank_before + delta))
+
+    user.fitness_rank = rank_after  # type: ignore[assignment]
+
+    rf = RankFeedback(
+        user_id=user.id,
+        session_id=body.session_id,
+        trigger=body.trigger,
+        feedback=body.feedback,
+        delta=delta,
+        rank_before=rank_before,
+        rank_after=rank_after,
+    )
+    db.add(rf)
+    db.commit()
+
+    return {"rank_before": rank_before, "rank_after": rank_after}
 
 
 # ---------------------------------------------------------------------------

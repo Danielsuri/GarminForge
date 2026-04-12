@@ -215,3 +215,148 @@ def test_generate_with_heart_condition_excludes_alternating_squat_wave():
     names = {ex.name for ex in plan.exercises}
     assert "ALTERNATING_WAVE" not in names
     assert "ALTERNATING_SQUAT_WAVE" not in names
+
+
+# ---------------------------------------------------------------------------
+# Task 6: PATCH /my/rank-feedback endpoint
+# ---------------------------------------------------------------------------
+from fastapi.testclient import TestClient
+from web.app import app
+from web.db import get_db
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+
+def _make_test_client(fitness_rank: float):
+    """Create a TestClient with an in-memory DB and a mocked authenticated user."""
+    from sqlalchemy import StaticPool
+    from web.db import Base as _Base
+
+    # Use StaticPool so all connections share the same in-memory DB instance
+    engine = create_engine(
+        "sqlite:///:memory:",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    _Base.metadata.create_all(engine)
+    SessionLocal = sessionmaker(bind=engine)
+
+    def override_get_db():
+        db = SessionLocal()
+        try:
+            yield db
+        finally:
+            db.close()
+
+    app.dependency_overrides[get_db] = override_get_db
+
+    db = SessionLocal()
+    from web.models import User as _User
+    user = _User(email="t@t.com", hashed_password="x", fitness_rank=fitness_rank,
+                 questionnaire_completed=True)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    user_id = user.id
+    db.close()
+
+    import web.routes_my as _routes_my
+
+    _original = _routes_my._require_user
+
+    # Monkeypatch _require_user in routes_my to look up user in the test DB.
+    # We use the db session provided by the endpoint (which comes from our
+    # override_get_db), so that mutations to user.fitness_rank are committed
+    # to the same in-memory engine we later query for assertions.
+    def _fake_require_user(request, db):
+        return db.get(_User, user_id)
+
+    _routes_my._require_user = _fake_require_user  # type: ignore[assignment]
+
+    client = TestClient(app, raise_server_exceptions=True)
+
+    return client, user_id, SessionLocal, _routes_my, _original
+
+
+def test_rank_feedback_too_easy_post_increases_rank():
+    client, user_id, SL, routes_my, orig = _make_test_client(3.0)
+    try:
+        resp = client.patch("/my/rank-feedback", json={"trigger": "post_workout", "feedback": "too_easy"})
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["rank_before"] == 3.0
+        assert data["rank_after"] == 3.5
+        db = SL()
+        from web.models import User as _U
+        u = db.get(_U, user_id)
+        assert u.fitness_rank == 3.5
+        db.close()
+    finally:
+        routes_my._require_user = orig
+        app.dependency_overrides.pop(get_db, None)
+
+
+def test_rank_feedback_too_hard_post_decreases_rank():
+    client, _, _, routes_my, orig = _make_test_client(5.0)
+    try:
+        resp = client.patch("/my/rank-feedback", json={"trigger": "post_workout", "feedback": "too_hard"})
+        assert resp.status_code == 200
+        assert resp.json()["rank_after"] == 4.5
+    finally:
+        routes_my._require_user = orig
+        app.dependency_overrides.pop(get_db, None)
+
+
+def test_rank_feedback_just_right_no_change():
+    client, _, _, routes_my, orig = _make_test_client(5.0)
+    try:
+        resp = client.patch("/my/rank-feedback", json={"trigger": "post_workout", "feedback": "just_right"})
+        assert resp.status_code == 200
+        assert resp.json()["rank_after"] == 5.0
+    finally:
+        routes_my._require_user = orig
+        app.dependency_overrides.pop(get_db, None)
+
+
+def test_rank_feedback_mid_workout_too_easy():
+    client, _, _, routes_my, orig = _make_test_client(5.0)
+    try:
+        resp = client.patch("/my/rank-feedback", json={"trigger": "mid_workout", "feedback": "too_easy"})
+        assert resp.status_code == 200
+        import pytest as _pytest
+        assert resp.json()["rank_after"] == _pytest.approx(5.1)
+    finally:
+        routes_my._require_user = orig
+        app.dependency_overrides.pop(get_db, None)
+
+
+def test_rank_feedback_clamped_at_max():
+    client, _, _, routes_my, orig = _make_test_client(9.8)
+    try:
+        resp = client.patch("/my/rank-feedback", json={"trigger": "post_workout", "feedback": "too_easy"})
+        assert resp.status_code == 200
+        assert resp.json()["rank_after"] == 10.0
+    finally:
+        routes_my._require_user = orig
+        app.dependency_overrides.pop(get_db, None)
+
+
+def test_rank_feedback_clamped_at_min():
+    client, _, _, routes_my, orig = _make_test_client(1.2)
+    try:
+        resp = client.patch("/my/rank-feedback", json={"trigger": "post_workout", "feedback": "too_hard"})
+        assert resp.status_code == 200
+        assert resp.json()["rank_after"] == 1.0
+    finally:
+        routes_my._require_user = orig
+        app.dependency_overrides.pop(get_db, None)
+
+
+def test_rank_feedback_mid_just_right_invalid():
+    client, _, _, routes_my, orig = _make_test_client(5.0)
+    try:
+        resp = client.patch("/my/rank-feedback", json={"trigger": "mid_workout", "feedback": "just_right"})
+        assert resp.status_code == 400
+    finally:
+        routes_my._require_user = orig
+        app.dependency_overrides.pop(get_db, None)
