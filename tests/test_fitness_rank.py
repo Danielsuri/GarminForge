@@ -83,3 +83,12 @@ def test_none_fitness_level_falls_back():
 
 def test_rank_clamped_at_10():
     assert compute_initial_rank("Advanced", "18-29", []) <= 10.0
+
+
+from web.workout_generator import _POOL
+
+
+def test_all_pool_exercises_have_difficulty():
+    for ex in _POOL:
+        assert hasattr(ex, "difficulty"), f"{ex.name} missing difficulty"
+        assert 1 <= ex.difficulty <= 10, f"{ex.name} difficulty {ex.difficulty} out of range"
