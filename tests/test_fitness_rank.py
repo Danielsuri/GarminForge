@@ -38,5 +38,8 @@ def test_rank_feedback_stores_delta(db):
     db.add(rf)
     db.commit()
     db.refresh(rf)
+    assert rf.delta == 0.5
+    assert rf.rank_before == 3.0
     assert rf.rank_after == 3.5
     assert rf.trigger == "post_workout"
+    assert rf.feedback == "too_easy"

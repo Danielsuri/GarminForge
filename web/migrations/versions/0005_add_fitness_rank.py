@@ -31,7 +31,7 @@ def upgrade() -> None:
         sa.Column("delta", sa.Float(), nullable=False),
         sa.Column("rank_before", sa.Float(), nullable=False),
         sa.Column("rank_after", sa.Float(), nullable=False),
-        sa.Column("created_at", sa.DateTime(), server_default=sa.func.now()),
+        sa.Column("created_at", sa.DateTime(), server_default=sa.func.now(), nullable=False),
     )
 
 
