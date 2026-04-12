@@ -376,6 +376,22 @@
           </button>
         </div>
 
+        {# Post-workout feedback — shown only on the complete step #}
+        <div id="postWorkoutFeedback" class="text-center" style="display:none;">
+          <p class="text-muted mb-3" style="font-size:.9rem;">How did that feel?</p>
+          <div class="d-flex gap-2 justify-content-center flex-wrap">
+            <button type="button" class="btn btn-outline-warning px-4" id="postTooEasyBtn">
+              <i class="bi bi-emoji-laughing me-1"></i>Too easy
+            </button>
+            <button type="button" class="btn btn-outline-success px-4" id="postJustRightBtn">
+              <i class="bi bi-emoji-smile me-1"></i>Just right
+            </button>
+            <button type="button" class="btn btn-outline-danger px-4" id="postTooHardBtn">
+              <i class="bi bi-emoji-frown me-1"></i>Too hard
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -1150,6 +1166,8 @@ function renderPlayerStep() {
     document.getElementById('playerSkipBtn').disabled      = true;
     playerReleaseWakeLock();
     if (window.speechSynthesis) window.speechSynthesis.cancel();
+    document.getElementById('postWorkoutFeedback').style.display = 'block';
+    document.getElementById('midWorkoutFeedback').style.display  = 'none';
   }
 }
 
@@ -1276,6 +1294,29 @@ function applyMidWorkoutRepScale(factor) {
 document.getElementById('midTooEasyBtn').addEventListener('click', () => applyMidWorkoutRepScale(1.2));
 document.getElementById('midTooHardBtn').addEventListener('click', () => applyMidWorkoutRepScale(0.8));
 
+// ── Post-workout feedback ─────────────────────────────────────────────
+function submitPostWorkoutFeedback(feedback) {
+  ['postTooEasyBtn', 'postJustRightBtn', 'postTooHardBtn'].forEach(id => {
+    document.getElementById(id).disabled = true;
+  });
+
+  fetch('/my/rank-feedback', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ trigger: 'post_workout', feedback }),
+  })
+  .catch(() => {})
+  .finally(() => {
+    bootstrap.Modal.getOrCreateInstance(
+      document.getElementById('workoutPlayerModal')
+    ).hide();
+  });
+}
+
+document.getElementById('postTooEasyBtn').addEventListener('click',  () => submitPostWorkoutFeedback('too_easy'));
+document.getElementById('postJustRightBtn').addEventListener('click', () => submitPostWorkoutFeedback('just_right'));
+document.getElementById('postTooHardBtn').addEventListener('click',  () => submitPostWorkoutFeedback('too_hard'));
+
 // ── Teardown on any modal close (backdrop, Escape, or close button) ───
 document.getElementById('workoutPlayerModal').addEventListener('hide.bs.modal', () => {
   clearInterval(playerInterval);
@@ -1287,6 +1328,10 @@ document.getElementById('workoutPlayerModal').addEventListener('hide.bs.modal', 
   document.getElementById('midTooEasyBtn').disabled = false;
   document.getElementById('midTooHardBtn').disabled = false;
   midFeedbackUsed = false;
+  document.getElementById('postWorkoutFeedback').style.display = 'none';
+  ['postTooEasyBtn', 'postJustRightBtn', 'postTooHardBtn'].forEach(id => {
+    document.getElementById(id).disabled = false;
+  });
 });
 
 // ── Launch ────────────────────────────────────────────────────────────
@@ -1304,7 +1349,12 @@ document.getElementById('playBtn').addEventListener('click', () => {
   midFeedbackUsed = false;
   document.getElementById('midTooEasyBtn').disabled = false;
   document.getElementById('midTooHardBtn').disabled = false;
-  document.getElementById('midWorkoutFeedback').style.opacity = '0.6';
+  document.getElementById('midWorkoutFeedback').style.display  = 'flex';
+  document.getElementById('midWorkoutFeedback').style.opacity  = '0.6';
+  document.getElementById('postWorkoutFeedback').style.display = 'none';
+  ['postTooEasyBtn', 'postJustRightBtn', 'postTooHardBtn'].forEach(id => {
+    document.getElementById(id).disabled = false;
+  });
 
   playerAcquireWakeLock();
   bootstrap.Modal.getOrCreateInstance(
