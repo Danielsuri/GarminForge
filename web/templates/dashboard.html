@@ -306,12 +306,15 @@
         var doc = parser.parseFromString(html, 'text/html');
         var preview = doc.getElementById('workoutCard');
         if (preview) {
-          // Clear container and inject the preview card
-          var container = document.getElementById('previewContainer');
+          // Clear container and inject the preview card.
+          // #previewContainer only exists when the initial page had no workout;
+          // fall back to #previewSection so re-generation always works.
+          var container = document.getElementById('previewContainer')
+                       || document.getElementById('previewSection');
           var placeholder = document.getElementById('previewPlaceholder');
           if (placeholder) placeholder.remove();
-          while (container.firstChild) container.removeChild(container.firstChild);
-          container.appendChild(document.adoptNode(preview));
+          while (container && container.firstChild) container.removeChild(container.firstChild);
+          if (container) container.appendChild(document.adoptNode(preview));
 
           // Also inject modals and toast container (they live outside #workoutPreviewCard)
           ['editToastContainer', 'replaceModal', 'addModal', 'videoTutorialModal', 'workoutPlayerModal'].forEach(function(id) {

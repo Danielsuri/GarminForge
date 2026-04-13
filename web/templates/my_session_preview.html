@@ -88,8 +88,7 @@
       </div>
 
       <div class="d-flex align-items-center gap-2 flex-shrink-0">
-        <button type="button" id="playBtn" class="play-btn-charged" aria-label="Start workout"
-                onclick="document.getElementById('uploadBtn')?.click()">
+        <button type="button" id="playBtn" class="play-btn-charged" aria-label="Start workout">
           <svg class="play-btn-icon" viewBox="0 0 16 16" fill="#ffffff" aria-hidden="true" width="14" height="14">
             <path d="M5.5 3.5l8 4.5-8 4.5V3.5z"/>
           </svg>
@@ -335,6 +334,85 @@
   </div>
 </div>
 
+{# ===== Workout Player Modal ===== #}
+<div class="modal fade" id="workoutPlayerModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content border-0" style="background:#0a0a0a;color:#fff;">
+
+      <div class="modal-header border-0 px-4 pt-3 pb-0">
+        <span class="text-muted small" id="playerRoundLabel">Round 1 of 3</span>
+        <button type="button" class="btn-close btn-close-white ms-auto"
+                data-bs-dismiss="modal" id="playerCloseBtn"></button>
+      </div>
+
+      <div class="modal-body d-flex flex-column align-items-center justify-content-center px-4 py-2"
+           style="gap:16px;flex:1;">
+
+        <div id="playerMediaArea"
+             style="width:100%;max-width:560px;aspect-ratio:16/9;border-radius:12px;overflow:hidden;
+                    background:#111;display:flex;align-items:center;justify-content:center;">
+        </div>
+
+        <h1 id="playerExerciseName" class="text-center fw-bold mb-0"
+            style="font-size:clamp(1.4rem,5vw,2.2rem);letter-spacing:-.01em;">
+          Get Ready
+        </h1>
+
+        <div id="playerTimer"
+             style="font-size:clamp(3rem,15vw,6rem);font-weight:800;line-height:1;
+                    color:#4ade80;font-variant-numeric:tabular-nums;">
+          5
+        </div>
+
+        <div id="playerStepLabel" class="text-muted" style="font-size:.9rem;">
+          Step 1 of 18
+        </div>
+
+        <div style="width:100%;max-width:560px;background:#222;border-radius:4px;height:6px;">
+          <div id="playerProgress"
+               style="background:#4ade80;height:6px;border-radius:4px;width:0%;transition:width .4s ease;">
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 mt-2">
+          <button type="button" class="btn btn-outline-light px-4 py-2 fw-semibold" id="playerPauseBtn">
+            <i class="bi bi-pause-fill" id="playerPauseIcon"></i>
+            <span id="playerPauseLabel" class="ms-1">Pause</span>
+          </button>
+          <button type="button" class="btn btn-outline-secondary px-4 py-2" id="playerSkipBtn">
+            <i class="bi bi-skip-forward-fill me-1"></i>Skip
+          </button>
+        </div>
+
+        <div class="d-flex gap-2 mt-1" id="midWorkoutFeedback" style="opacity:.6;">
+          <button type="button" class="btn btn-sm btn-outline-warning px-3" id="midTooEasyBtn">
+            <i class="bi bi-chevron-double-up me-1"></i>Too easy
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-danger px-3" id="midTooHardBtn">
+            <i class="bi bi-chevron-double-down me-1"></i>Too hard
+          </button>
+        </div>
+
+        <div id="postWorkoutFeedback" class="text-center" style="display:none;">
+          <p class="text-muted mb-3" style="font-size:.9rem;">How did that feel?</p>
+          <div class="d-flex gap-2 justify-content-center flex-wrap">
+            <button type="button" class="btn btn-outline-warning px-4" id="postTooEasyBtn">
+              <i class="bi bi-emoji-laughing me-1"></i>Too easy
+            </button>
+            <button type="button" class="btn btn-outline-success px-4" id="postJustRightBtn">
+              <i class="bi bi-emoji-smile me-1"></i>Just right
+            </button>
+            <button type="button" class="btn btn-outline-danger px-4" id="postTooHardBtn">
+              <i class="bi bi-emoji-frown me-1"></i>Too hard
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
 {# Video tutorial modal (same as workout preview) #}
 <div class="modal fade" id="videoModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -437,5 +515,331 @@ document.getElementById('uploadForm')?.addEventListener('submit', function() {
 });
 
 updateMuscleMap();
+</script>
+
+<script>
+/* -----------------------------------------------------------------------
+   Workout Player — session preview
+   Uses the same modal/logic as workout_preview.html.
+   --------------------------------------------------------------------- */
+(function () {
+const exercises = {{ exercises | tojson }};
+
+// ── State ──────────────────────────────────────────────────────────────
+let playerQueue    = [];
+let playerIndex    = 0;
+let playerTimeLeft = 0;
+let playerInterval = null;
+let playerPaused   = false;
+let playerWakeLock = null;
+let midFeedbackUsed = false;
+
+// ── TTS ────────────────────────────────────────────────────────────────
+function playerSpeak(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+}
+
+// ── Wake Lock ──────────────────────────────────────────────────────────
+async function playerAcquireWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try { playerWakeLock = await navigator.wakeLock.request('screen'); } catch (_) {}
+}
+function playerReleaseWakeLock() {
+  if (playerWakeLock) { playerWakeLock.release(); playerWakeLock = null; }
+}
+
+// ── Queue builder ──────────────────────────────────────────────────────
+function buildPlayerQueue(exs) {
+  const queue = [{ type: 'warmup', duration: 5 }];
+  const rounds = exs.length ? exs[0].sets : 1;
+  for (let r = 0; r < rounds; r++) {
+    for (let i = 0; i < exs.length; i++) {
+      const ex     = exs[i];
+      const nextEx = exs[(i + 1) % exs.length];
+      queue.push({ type: 'exercise', ex, round: r + 1, rounds });
+      if (ex.rest_seconds > 0) {
+        queue.push({ type: 'rest', ex, round: r + 1, rounds, nextEx });
+      }
+    }
+  }
+  queue.push({ type: 'complete' });
+  return queue;
+}
+
+// ── YouTube video-ID helper ────────────────────────────────────────────
+function youtubeId(url) {
+  if (!url) return null;
+  const m = String(url).match(/[?&]v=([^&]+)/);
+  return m ? m[1] : null;
+}
+
+// ── Media area renderer ────────────────────────────────────────────────
+function renderMediaArea(step) {
+  const area = document.getElementById('playerMediaArea');
+  area.replaceChildren();
+  if (step.type !== 'exercise') { area.style.display = 'none'; return; }
+  area.style.display = 'flex';
+  const ex = step.ex;
+  if (ex.video_url) {
+    const video = document.createElement('video');
+    video.setAttribute('src', ex.video_url);
+    video.autoplay = true; video.loop = true; video.muted = true;
+    video.setAttribute('playsinline', '');
+    video.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+    area.appendChild(video);
+  } else {
+    const vid = youtubeId(ex.link);
+    if (vid) {
+      const frame = document.createElement('iframe');
+      frame.setAttribute('src', 'https://www.youtube.com/embed/' + vid + '?rel=0&modestbranding=1');
+      frame.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+      frame.setAttribute('allowfullscreen', '');
+      frame.setAttribute('frameborder', '0');
+      frame.setAttribute('title', ex.label);
+      frame.style.cssText = 'width:100%;height:100%;border:0;';
+      area.appendChild(frame);
+    } else {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'text-align:center;padding:16px;';
+      const icon = document.createElement('div');
+      icon.style.fontSize = '3rem';
+      icon.textContent = '\uD83C\uDFCB\uFE0F';
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'font-size:1rem;font-weight:600;color:#ccc;margin-top:8px;';
+      lbl.textContent = ex.label;
+      const muscle = document.createElement('div');
+      muscle.style.cssText = 'font-size:.8rem;color:#666;margin-top:4px;';
+      muscle.textContent = (ex.muscle_group || '').replace(/_/g, ' ');
+      wrap.append(icon, lbl, muscle);
+      area.appendChild(wrap);
+    }
+  }
+}
+
+// ── UI updater ────────────────────────────────────────────────────────
+function renderPlayerStep() {
+  const step  = playerQueue[playerIndex];
+  const total = playerQueue.length - 1;
+  const pct   = Math.round((playerIndex / Math.max(total, 1)) * 100);
+
+  document.getElementById('playerProgress').style.width = pct + '%';
+  document.getElementById('playerStepLabel').textContent =
+    'Step ' + (playerIndex + 1) + ' of ' + total;
+
+  renderMediaArea(step);
+
+  const nameEl  = document.getElementById('playerExerciseName');
+  const timerEl = document.getElementById('playerTimer');
+  const roundEl = document.getElementById('playerRoundLabel');
+
+  if (step.type === 'warmup') {
+    roundEl.textContent = 'Get Ready';
+    nameEl.textContent  = 'Get Ready';
+    timerEl.textContent = String(playerTimeLeft);
+    timerEl.style.color = '#facc15';
+  } else if (step.type === 'exercise') {
+    roundEl.textContent = 'Round ' + step.round + ' of ' + step.rounds;
+    nameEl.textContent  = step.ex.label;
+    timerEl.style.color = '#4ade80';
+    timerEl.textContent = step.ex.duration_sec
+      ? String(playerTimeLeft)
+      : '\u00D7\u00A0' + step.ex.reps;
+  } else if (step.type === 'rest') {
+    roundEl.textContent = 'Round ' + step.round + ' of ' + step.rounds;
+    nameEl.textContent  = 'Rest \u00B7 Next: ' + step.nextEx.label;
+    timerEl.textContent = String(playerTimeLeft);
+    timerEl.style.color = '#60a5fa';
+  } else if (step.type === 'complete') {
+    roundEl.textContent  = '';
+    nameEl.textContent   = 'Workout Complete!';
+    timerEl.textContent  = '\uD83C\uDF89';
+    timerEl.style.color  = '#4ade80';
+    document.getElementById('playerStepLabel').textContent = 'Great work!';
+    document.getElementById('playerProgress').style.width  = '100%';
+    document.getElementById('playerSkipBtn').disabled      = true;
+    playerReleaseWakeLock();
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    document.getElementById('postWorkoutFeedback').style.display = 'block';
+    document.getElementById('midWorkoutFeedback').style.display  = 'none';
+  }
+}
+
+// ── Advance to next step ──────────────────────────────────────────────
+function playerAdvance() {
+  clearInterval(playerInterval);
+  playerInterval = null;
+  if (playerIndex < playerQueue.length - 1) playerIndex++;
+  playerStartStep();
+}
+
+// ── Start a step ─────────────────────────────────────────────────────
+function playerStartStep() {
+  const step = playerQueue[playerIndex];
+  if (step.type === 'warmup') {
+    playerTimeLeft = step.duration;
+    playerSpeak('Get ready');
+    renderPlayerStep();
+    playerInterval = setInterval(() => {
+      playerTimeLeft--;
+      if (playerTimeLeft <= 0) { playerAdvance(); return; }
+      renderPlayerStep();
+    }, 1000);
+  } else if (step.type === 'exercise') {
+    if (step.ex.duration_sec) {
+      playerTimeLeft = Math.round(step.ex.duration_sec);
+      playerSpeak('Exercise: ' + step.ex.label + ', ' + playerTimeLeft + ' seconds');
+      renderPlayerStep();
+      playerInterval = setInterval(() => {
+        playerTimeLeft--;
+        if (playerTimeLeft <= 0) { playerAdvance(); return; }
+        renderPlayerStep();
+      }, 1000);
+    } else {
+      playerTimeLeft = 0;
+      playerSpeak('Exercise: ' + step.ex.label + ', ' + step.ex.reps + ' reps');
+      renderPlayerStep();
+    }
+  } else if (step.type === 'rest') {
+    playerTimeLeft = Math.round(step.ex.rest_seconds);
+    playerSpeak('Rest, ' + playerTimeLeft + ' seconds');
+    renderPlayerStep();
+    playerInterval = setInterval(() => {
+      playerTimeLeft--;
+      if (playerTimeLeft <= 0) {
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+        playerAdvance(); return;
+      }
+      renderPlayerStep();
+    }, 1000);
+  } else if (step.type === 'complete') {
+    renderPlayerStep();
+    playerSpeak('Workout complete. Great work!');
+  }
+}
+
+// ── Mid-workout feedback ──────────────────────────────────────────────
+function applyMidWorkoutRepScale(factor) {
+  if (midFeedbackUsed) return;
+  midFeedbackUsed = true;
+  document.getElementById('midTooEasyBtn').disabled = true;
+  document.getElementById('midTooHardBtn').disabled = true;
+  document.getElementById('midWorkoutFeedback').style.opacity = '0.3';
+  for (let i = playerIndex + 1; i < playerQueue.length; i++) {
+    const step = playerQueue[i];
+    if (step.type === 'exercise' && step.ex && step.ex.reps) {
+      step.ex.reps = Math.max(1, Math.round(step.ex.reps * factor));
+    }
+  }
+  fetch('/my/rank-feedback', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ trigger: 'mid_workout', feedback: factor > 1 ? 'too_easy' : 'too_hard' }),
+  }).catch(() => {});
+}
+
+document.getElementById('midTooEasyBtn').addEventListener('click', () => applyMidWorkoutRepScale(1.2));
+document.getElementById('midTooHardBtn').addEventListener('click', () => applyMidWorkoutRepScale(0.8));
+
+// ── Post-workout feedback ─────────────────────────────────────────────
+function submitPostWorkoutFeedback(feedback) {
+  ['postTooEasyBtn', 'postJustRightBtn', 'postTooHardBtn'].forEach(id => {
+    document.getElementById(id).disabled = true;
+  });
+  fetch('/my/rank-feedback', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ trigger: 'post_workout', feedback }),
+  })
+  .catch(() => {})
+  .finally(() => {
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('workoutPlayerModal')).hide();
+  });
+}
+
+document.getElementById('postTooEasyBtn').addEventListener('click',  () => submitPostWorkoutFeedback('too_easy'));
+document.getElementById('postJustRightBtn').addEventListener('click', () => submitPostWorkoutFeedback('just_right'));
+document.getElementById('postTooHardBtn').addEventListener('click',  () => submitPostWorkoutFeedback('too_hard'));
+
+// ── Teardown on modal close ───────────────────────────────────────────
+document.getElementById('workoutPlayerModal').addEventListener('hide.bs.modal', () => {
+  clearInterval(playerInterval);
+  playerInterval = null;
+  playerReleaseWakeLock();
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  document.getElementById('midWorkoutFeedback').style.display  = 'flex';
+  document.getElementById('midWorkoutFeedback').style.opacity  = '0.6';
+  document.getElementById('midTooEasyBtn').disabled = false;
+  document.getElementById('midTooHardBtn').disabled = false;
+  midFeedbackUsed = false;
+  document.getElementById('postWorkoutFeedback').style.display = 'none';
+  ['postTooEasyBtn', 'postJustRightBtn', 'postTooHardBtn'].forEach(id => {
+    document.getElementById(id).disabled = false;
+  });
+});
+
+// ── Pause / Resume ────────────────────────────────────────────────────
+document.getElementById('playerPauseBtn').addEventListener('click', () => {
+  const iconEl  = document.getElementById('playerPauseIcon');
+  const labelEl = document.getElementById('playerPauseLabel');
+  if (playerPaused) {
+    playerPaused = false;
+    iconEl.className  = 'bi bi-pause-fill';
+    labelEl.textContent = 'Pause';
+    const step = playerQueue[playerIndex];
+    const isTimed = step.type === 'warmup' || step.type === 'rest' ||
+                    (step.type === 'exercise' && step.ex.duration_sec);
+    if (isTimed && playerTimeLeft > 0) {
+      playerInterval = setInterval(() => {
+        playerTimeLeft--;
+        if (playerTimeLeft <= 0) { playerAdvance(); return; }
+        renderPlayerStep();
+      }, 1000);
+    }
+  } else {
+    playerPaused = true;
+    clearInterval(playerInterval);
+    playerInterval = null;
+    iconEl.className  = 'bi bi-play-fill';
+    labelEl.textContent = 'Resume';
+  }
+});
+
+// ── Skip ──────────────────────────────────────────────────────────────
+document.getElementById('playerSkipBtn').addEventListener('click', () => {
+  playerAdvance();
+});
+
+// ── Launch ────────────────────────────────────────────────────────────
+document.getElementById('playBtn').addEventListener('click', () => {
+  clearInterval(playerInterval);
+  playerInterval  = null;
+  playerPaused    = false;
+  playerIndex     = 0;
+  playerQueue     = buildPlayerQueue(exercises);
+
+  document.getElementById('playerPauseIcon').className    = 'bi bi-pause-fill';
+  document.getElementById('playerPauseLabel').textContent = 'Pause';
+  document.getElementById('playerSkipBtn').disabled       = false;
+
+  midFeedbackUsed = false;
+  document.getElementById('midTooEasyBtn').disabled = false;
+  document.getElementById('midTooHardBtn').disabled = false;
+  document.getElementById('midWorkoutFeedback').style.display  = 'flex';
+  document.getElementById('midWorkoutFeedback').style.opacity  = '0.6';
+  document.getElementById('postWorkoutFeedback').style.display = 'none';
+  ['postTooEasyBtn', 'postJustRightBtn', 'postTooHardBtn'].forEach(id => {
+    document.getElementById(id).disabled = false;
+  });
+
+  playerAcquireWakeLock();
+  bootstrap.Modal.getOrCreateInstance(
+    document.getElementById('workoutPlayerModal')
+  ).show();
+  playerStartStep();
+});
+
+})();
 </script>
 {% endblock %}

@@ -1291,8 +1291,8 @@ function applyMidWorkoutRepScale(factor) {
   }).catch(() => {}); // fire-and-forget
 }
 
-document.getElementById('midTooEasyBtn').addEventListener('click', () => applyMidWorkoutRepScale(1.2));
-document.getElementById('midTooHardBtn').addEventListener('click', () => applyMidWorkoutRepScale(0.8));
+document.getElementById('midTooEasyBtn')?.addEventListener('click', () => applyMidWorkoutRepScale(1.2));
+document.getElementById('midTooHardBtn')?.addEventListener('click', () => applyMidWorkoutRepScale(0.8));
 
 // ── Post-workout feedback ─────────────────────────────────────────────
 function submitPostWorkoutFeedback(feedback) {
@@ -1313,9 +1313,9 @@ function submitPostWorkoutFeedback(feedback) {
   });
 }
 
-document.getElementById('postTooEasyBtn').addEventListener('click',  () => submitPostWorkoutFeedback('too_easy'));
-document.getElementById('postJustRightBtn').addEventListener('click', () => submitPostWorkoutFeedback('just_right'));
-document.getElementById('postTooHardBtn').addEventListener('click',  () => submitPostWorkoutFeedback('too_hard'));
+document.getElementById('postTooEasyBtn')?.addEventListener('click',  () => submitPostWorkoutFeedback('too_easy'));
+document.getElementById('postJustRightBtn')?.addEventListener('click', () => submitPostWorkoutFeedback('just_right'));
+document.getElementById('postTooHardBtn')?.addEventListener('click',  () => submitPostWorkoutFeedback('too_hard'));
 
 // ── Teardown on any modal close (backdrop, Escape, or close button) ───
 document.getElementById('workoutPlayerModal').addEventListener('hide.bs.modal', () => {
