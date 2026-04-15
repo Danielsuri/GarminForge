@@ -772,7 +772,7 @@ document.getElementById('playerPauseBtn').addEventListener('click', () => {
     labelEl.textContent = 'Pause';
     const step = playerQueue[playerIndex];
     const isTimed = step.type === 'warmup' || step.type === 'rest' ||
-                    (step.type === 'exercise' && step.ex.duration_sec);
+                    step.type === 'exercise';
     if (isTimed && playerTimeLeft > 0) {
       playerInterval = setInterval(() => {
         playerTimeLeft--;
