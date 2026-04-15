@@ -158,7 +158,12 @@
                    data-primary='{{ (ex.primary_muscles or []) | tojson }}'
                    data-secondary='{{ (ex.secondary_muscles or []) | tojson }}'>
                 <div class="exercise-thumb flex-shrink-0" style="width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,#1e2030 0%,#252840 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:16px;">
-                  {% if ex.video_url and ex.video_url.startswith('/static') %}
+                  {% if ex.video_url and ex.video_url.endswith('.gif') %}
+                    <img src="{{ ex.video_url | e }}"
+                         alt="{{ (ex.label or ex.name) | e }}"
+                         style="width:40px;height:40px;object-fit:cover;border-radius:8px;display:block;"
+                         loading="lazy">
+                  {% elif ex.video_url and ex.video_url.startswith('/static') %}
                     <span style="font-size:10px;color:#888;">▶</span>
                   {% else %}
                     🏋️
@@ -393,7 +398,6 @@
       </div>
       <div class="modal-body pt-2">
         <div id="videoContainer" style="position:relative;width:100%;padding-bottom:56.25%;background:#000;border-radius:8px;overflow:hidden;">
-          <video id="videoPlayer" controls style="position:absolute;top:0;left:0;width:100%;height:100%;"></video>
         </div>
       </div>
     </div>
@@ -461,17 +465,36 @@ function updateMuscleMap() {
 }
 
 window.openVideoTutorial = function(url, label) {
-  var player = document.getElementById('videoPlayer');
-  var titleEl = document.getElementById('videoModalLabel');
-  if (player) { player.src = url; player.load(); }
+  var container = document.getElementById('videoContainer');
+  var titleEl   = document.getElementById('videoModalLabel');
   if (titleEl) { titleEl.textContent = label; }
-  var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('videoModal'));
-  modal.show();
+  if (container) {
+    container.replaceChildren();
+    if (url && url.endsWith('.gif')) {
+      var img = document.createElement('img');
+      img.src = url;
+      img.alt = label || '';
+      img.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;';
+      container.appendChild(img);
+    } else {
+      var video = document.createElement('video');
+      video.src = url;
+      video.controls = true;
+      video.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;';
+      container.appendChild(video);
+      video.load();
+    }
+  }
+  bootstrap.Modal.getOrCreateInstance(document.getElementById('videoModal')).show();
 };
 
 document.getElementById('videoModal')?.addEventListener('hidden.bs.modal', function() {
-  var player = document.getElementById('videoPlayer');
-  if (player) { player.pause(); player.src = ''; }
+  var container = document.getElementById('videoContainer');
+  if (container) {
+    var video = container.querySelector('video');
+    if (video) { video.pause(); video.src = ''; }
+    container.replaceChildren();
+  }
 });
 
 document.getElementById('uploadForm')?.addEventListener('submit', function() {
@@ -553,12 +576,20 @@ function renderMediaArea(step) {
   area.style.display = 'flex';
   const ex = step.ex;
   if (ex.video_url) {
-    const video = document.createElement('video');
-    video.setAttribute('src', ex.video_url);
-    video.autoplay = true; video.loop = true; video.muted = true;
-    video.setAttribute('playsinline', '');
-    video.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-    area.appendChild(video);
+    if (ex.video_url.endsWith('.gif')) {
+      const img = document.createElement('img');
+      img.setAttribute('src', ex.video_url);
+      img.setAttribute('alt', ex.label || '');
+      img.style.cssText = 'width:100%;height:100%;object-fit:contain;';
+      area.appendChild(img);
+    } else {
+      const video = document.createElement('video');
+      video.setAttribute('src', ex.video_url);
+      video.autoplay = true; video.loop = true; video.muted = true;
+      video.setAttribute('playsinline', '');
+      video.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+      area.appendChild(video);
+    }
   } else {
     const vid = youtubeId(ex.link);
     if (vid) {
