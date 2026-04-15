@@ -197,42 +197,50 @@
 
     /* ---------- Mobile ---------- */
     @media (max-width: 767px) {
-      .koda-login-wrap {
-        display: block;
-        position: relative;
-        min-height: 100vh;
+      html, body {
+        background: #0d0d1a;
       }
 
+      .koda-login-wrap {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        grid-template-columns: none;
+      }
+
+      /* Slim brand header only */
       .koda-login-hero {
-        position: fixed;
-        inset: 0;
-        padding: 24px 20px 40vh;
-        z-index: 0;
+        position: static;
+        background: transparent;
+        padding: 28px 20px 12px;
+        flex-shrink: 0;
+      }
+
+      .koda-login-hero .hero-body,
+      .koda-login-tagline,
+      .koda-hero-texture,
+      .koda-hero-glow {
+        display: none;
       }
 
       .koda-login-headline {
         font-size: 26px;
       }
 
-      .koda-login-tagline {
-        display: none;
+      /* Form panel as a full-bleed card */
+      .koda-login-form-panel {
+        flex: 1;
+        background: #1a1d2e;
+        border: 1px solid #2a2d40;
+        border-radius: 20px 20px 0 0;
+        border-inline-start: 1px solid #2a2d40;
+        border-bottom: none;
+        padding: 28px 20px 36px;
+        justify-content: flex-start;
+        box-shadow: 0 -4px 32px rgba(0,0,0,.4);
       }
 
-      .koda-login-form-panel {
-        position: relative;
-        z-index: 1;
-        margin-top: 40vh;
-        background: rgba(13,17,23,0.88);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(124,58,237,0.3);
-        border-radius: 18px 18px 0 0;
-        border-inline-start: none;
-        border-bottom: none;
-        min-height: 60vh;
-        justify-content: flex-start;
-        padding: 28px 20px;
-      }
+      .koda-form-eyebrow { margin-top: 0; }
     }
   </style>
 </head>

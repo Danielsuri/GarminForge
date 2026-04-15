@@ -71,7 +71,7 @@
         <button class="koda-hamburger" id="kodaHamburger" aria-label="Menu">&#9776;</button>
       {% else %}
         <a href="{{ url_for('login_forge_page') }}" class="koda-nav-link">{{ t('nav_sign_in') }}</a>
-        <a href="{{ url_for('register_page') }}" class="btn-koda-primary" style="padding:7px 14px;font-size:13px;">
+        <a href="/onboarding" class="btn-koda-primary" style="padding:7px 14px;font-size:13px;">
           {{ t('nav_register') }}
         </a>
       {% endif %}

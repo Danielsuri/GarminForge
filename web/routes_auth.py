@@ -119,7 +119,8 @@ def _social_flags() -> dict[str, bool]:
 async def register_page(request: Request, db: Session = Depends(get_db)):
     if get_current_user(request, db):
         return RedirectResponse("/", status_code=303)
-    return render_template("register.html", request, db=db, **_social_flags())
+    # Registration is only available through the questionnaire flow
+    return RedirectResponse("/onboarding", status_code=303)
 
 
 @router.post("/register")
