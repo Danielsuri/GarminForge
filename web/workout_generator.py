@@ -444,7 +444,7 @@ def _num_exercises(duration_minutes: int, goal: str) -> int:
         "general_fitness": 7,
         "endurance":      4,
     }.get(goal, 6)
-    return max(2, min(9, work_minutes // mins_per_block))
+    return max(4, min(9, work_minutes // mins_per_block))
 
 
 def _select_exercises(
@@ -499,13 +499,21 @@ def _select_exercises(
         selected.append(random.choice(candidates))
         used_groups.add(group)
 
-    # If still short, allow repeating groups
+    # If still short, allow repeating groups (then repeat exercises if pool is tiny)
     remaining = num - len(selected)
     if remaining > 0:
         all_candidates = [ex for exs in by_group.values() for ex in exs
                           if ex not in selected]
         random.shuffle(all_candidates)
         selected.extend(all_candidates[:remaining])
+
+    # If pool is genuinely tiny, pad with repeats to hit the minimum count
+    remaining = num - len(selected)
+    if remaining > 0:
+        all_pool = [ex for exs in by_group.values() for ex in exs]
+        if all_pool:
+            while len(selected) < num:
+                selected.append(random.choice(all_pool))
 
     return selected[:num]
 
