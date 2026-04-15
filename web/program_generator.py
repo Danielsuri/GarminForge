@@ -521,3 +521,103 @@ def auto_generate_program(user: User, db: Session) -> Program:
     db.commit()
     db.refresh(program)
     return program
+
+
+def refresh_future_program_sessions(user: User, db: Session) -> int:
+    """Regenerate all future uncompleted sessions of the user's active program
+    using the user's current ``fitness_rank``.
+
+    Called automatically after a rank-feedback update so the program stays
+    calibrated to the user's evolving fitness level.  Already-completed
+    sessions are never touched.
+
+    Returns the number of sessions regenerated.
+    """
+    from web.models import Program, ProgramSession  # avoid circular at module level
+
+    program = (
+        db.query(Program)
+        .filter_by(user_id=user.id, status="active")
+        .first()
+    )
+    if program is None:
+        return 0
+
+    future_sessions = [s for s in program.program_sessions if s.completed_at is None]
+    if not future_sessions:
+        return 0
+
+    equipment: list[str] = json.loads(program.equipment_json or '["bodyweight"]')
+    goal = program.goal
+    periodization_type = program.periodization_type
+    duration_weeks = program.duration_weeks
+
+    # Clamp duration_weeks to a supported linear/block table
+    if periodization_type == "linear" and duration_weeks not in _LINEAR_PHASES:
+        supported = sorted(_LINEAR_PHASES.keys())
+        duration_weeks_clamped = min(supported, key=lambda x: abs(x - duration_weeks))
+    else:
+        duration_weeks_clamped = duration_weeks
+
+    # Infer weekly split from max day_num across all sessions
+    weekly_workout_days = max(s.day_num for s in program.program_sessions)
+    split = _SPLITS.get(weekly_workout_days, _SPLITS[3])
+    focus_to_split: dict[str, SplitDay] = {sd.label: sd for sd in split}
+
+    base_minutes = 45  # auto_generate_program always uses 45
+
+    updated = 0
+    for ps in future_sessions:
+        split_day = focus_to_split.get(ps.focus)
+        if split_day is None:
+            continue
+
+        day_idx = ps.day_num - 1
+        phase = _phase_params(ps.week_num, duration_weeks_clamped, periodization_type, day_idx)
+
+        if periodization_type == "linear":
+            raw_phase_key = (
+                _LINEAR_PHASES.get(duration_weeks_clamped, _LINEAR_PHASES[8])
+                [min(ps.week_num - 1, duration_weeks_clamped - 1)]
+            )
+        elif periodization_type == "block":
+            raw_phase_key = _block_phase_key(ps.week_num, duration_weeks_clamped)
+        else:
+            raw_phase_key = "acc"
+
+        week_duration = _session_duration(ps.week_num, duration_weeks, base_minutes, raw_phase_key)
+        name = f"Week {ps.week_num} Day {ps.day_num} · {split_day.short} — {week_duration} min"
+
+        plan: WorkoutPlan = _generate_session(
+            equipment=equipment,
+            goal=goal,
+            duration_minutes=week_duration,
+            muscle_groups=split_day.muscle_groups,
+            override_sets=phase.sets,
+            override_reps=phase.reps_high,
+            override_rest=phase.rest_seconds,
+            fitness_rank=user.fitness_rank,
+            workout_name=name,
+        )
+
+        ps.garmin_payload_json = json.dumps(plan.garmin_payload)
+        ps.exercises_json = json.dumps([
+            {
+                "category": e.category,
+                "name": e.name,
+                "label": e.label,
+                "sets": e.sets,
+                "reps": e.reps,
+                "duration_sec": e.duration_sec,
+                "rest_seconds": e.rest_seconds,
+                "muscle_group": e.muscle_group,
+                "primary_muscles": e.primary_muscles,
+                "secondary_muscles": e.secondary_muscles,
+                "video_url": e.video_url,
+            }
+            for e in plan.exercises
+        ])
+        updated += 1
+
+    db.commit()
+    return updated

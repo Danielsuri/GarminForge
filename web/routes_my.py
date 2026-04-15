@@ -23,6 +23,7 @@ from sqlalchemy.orm import Session, joinedload
 from web.auth_utils import require_user
 from web.db import get_db
 from web.models import ProgramSession, RankFeedback, SavedPlan, WorkoutSession
+from web.program_generator import refresh_future_program_sessions
 from web.rendering import render_template
 from web.translations import make_t
 from web.workout_generator import EQUIPMENT_OPTIONS, GOALS, ExerciseInfo, WorkoutPlan, _LOCAL_VIDEO_MAP
@@ -395,9 +396,17 @@ async def rank_feedback(
         rank_after=rank_after,
     )
     db.add(rf)
+    db.flush()
+
+    # Regenerate future program sessions to reflect the new fitness rank
+    refreshed = refresh_future_program_sessions(user, db)
+    if refreshed:
+        logger.info("Refreshed %d future program sessions for user %s (rank %.1f → %.1f)",
+                    refreshed, user.id, rank_before, rank_after)
+
     db.commit()
 
-    return {"rank_before": rank_before, "rank_after": rank_after}
+    return {"rank_before": rank_before, "rank_after": rank_after, "sessions_refreshed": refreshed}
 
 
 # ---------------------------------------------------------------------------
