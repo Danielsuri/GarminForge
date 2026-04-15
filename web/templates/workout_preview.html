@@ -102,6 +102,18 @@
             <i class="bi bi-grip-vertical"></i>
           </div>
           <div class="step-number flex-shrink-0">{{ loop.index }}</div>
+          <div class="exercise-thumb flex-shrink-0" style="width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,#1e2030 0%,#252840 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:16px;">
+            {% if ex.video_url and ex.video_url.endswith('.gif') %}
+              <img src="{{ ex.video_url | e }}"
+                   alt="{{ ex.label | e }}"
+                   style="width:40px;height:40px;object-fit:cover;border-radius:8px;display:block;"
+                   loading="lazy">
+            {% elif ex.video_url and ex.video_url.startswith('/static') %}
+              <span style="font-size:10px;color:#888;">▶</span>
+            {% else %}
+              🏋️
+            {% endif %}
+          </div>
           <div class="flex-grow-1 min-w-0">
             <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap">
               <div class="min-w-0">
@@ -305,9 +317,8 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body p-0">
-        <video id="videoTutorialPlayer" controls playsinline
-               style="width:100%;display:block;background:#000;max-height:70vh;">
-        </video>
+        <div id="videoTutorialContainer" style="position:relative;width:100%;padding-bottom:56.25%;background:#000;border-radius:0 0 4px 4px;overflow:hidden;">
+        </div>
       </div>
     </div>
   </div>
@@ -518,6 +529,13 @@ function exerciseRowHTML(ex, idx, isLast) {
         <i class="bi bi-grip-vertical"></i>
       </div>
       <div class="step-number flex-shrink-0">${idx + 1}</div>
+      <div class="exercise-thumb flex-shrink-0" style="width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,#1e2030 0%,#252840 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:16px;">
+        ${ex.video_url && ex.video_url.endsWith('.gif')
+          ? `<img src="${esc(ex.video_url)}" alt="${esc(ex.label)}" loading="lazy" style="width:40px;height:40px;object-fit:cover;border-radius:8px;display:block;">`
+          : ex.video_url && ex.video_url.startsWith('/static')
+            ? `<span style="font-size:10px;color:#888;">▶</span>`
+            : `\uD83C\uDFCB\uFE0F`}
+      </div>
       <div class="flex-grow-1 min-w-0">
         <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap">
           <div class="min-w-0">
@@ -927,20 +945,39 @@ document.getElementById('saveBtn')?.addEventListener('click', async function () 
    Video Tutorial Modal
    --------------------------------------------------------------------- */
 function openVideoTutorial(url, label) {
-  const player = document.getElementById('videoTutorialPlayer');
-  const title  = document.getElementById('videoTutorialModalLabel');
-  player.setAttribute('src', url);
-  title.textContent = label;
+  const container = document.getElementById('videoTutorialContainer');
+  const title     = document.getElementById('videoTutorialModalLabel');
+  if (title) { title.textContent = label; }
+  if (container) {
+    container.replaceChildren();
+    if (url && url.endsWith('.gif')) {
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = label || '';
+      img.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;';
+      container.appendChild(img);
+    } else {
+      const video = document.createElement('video');
+      video.src = url;
+      video.controls = true;
+      video.setAttribute('playsinline', '');
+      video.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;';
+      container.appendChild(video);
+      video.load();
+    }
+  }
   bootstrap.Modal.getOrCreateInstance(
     document.getElementById('videoTutorialModal')
   ).show();
 }
 
-document.getElementById('videoTutorialModal').addEventListener('hide.bs.modal', () => {
-  const player = document.getElementById('videoTutorialPlayer');
-  player.pause();
-  player.removeAttribute('src');
-  player.load();
+document.getElementById('videoTutorialModal').addEventListener('hidden.bs.modal', () => {
+  const container = document.getElementById('videoTutorialContainer');
+  if (container) {
+    const video = container.querySelector('video');
+    if (video) { video.pause(); video.src = ''; }
+    container.replaceChildren();
+  }
 });
 
 /* Expose onclick-handler functions to window so they work both in
@@ -1082,14 +1119,22 @@ function renderMediaArea(step) {
 
   const ex = step.ex;
   if (ex.video_url) {
-    const video = document.createElement('video');
-    video.setAttribute('src', ex.video_url);
-    video.autoplay = true;
-    video.loop     = true;
-    video.muted    = true;
-    video.setAttribute('playsinline', '');
-    video.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-    area.appendChild(video);
+    if (ex.video_url.endsWith('.gif')) {
+      const img = document.createElement('img');
+      img.setAttribute('src', ex.video_url);
+      img.setAttribute('alt', ex.label || '');
+      img.style.cssText = 'width:100%;height:100%;object-fit:contain;';
+      area.appendChild(img);
+    } else {
+      const video = document.createElement('video');
+      video.setAttribute('src', ex.video_url);
+      video.autoplay = true;
+      video.loop     = true;
+      video.muted    = true;
+      video.setAttribute('playsinline', '');
+      video.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+      area.appendChild(video);
+    }
   } else {
     const vid = youtubeId(ex.link);
     if (vid) {
