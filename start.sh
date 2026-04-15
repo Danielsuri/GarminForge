@@ -41,7 +41,7 @@ cd "$SCRIPT_DIR"
 
 # Install / upgrade Python dependencies (picks up any new packages after git pull)
 echo "Installing dependencies..."
-"$VENV_BIN/pip" install -e ".[web]" -q
+"$VENV_BIN/pip" install -e ".[web]" -q --no-build-isolation
 
 # Run DB migrations before starting.
 # If a migration fails with "duplicate column" it means those columns were
