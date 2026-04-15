@@ -39,6 +39,10 @@ fi
 
 cd "$SCRIPT_DIR"
 
+# Install / upgrade Python dependencies (picks up any new packages after git pull)
+echo "Installing dependencies..."
+"$VENV_BIN/pip" install -e ".[web]" -q
+
 # Run DB migrations before starting.
 # If a migration fails with "duplicate column" it means those columns were
 # already applied outside of Alembic (e.g. by a manual ALTER TABLE or a
