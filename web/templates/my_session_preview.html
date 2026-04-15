@@ -332,6 +332,8 @@
           5
         </div>
 
+        <div id="playerRepsHint" class="text-muted" style="font-size:1rem;display:none;"></div>
+
         <div id="playerStepLabel" class="text-muted" style="font-size:.9rem;">
           Step 1 of 18
         </div>
@@ -598,27 +600,34 @@ function renderPlayerStep() {
 
   renderMediaArea(step);
 
-  const nameEl  = document.getElementById('playerExerciseName');
-  const timerEl = document.getElementById('playerTimer');
-  const roundEl = document.getElementById('playerRoundLabel');
+  const nameEl     = document.getElementById('playerExerciseName');
+  const timerEl    = document.getElementById('playerTimer');
+  const roundEl    = document.getElementById('playerRoundLabel');
+  const repsHintEl = document.getElementById('playerRepsHint');
 
   if (step.type === 'warmup') {
-    roundEl.textContent = 'Get Ready';
-    nameEl.textContent  = 'Get Ready';
-    timerEl.textContent = String(playerTimeLeft);
-    timerEl.style.color = '#facc15';
+    roundEl.textContent      = 'Get Ready';
+    nameEl.textContent       = 'Get Ready';
+    timerEl.textContent      = String(playerTimeLeft);
+    timerEl.style.color      = '#facc15';
+    repsHintEl.style.display = 'none';
   } else if (step.type === 'exercise') {
     roundEl.textContent = 'Round ' + step.round + ' of ' + step.rounds;
     nameEl.textContent  = step.ex.label;
     timerEl.style.color = '#4ade80';
-    timerEl.textContent = step.ex.duration_sec
-      ? String(playerTimeLeft)
-      : '\u00D7\u00A0' + step.ex.reps;
-  } else if (step.type === 'rest') {
-    roundEl.textContent = 'Round ' + step.round + ' of ' + step.rounds;
-    nameEl.textContent  = 'Rest \u00B7 Next: ' + step.nextEx.label;
     timerEl.textContent = String(playerTimeLeft);
-    timerEl.style.color = '#60a5fa';
+    if (!step.ex.duration_sec && step.ex.reps) {
+      repsHintEl.textContent      = '\u00D7\u00A0' + step.ex.reps + ' reps';
+      repsHintEl.style.display    = 'block';
+    } else {
+      repsHintEl.style.display = 'none';
+    }
+  } else if (step.type === 'rest') {
+    roundEl.textContent      = 'Round ' + step.round + ' of ' + step.rounds;
+    nameEl.textContent       = 'Rest \u00B7 Next: ' + step.nextEx.label;
+    timerEl.textContent      = String(playerTimeLeft);
+    timerEl.style.color      = '#60a5fa';
+    repsHintEl.style.display = 'none';
   } else if (step.type === 'complete') {
     roundEl.textContent  = '';
     nameEl.textContent   = 'Workout Complete!';
@@ -665,9 +674,15 @@ function playerStartStep() {
         renderPlayerStep();
       }, 1000);
     } else {
-      playerTimeLeft = 0;
+      // Rep-based: 3 s per rep so the set auto-advances without manual tapping
+      playerTimeLeft = (step.ex.reps || 10) * 3;
       playerSpeak('Exercise: ' + step.ex.label + ', ' + step.ex.reps + ' reps');
       renderPlayerStep();
+      playerInterval = setInterval(() => {
+        playerTimeLeft--;
+        if (playerTimeLeft <= 0) { playerAdvance(); return; }
+        renderPlayerStep();
+      }, 1000);
     }
   } else if (step.type === 'rest') {
     playerTimeLeft = Math.round(step.ex.rest_seconds);
