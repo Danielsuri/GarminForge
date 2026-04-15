@@ -20,6 +20,8 @@ MANUAL_OVERRIDES: dict[str, str | None] = {
     "BARBELL_BACK_SQUAT": "barbell squat",
     # ExerciseDB drops the equipment prefix
     "DUMBBELL_LATERAL_RAISE": "lateral raise",
+    # Fuzzy search returns cable exercises first; pin to the correct name
+    "GOBLET_SQUAT": "dumbbell goblet squat",
     # Single-word category keys used by sled/sandbag/suspension variants — too ambiguous
     "PUSH": None,
     "ROW": None,
