@@ -72,6 +72,7 @@ def main() -> None:
     unique_keys = sorted({tmpl.name for tmpl in _POOL})
     counts = {
         "downloaded": 0,
+        "dry_run": 0,
         "skipped_exists": 0,
         "not_found": 0,
         "overridden_skip": 0,
@@ -96,6 +97,7 @@ def main() -> None:
 
         if args.dry_run:
             print("(dry-run)")
+            counts["dry_run"] += 1
             continue
 
         gif_url = _fetch_gif_url(args.api_url, search_name)
@@ -114,6 +116,7 @@ def main() -> None:
     print("\n--- Summary ---")
     for label, key in [
         ("Downloaded", "downloaded"),
+        ("Would download (dry-run)", "dry_run"),
         ("Skipped (exists)", "skipped_exists"),
         ("Not found", "not_found"),
         ("Skipped (override)", "overridden_skip"),
