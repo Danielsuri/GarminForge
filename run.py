@@ -20,6 +20,12 @@ import argparse
 import logging
 import sys
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # python-dotenv not installed; rely on shell environment
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(levelname)s [%(name)s] %(message)s",

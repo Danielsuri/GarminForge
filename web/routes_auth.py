@@ -135,11 +135,13 @@ async def register_submit(
 
     if not email or "@" not in email:
         return render_template(
-            "register.html", request, db=db, flash_error="Please enter a valid email address."
+            "register.html", request, db=db, flash_error="Please enter a valid email address.",
+            **_social_flags()
         )
     if len(password) < 8:
         return render_template(
-            "register.html", request, db=db, flash_error="Password must be at least 8 characters."
+            "register.html", request, db=db, flash_error="Password must be at least 8 characters.",
+            **_social_flags()
         )
     if db.query(User).filter_by(email=email).first():
         return render_template(
@@ -147,6 +149,7 @@ async def register_submit(
             request,
             db=db,
             flash_error="An account with this email already exists.",
+            **_social_flags()
         )
 
     user = User(

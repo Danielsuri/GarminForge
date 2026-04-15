@@ -20,6 +20,9 @@ build/
 oauth1_token.json
 oauth2_token.json
 
+# OAuth client secrets / credentials
+secrets/
+
 # Environment variables
 .env
 .env.*
