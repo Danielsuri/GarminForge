@@ -58,7 +58,7 @@ def _fetch_gif_url(api_url: str, exercise_name: str) -> str | None:
             break
         except urllib.error.HTTPError as exc:
             if exc.code == 429 and attempt == 0:
-                print(f"\n  [RATE]   429 — waiting 60 s ...", flush=True)
+                print("\n  [RATE]   429 -- waiting 60 s ...", flush=True)
                 time.sleep(60)
                 continue
             print(f"  [ERROR] HTTP request failed for '{exercise_name}': {exc}")
@@ -117,13 +117,13 @@ def main() -> None:
         dest = _GIF_DIR / f"{key}.gif"
 
         if dest.exists():
-            print(f"  [SKIP]   {key} — already exists")
+            print(f"  [SKIP]   {key} -- already exists")
             counts["skipped_exists"] += 1
             continue
 
         search_name = garmin_to_exercisedb_name(key)
         if search_name is None:
-            print(f"  [SKIP]   {key} — no ExerciseDB match (None override)")
+            print(f"  [SKIP]   {key} -- no ExerciseDB match (None override)")
             counts["overridden_skip"] += 1
             continue
 
@@ -143,7 +143,7 @@ def main() -> None:
 
         ok = _download_gif(gif_url, dest)
         if ok:
-            print(f"OK → {dest.name}")
+            print(f"OK -> {dest.name}")
             counts["downloaded"] += 1
         else:
             counts["error"] += 1
