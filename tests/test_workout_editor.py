@@ -165,15 +165,15 @@ class TestExerciseInfoVideoUrl:
         assert _LOCAL_VIDEO_MAP["JUMP_SQUAT"] == "/static/videos/jump-squat.mp4"
 
     def test_exercise_info_has_video_url_field(self):
-        """ExerciseInfo dataclass must have a video_url field defaulting to None."""
+        """ExerciseInfo dataclass must have a video_url field."""
         import dataclasses
         from web.workout_generator import ExerciseInfo
         field_names = {f.name for f in dataclasses.fields(ExerciseInfo)}
         assert "video_url" in field_names
-        # default is None
+        # video_url is either None or a /static/... URL string
         plan = generate(["bodyweight"], "build_muscle", 45, seed=42)
-        # at least one exercise should have video_url as None (most won't have local video)
-        assert any(e.video_url is None for e in plan.exercises)
+        for ex in plan.exercises:
+            assert ex.video_url is None or ex.video_url.startswith("/static/")
 
     def test_video_url_populated_when_exercise_matches_map(self):
         """ExerciseInfo.video_url is set when the exercise name is in _LOCAL_VIDEO_MAP."""
