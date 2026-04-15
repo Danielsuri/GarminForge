@@ -133,14 +133,35 @@
 .wopt-title      { font-weight: 600; font-size: 14px; }
 .wopt-desc       { font-size: 12px; color: var(--text-secondary, #888); line-height: 1.4; }
 
-/* ── Equipment tag cloud (existing) ───────────────────────────── */
-.wtags { display: flex; flex-wrap: wrap; gap: 7px; }
-.wtag { display: inline-flex; align-items: center; background: #13151f;
-  border: 1.5px solid #252840; border-radius: 20px; padding: 6px 14px;
-  font-size: 13px; color: #bbb; cursor: pointer;
-  transition: border-color .18s, background .18s, color .18s; user-select: none; }
-.wtag:has(input:checked) { border-color: #7c3aed; background: #7c3aed22; color: #fff; }
-.wtag input { display: none; }
+/* ── Equipment dropdown ─────────────────────────────────────────── */
+.eq-dropdown { position: relative; }
+.eq-trigger {
+  width: 100%; background: #13151f; border: 1.5px solid #252840;
+  border-radius: 10px; padding: 11px 16px; font-size: 14px; color: #bbb;
+  cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+  transition: border-color .18s, color .18s; text-align: left; }
+.eq-trigger:hover, .eq-trigger.open { border-color: #7c3aed; color: #fff; }
+.eq-trigger-arrow { transition: transform .2s; flex-shrink: 0; margin-left: 8px; }
+.eq-trigger.open .eq-trigger-arrow { transform: rotate(180deg); }
+.eq-panel {
+  display: none; position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 50;
+  background: #1a1d2e; border: 1.5px solid #2a2d40; border-radius: 12px;
+  max-height: 280px; overflow-y: auto; padding: 6px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  scrollbar-width: thin; scrollbar-color: #252840 transparent; }
+.eq-panel.open { display: block; }
+.eq-option {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 8px; cursor: pointer;
+  font-size: 13px; color: #bbb; transition: background .15s, color .15s;
+  user-select: none; }
+.eq-option:hover { background: #252840; color: #fff; }
+.eq-option input { display: none; }
+.eq-option-icon { font-size: 15px; flex-shrink: 0; width: 20px; text-align: center; }
+.eq-option-label { flex: 1; }
+.eq-option-check { color: #7c3aed; font-size: 14px; opacity: 0; transition: opacity .15s; }
+.eq-option:has(input:checked) { background: #7c3aed18; color: #fff; }
+.eq-option:has(input:checked) .eq-option-check { opacity: 1; }
 
 /* ── Nav buttons — always pinned at the bottom of the card ──────── */
 .wnav { flex-shrink: 0; display: flex; gap: 10px; padding: 14px 24px 20px; }
@@ -312,14 +333,25 @@
       <div class="wcard-body">
         <div class="wcard-label">{{ t("q_step") }} 5</div>
         <div class="wcard-title">{{ t("q_equipment_q") }}</div>
-        <div class="wtags">
-          {% for eq in equipment_options %}
-          <label class="wtag">
-            <input type="checkbox" name="equipment_pick" value="{{ eq.tag }}"
-              {% if eq.tag in existing_equipment %}checked{% endif %}>
-            {{ eq.icon }} {{ t("eq_" ~ eq.tag) }}
-          </label>
-          {% endfor %}
+        <div class="eq-dropdown" id="eqDropdown">
+          <button type="button" class="eq-trigger" id="eqTrigger" onclick="toggleEqDropdown()">
+            <span id="eqTriggerText">Select equipment...</span>
+            <svg class="eq-trigger-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M2.5 5L7 9.5L11.5 5" stroke="#888" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="eq-panel" id="eqPanel">
+            {% for eq in equipment_options %}
+            <label class="eq-option">
+              <input type="checkbox" name="equipment_pick" value="{{ eq.tag }}"
+                {% if eq.tag in existing_equipment %}checked{% endif %}
+                onchange="updateEqTrigger()">
+              <span class="eq-option-icon">{{ eq.icon }}</span>
+              <span class="eq-option-label">{{ t("eq_" ~ eq.tag) }}</span>
+              <span class="eq-option-check">✓</span>
+            </label>
+            {% endfor %}
+          </div>
         </div>
       </div>
       <div class="wnav">
@@ -664,6 +696,43 @@
     document.getElementById('hHeightCm').value = heightCm ? heightCm.toFixed(1) : '';
     document.getElementById('hWeightKg').value = weightKg ? weightKg.toFixed(1) : '';
   }
+
+  // ── Equipment dropdown ───────────────────────────────────────────
+  window.toggleEqDropdown = function () {
+    const trigger = document.getElementById('eqTrigger');
+    const panel   = document.getElementById('eqPanel');
+    const open    = panel.classList.toggle('open');
+    trigger.classList.toggle('open', open);
+  };
+
+  window.updateEqTrigger = function () {
+    const checked = Array.from(document.querySelectorAll('input[name="equipment_pick"]:checked'));
+    const text    = document.getElementById('eqTriggerText');
+    if (checked.length === 0) {
+      text.textContent = 'Select equipment...';
+      text.style.color = '';
+    } else if (checked.length === 1) {
+      const label = checked[0].closest('.eq-option').querySelector('.eq-option-label');
+      text.textContent = (checked[0].closest('.eq-option').querySelector('.eq-option-icon').textContent.trim())
+                         + ' ' + label.textContent.trim();
+      text.style.color = '#fff';
+    } else {
+      text.textContent = checked.length + ' items selected';
+      text.style.color = '#fff';
+    }
+  };
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function (e) {
+    const dd = document.getElementById('eqDropdown');
+    if (dd && !dd.contains(e.target)) {
+      document.getElementById('eqPanel').classList.remove('open');
+      document.getElementById('eqTrigger').classList.remove('open');
+    }
+  });
+
+  // Init trigger text from pre-checked values
+  updateEqTrigger();
 
   // ── Init ─────────────────────────────────────────────────────────
   showCard(cur);

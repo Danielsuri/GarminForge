@@ -24,7 +24,7 @@ from web.db import get_db
 from web.models import Program, ProgramSession
 from web.program_generator import generate_program
 from web.rendering import render_template
-from web.workout_generator import EQUIPMENT_OPTIONS, GOALS
+from web.workout_generator import EQUIPMENT_OPTIONS, GOALS, _LOCAL_VIDEO_MAP
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/my")
@@ -346,6 +346,12 @@ async def session_preview(
         exercises = json.loads(session_obj.exercises_json)
     except Exception:
         exercises = []
+
+    # Refresh video_url from the current media map so newly downloaded GIFs
+    # are shown even for sessions generated before the GIFs existed.
+    for ex in exercises:
+        if isinstance(ex, dict):
+            ex["video_url"] = _LOCAL_VIDEO_MAP.get(ex.get("name") or "")  # type: ignore[assignment]
 
     try:
         garmin_payload = json.loads(session_obj.garmin_payload_json)
