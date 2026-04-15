@@ -1743,7 +1743,8 @@ def _build_media_map(
     gif_dir = static_dir / "gifs"
     if gif_dir.is_dir():
         for p in gif_dir.glob("*.gif"):
-            result[p.stem] = f"/static/gifs/{p.name}"
+            key = p.stem.upper().replace("-", "_")
+            result[key] = f"/static/gifs/{p.name}"
 
     # MP4 pass second (higher priority — overwrites any GIF for same key)
     video_dir = static_dir / "videos"
