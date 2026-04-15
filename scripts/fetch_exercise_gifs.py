@@ -40,16 +40,17 @@ _HEADERS = {
 }
 
 
-def _fetch_gif_url(api_url: str, exercise_name: str) -> str | None:
-    """Query ExerciseDB; return the gifUrl of the first result or None.
+def _fetch_gif_urls(api_url: str, exercise_name: str) -> list[str]:
+    """Query ExerciseDB; return up to 5 candidate gifUrls (fuzzy search).
 
     Handles both response shapes:
       - oss.exercisedb.dev: {"success": true, "data": [...]}
       - legacy local API:   [...]
     Retries once after a 60 s back-off on HTTP 429.
+    Returns empty list on error or no results.
     """
     encoded = urllib.parse.quote(exercise_name)
-    url = f"{api_url.rstrip('/')}/api/v1/exercises?name={encoded}&limit=1"
+    url = f"{api_url.rstrip('/')}/api/v1/exercises?name={encoded}&limit=5"
     for attempt in range(2):
         req = urllib.request.Request(url, headers=_HEADERS)
         try:
@@ -62,17 +63,17 @@ def _fetch_gif_url(api_url: str, exercise_name: str) -> str | None:
                 time.sleep(60)
                 continue
             print(f"  [ERROR] HTTP request failed for '{exercise_name}': {exc}")
-            return None
+            return []
         except Exception as exc:
             print(f"  [ERROR] HTTP request failed for '{exercise_name}': {exc}")
-            return None
+            return []
     else:
-        return None
+        return []
     # Unwrap envelope if present
     data = payload.get("data", payload) if isinstance(payload, dict) else payload
     if not data:
-        return None
-    return data[0].get("gifUrl")
+        return []
+    return [entry["gifUrl"] for entry in data if entry.get("gifUrl")]
 
 
 def _download_gif(gif_url: str, dest: pathlib.Path) -> bool:
@@ -134,14 +135,18 @@ def main() -> None:
             counts["dry_run"] += 1
             continue
 
-        gif_url = _fetch_gif_url(args.api_url, search_name)
+        gif_urls = _fetch_gif_urls(args.api_url, search_name)
         time.sleep(3)
-        if gif_url is None:
+        if not gif_urls:
             print("NOT FOUND")
             counts["not_found"] += 1
             continue
 
-        ok = _download_gif(gif_url, dest)
+        ok = False
+        for gif_url in gif_urls:
+            ok = _download_gif(gif_url, dest)
+            if ok:
+                break
         if ok:
             print(f"OK -> {dest.name}")
             counts["downloaded"] += 1
