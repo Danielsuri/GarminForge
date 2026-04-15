@@ -499,21 +499,13 @@ def _select_exercises(
         selected.append(random.choice(candidates))
         used_groups.add(group)
 
-    # If still short, allow repeating groups (then repeat exercises if pool is tiny)
+    # If still short, allow repeating groups (but never duplicate exercises)
     remaining = num - len(selected)
     if remaining > 0:
         all_candidates = [ex for exs in by_group.values() for ex in exs
                           if ex not in selected]
         random.shuffle(all_candidates)
         selected.extend(all_candidates[:remaining])
-
-    # If pool is genuinely tiny, pad with repeats to hit the minimum count
-    remaining = num - len(selected)
-    if remaining > 0:
-        all_pool = [ex for exs in by_group.values() for ex in exs]
-        if all_pool:
-            while len(selected) < num:
-                selected.append(random.choice(all_pool))
 
     return selected[:num]
 
@@ -622,9 +614,9 @@ def _generate_session(
     eq = equipment if equipment else ["bodyweight"]
     num = _num_exercises(duration_minutes, goal)
 
-    # 1. Filter by equipment
+    # 1. Filter by equipment (progressively broaden muscle-group scope if pool is too small)
     available = _available(eq, muscle_groups=muscle_groups)
-    if not available:
+    if len(available) < num:
         # Muscle group filter too narrow — fall back to full equipment pool
         available = _available(eq)
 
