@@ -185,6 +185,42 @@ class ProgramPlan:
 
 
 # ---------------------------------------------------------------------------
+# Progressive-overload helpers
+# ---------------------------------------------------------------------------
+
+def _week_difficulty_rank(week: int, duration_weeks: int) -> float:
+    """Map the week number to a difficulty rank (3.0 → 8.0).
+
+    Week 1 starts at 3 (easy exercises); the final week reaches 8 (hard).
+    This is passed as ``fitness_rank`` to ``_generate_session`` so exercise
+    selection naturally gets harder as the program progresses.
+    """
+    if duration_weeks <= 1:
+        return 5.0
+    return 3.0 + (week - 1) / (duration_weeks - 1) * 5.0
+
+
+def _session_duration(
+    week: int,
+    duration_weeks: int,
+    base_minutes: int,
+    phase_key: str,
+) -> int:
+    """Return a scaled session duration that grows over the program.
+
+    Early weeks are shorter to ease athletes in; volume peaks in the final
+    block.  Deload weeks are cut to 60 % of the base duration regardless.
+    """
+    if phase_key == "deload":
+        return max(20, round(base_minutes * 0.6))
+
+    # Linear ramp: week 1 = 65 %, last week = 100 %
+    progress = (week - 1) / max(1, duration_weeks - 1)  # 0.0 → 1.0
+    scale = 0.65 + 0.35 * progress
+    return max(20, round(base_minutes * scale))
+
+
+# ---------------------------------------------------------------------------
 # Seed helper
 # ---------------------------------------------------------------------------
 
@@ -262,16 +298,30 @@ def generate_program(
     for week in range(1, duration_weeks + 1):
         for day_idx, split_day in enumerate(split):
             phase = _phase_params(week, duration_weeks_clamped, periodization_type, day_idx)
-            name = f"Week {week} Day {day_idx + 1} · {split_day.short} — {duration_minutes} min"
+
+            # Resolve the raw phase key for duration scaling (deload detection)
+            if periodization_type == "linear":
+                raw_phase_key = (_LINEAR_PHASES.get(duration_weeks_clamped, _LINEAR_PHASES[8])
+                                 [min(week - 1, duration_weeks_clamped - 1)])
+            elif periodization_type == "block":
+                raw_phase_key = _block_phase_key(week, duration_weeks_clamped)
+            else:
+                raw_phase_key = "acc"  # undulating has no deload weeks
+
+            week_duration = _session_duration(week, duration_weeks, duration_minutes, raw_phase_key)
+            week_rank = _week_difficulty_rank(week, duration_weeks)
+
+            name = f"Week {week} Day {day_idx + 1} · {split_day.short} — {week_duration} min"
 
             plan: WorkoutPlan = _generate_session(
                 equipment=equipment if equipment else ["bodyweight"],
                 goal=goal,
-                duration_minutes=duration_minutes,
+                duration_minutes=week_duration,
                 muscle_groups=split_day.muscle_groups,
                 override_sets=phase.sets,
                 override_reps=phase.reps_high,
                 override_rest=phase.rest_seconds,
+                fitness_rank=week_rank,
                 workout_name=name,
                 seed=_session_seed(seed, week, day_idx),
             )
