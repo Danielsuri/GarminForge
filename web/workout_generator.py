@@ -534,6 +534,7 @@ class ExerciseInfo:
     primary_muscles:   list[str] = field(default_factory=list)
     secondary_muscles: list[str] = field(default_factory=list)
     video_url: str | None = None
+    difficulty: int = 5  # 1–10; default mid-range for legacy records missing this field
 
 
 @dataclass
@@ -693,6 +694,7 @@ def _generate_session(
             primary_muscles=tmpl.primary_muscles,
             secondary_muscles=tmpl.secondary_muscles,
             video_url=_LOCAL_VIDEO_MAP.get(tmpl.name),
+            difficulty=tmpl.difficulty,
         )
         # Build description from the same values that go into the Garmin step
         if ex.duration_sec is not None:

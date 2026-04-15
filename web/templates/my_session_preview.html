@@ -4,26 +4,8 @@
 
 {% block extra_head %}
 <style>
-/* ── Exercise thumbnail rows ───────────────────────────────────── */
-.exercise-row {
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 0; border-bottom: 1px solid #1e2030;
-}
-.exercise-row:last-child { border-bottom: none; }
-.exercise-thumb {
-  width: 44px; height: 44px; border-radius: 8px; flex-shrink: 0;
-  background: linear-gradient(135deg, #1e2030 0%, #252840 100%);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; color: #3a3d58; overflow: hidden;
-}
+/* ── Exercise thumbnail (used inside circuit items) ─────────────── */
 .exercise-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
-.exercise-row-info { flex: 1; min-width: 0; }
-.exercise-row-name { font-size: 14px; font-weight: 600; color: #e2e8f0;
-  display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.exercise-row-meta { display: flex; gap: 4px; margin-top: 4px; align-items: center; }
-.set-pip { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; flex-shrink: 0; }
-.set-pip--rest { background: #3b82f6; }
-.exercise-row-sets { font-size: 11px; color: #666; margin-left: 4px; }
 
 /* ── Nutrition coming-soon card ────────────────────────────────── */
 .nutrition-card {
@@ -111,36 +93,6 @@
 
       <div class="koda-card koda-card--active" id="workoutCard">
 
-        {# ── Mini exercise preview (first 5) ── #}
-        <div class="mb-4">
-          <div class="koda-section-label mb-2">{{ t("preview_exercises") }}</div>
-          {% for ex in exercises[:5] %}
-          <div class="exercise-row">
-            <div class="exercise-thumb">
-              {% if ex.video_url and ex.video_url.startswith('/static') %}
-                <span style="font-size:10px;color:#555;">▶</span>
-              {% else %}
-                <span>🏋️</span>
-              {% endif %}
-            </div>
-            <div class="exercise-row-info">
-              <span class="exercise-row-name">{{ ex.label }}</span>
-              <div class="exercise-row-meta">
-                {% for _ in range(ex.sets) %}<span class="set-pip"></span>{% endfor %}
-                <span class="exercise-row-sets">
-                  {{ ex.sets }}×{% if ex.reps %}{{ ex.reps }}{% else %}{{ (ex.duration_sec|int) }}s{% endif %}
-                </span>
-              </div>
-            </div>
-          </div>
-          {% endfor %}
-          {% if exercises|length > 5 %}
-          <div style="text-align:center;font-size:12px;color:#555;margin-top:8px;">
-            +{{ exercises|length - 5 }} {{ t("session_more_exercises") }}
-          </div>
-          {% endif %}
-        </div>
-
         {# Stats row #}
         {% set ex_count = exercises | length %}
         {% set sets_val = exercises[0].sets if exercises else 3 %}
@@ -180,27 +132,38 @@
 
           {# Circuit block #}
           <div class="koda-circuit-block mb-3">
-            <div class="koda-circuit-header justify-content-between">
-              <div class="d-flex align-items-center gap-2">
-                <span class="koda-badge koda-badge--violet" style="text-transform:uppercase;letter-spacing:.08em;">
-                  {{ t("badge_circuit") }}
-                </span>
+            <div class="koda-circuit-header">
+              <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                  <span class="koda-badge koda-badge--violet" style="text-transform:uppercase;letter-spacing:.08em;">
+                    {{ t("badge_circuit") }}
+                  </span>
+                  <span class="koda-badge koda-badge--violet" style="font-size:13px;font-weight:700;">
+                    × {{ sets_val }}
+                  </span>
+                </div>
                 <span style="font-size:12px;color:var(--text-secondary);">
-                  &mdash; {{ t("preview_circuit_desc_pre") }}{{ ex_count }}{{ t("preview_circuit_desc_post") }}
+                  {{ t("preview_circuit_desc_pre") }}{{ ex_count }}{{ t("preview_circuit_desc_post") }}
                 </span>
               </div>
-              <span class="koda-badge koda-badge--violet" style="font-size:13px;font-weight:700;">
-                × {{ sets_val }}
-              </span>
             </div>
 
             <div class="koda-circuit-body" id="sortableExercises">
               {% for ex in exercises %}
+              {%- set diff = (ex.difficulty if ex.difficulty is defined else 5) | int -%}
+              {%- set dots = ((diff + 1) // 2) | int -%}
+              {%- set dot_color = "var(--bs-danger)" if dots == 5 else ("#f97316" if dots >= 3 else "#22c55e") -%}
               <div class="exercise-item"
                    data-index="{{ loop.index0 }}"
                    data-primary='{{ (ex.primary_muscles or []) | tojson }}'
                    data-secondary='{{ (ex.secondary_muscles or []) | tojson }}'>
-                <div class="step-number flex-shrink-0">{{ loop.index }}</div>
+                <div class="exercise-thumb flex-shrink-0" style="width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,#1e2030 0%,#252840 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:16px;">
+                  {% if ex.video_url and ex.video_url.startswith('/static') %}
+                    <span style="font-size:10px;color:#888;">▶</span>
+                  {% else %}
+                    🏋️
+                  {% endif %}
+                </div>
                 <div class="flex-grow-1 min-w-0">
                   <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap">
                     <div class="min-w-0">
@@ -210,6 +173,11 @@
                       <span class="koda-badge koda-badge--slate ms-1" style="text-transform:capitalize;">
                         {{ ex.muscle_group | replace('_', ' ') }}
                       </span>
+                      <div class="d-flex align-items-center gap-1 mt-1">
+                        {% for i in range(5) %}
+                          <span style="width:7px;height:7px;border-radius:50%;background:{{ dot_color if i < dots else '#2a2d40' }};display:inline-block;flex-shrink:0;"></span>
+                        {% endfor %}
+                      </div>
                     </div>
                     <div class="d-flex gap-1 flex-shrink-0">
                       {% if ex.video_url %}
