@@ -188,18 +188,6 @@ class ProgramPlan:
 # Progressive-overload helpers
 # ---------------------------------------------------------------------------
 
-def _week_difficulty_rank(week: int, duration_weeks: int) -> float:
-    """Map the week number to a difficulty rank (3.0 → 8.0).
-
-    Week 1 starts at 3 (easy exercises); the final week reaches 8 (hard).
-    This is passed as ``fitness_rank`` to ``_generate_session`` so exercise
-    selection naturally gets harder as the program progresses.
-    """
-    if duration_weeks <= 1:
-        return 5.0
-    return 3.0 + (week - 1) / (duration_weeks - 1) * 5.0
-
-
 def _session_duration(
     week: int,
     duration_weeks: int,
@@ -243,6 +231,7 @@ def generate_program(
     duration_minutes: int,
     periodization_type: str = "linear",
     fitness_level: str = "intermediate",  # reserved for future difficulty scaling
+    fitness_rank: float | None = None,
     seed: int | None = None,
 ) -> ProgramPlan:
     """Generate a full multi-week periodized training program.
@@ -309,7 +298,6 @@ def generate_program(
                 raw_phase_key = "acc"  # undulating has no deload weeks
 
             week_duration = _session_duration(week, duration_weeks, duration_minutes, raw_phase_key)
-            week_rank = _week_difficulty_rank(week, duration_weeks)
 
             name = f"Week {week} Day {day_idx + 1} · {split_day.short} — {week_duration} min"
 
@@ -321,7 +309,7 @@ def generate_program(
                 override_sets=phase.sets,
                 override_reps=phase.reps_high,
                 override_rest=phase.rest_seconds,
-                fitness_rank=week_rank,
+                fitness_rank=fitness_rank,
                 workout_name=name,
                 seed=_session_seed(seed, week, day_idx),
             )
@@ -462,6 +450,7 @@ def auto_generate_program(user: User, db: Session) -> Program:
         duration_minutes=duration_minutes,
         periodization_type=periodization,
         fitness_level=fitness_level,
+        fitness_rank=user.fitness_rank,
     )
 
     program = Program(
