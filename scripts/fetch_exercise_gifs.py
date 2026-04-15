@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Download animated GIFs from a local ExerciseDB API for all exercises in _POOL.
+Download animated GIFs from the ExerciseDB OSS API for all exercises in _POOL.
 
 Usage:
-    python scripts/fetch_exercise_gifs.py                          # default http://localhost:3000
-    python scripts/fetch_exercise_gifs.py --api-url http://host:3000
+    python scripts/fetch_exercise_gifs.py                          # uses oss.exercisedb.dev
+    python scripts/fetch_exercise_gifs.py --api-url https://...    # override API base URL
     python scripts/fetch_exercise_gifs.py --dry-run                # preview without downloading
 
 Output: web/static/gifs/<GARMIN_KEY>.gif  (e.g. BARBELL_BENCH_PRESS.gif)
@@ -16,6 +16,7 @@ import argparse
 import json
 import pathlib
 import sys
+import time
 import urllib.parse
 import urllib.request
 
@@ -29,16 +30,46 @@ from web.workout_generator import _POOL  # noqa: E402
 from exercisedb_map import garmin_to_exercisedb_name  # noqa: E402
 
 
+_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0.0.0 Safari/537.36"
+    ),
+    "Accept": "application/json, image/gif, */*",
+}
+
+
 def _fetch_gif_url(api_url: str, exercise_name: str) -> str | None:
-    """Query ExerciseDB; return the gifUrl of the first result or None."""
+    """Query ExerciseDB; return the gifUrl of the first result or None.
+
+    Handles both response shapes:
+      - oss.exercisedb.dev: {"success": true, "data": [...]}
+      - legacy local API:   [...]
+    Retries once after a 60 s back-off on HTTP 429.
+    """
     encoded = urllib.parse.quote(exercise_name)
     url = f"{api_url.rstrip('/')}/api/v1/exercises?name={encoded}&limit=1"
-    try:
-        with urllib.request.urlopen(url, timeout=10) as resp:
-            data = json.loads(resp.read().decode())
-    except Exception as exc:
-        print(f"  [ERROR] HTTP request failed for '{exercise_name}': {exc}")
+    for attempt in range(2):
+        req = urllib.request.Request(url, headers=_HEADERS)
+        try:
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                payload = json.loads(resp.read().decode())
+            break
+        except urllib.error.HTTPError as exc:
+            if exc.code == 429 and attempt == 0:
+                print(f"\n  [RATE]   429 — waiting 60 s ...", flush=True)
+                time.sleep(60)
+                continue
+            print(f"  [ERROR] HTTP request failed for '{exercise_name}': {exc}")
+            return None
+        except Exception as exc:
+            print(f"  [ERROR] HTTP request failed for '{exercise_name}': {exc}")
+            return None
+    else:
         return None
+    # Unwrap envelope if present
+    data = payload.get("data", payload) if isinstance(payload, dict) else payload
     if not data:
         return None
     return data[0].get("gifUrl")
@@ -46,8 +77,9 @@ def _fetch_gif_url(api_url: str, exercise_name: str) -> str | None:
 
 def _download_gif(gif_url: str, dest: pathlib.Path) -> bool:
     """Download gif_url to dest. Returns True on success."""
+    req = urllib.request.Request(gif_url, headers=_HEADERS)
     try:
-        with urllib.request.urlopen(gif_url, timeout=30) as resp:
+        with urllib.request.urlopen(req, timeout=30) as resp:
             dest.write_bytes(resp.read())
         return True
     except Exception as exc:
@@ -58,7 +90,9 @@ def _download_gif(gif_url: str, dest: pathlib.Path) -> bool:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Download ExerciseDB GIFs")
     parser.add_argument(
-        "--api-url", default="http://localhost:3000", help="Base URL of local ExerciseDB API"
+        "--api-url",
+        default="https://oss.exercisedb.dev",
+        help="ExerciseDB API base URL (default: https://oss.exercisedb.dev)",
     )
     parser.add_argument(
         "--dry-run",
@@ -93,7 +127,7 @@ def main() -> None:
             counts["overridden_skip"] += 1
             continue
 
-        print(f"  [QUERY]  {key} → '{search_name}' ...", end=" ", flush=True)
+        print(f"  [QUERY]  {key} -> '{search_name}' ...", end=" ", flush=True)
 
         if args.dry_run:
             print("(dry-run)")
@@ -101,6 +135,7 @@ def main() -> None:
             continue
 
         gif_url = _fetch_gif_url(args.api_url, search_name)
+        time.sleep(3)
         if gif_url is None:
             print("NOT FOUND")
             counts["not_found"] += 1
