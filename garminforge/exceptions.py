@@ -40,6 +40,21 @@ class ConnectionError(GarminForgeError):  # noqa: A001 — intentional shadowing
     """Raised on network errors or unexpected 4xx/5xx responses."""
 
 
+class StravaAuthError(GarminForgeError):
+    """Raised when Strava returns HTTP 401 (token invalid or revoked).
+
+    Recovery: disconnect and reconnect the Strava account via /strava/connect.
+    """
+
+
+class StravaRateLimitError(GarminForgeError):
+    """Raised when Strava returns HTTP 429 (rate limited).
+
+    Strava allows 100 requests per 15 minutes and 1 000 per day.
+    Back off for at least 15 minutes before retrying.
+    """
+
+
 # ---------------------------------------------------------------------------
 # Workout validation
 # ---------------------------------------------------------------------------
