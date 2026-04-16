@@ -29,11 +29,12 @@ MANUAL_OVERRIDES: dict[str, str | None] = {
     "SQUAT": None,
     "CURL": None,
     "BACK_SQUAT": None,
-    # Sled / sandbag movements not covered by ExerciseDB
+    # Sled / sandbag movements — use barbell equivalent where available
+    "CLEAN_AND_PRESS": "barbell clean and press",
+    # No ExerciseDB equivalent for these
     "FORWARD_DRAG": None,
     "BACKWARD_DRAG": None,
     "SHOULDERING": None,
-    "CLEAN_AND_PRESS": None,
     "OVERHEAD_CARRY": None,
     # Specialty movements with low or absent coverage
     "ROPE_CLIMB": "rope climbing",
