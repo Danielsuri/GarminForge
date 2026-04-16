@@ -1829,14 +1829,22 @@ def _generate_session(
             excluded_names |= _HEALTH_EXCLUSIONS.get(condition, set())
         available = [ex for ex in available if ex.name not in excluded_names]
 
-    # 3. Apply rank band (exercises within ±2 of fitness_rank, widen if needed)
+    # 3. Apply rank band — hard cap upper difficulty at fitness_rank + 2, widen downward if needed
     if fitness_rank is not None:
-        for band in (2, 3, 4):
-            band_pool = [ex for ex in available if abs(ex.difficulty - fitness_rank) <= band]
+        max_diff = fitness_rank + 2
+        for low_band in (2, 3, 4, 5):
+            band_pool = [
+                ex for ex in available
+                if ex.difficulty <= max_diff and ex.difficulty >= fitness_rank - low_band
+            ]
             if len(band_pool) >= num:
                 available = band_pool
                 break
-        # If still short after band=4, keep full available pool (already set above)
+        # If still short after widening down, allow full pool below the hard cap
+        else:
+            capped = [ex for ex in available if ex.difficulty <= max_diff]
+            if capped:
+                available = capped
 
     templates = _select_exercises(available, num, goal)
 
