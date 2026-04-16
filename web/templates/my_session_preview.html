@@ -620,6 +620,8 @@ function renderMediaArea(step) {
 }
 
 // ── UI updater ────────────────────────────────────────────────────────
+let _lastMediaIndex = -1;
+
 function renderPlayerStep() {
   const step  = playerQueue[playerIndex];
   const total = playerQueue.length - 1;
@@ -629,7 +631,12 @@ function renderPlayerStep() {
   document.getElementById('playerStepLabel').textContent =
     'Step ' + (playerIndex + 1) + ' of ' + total;
 
-  renderMediaArea(step);
+  // Only rebuild the media area when the step changes, not every tick.
+  // Rebuilding every second restarts GIF animations from frame 0.
+  if (playerIndex !== _lastMediaIndex) {
+    _lastMediaIndex = playerIndex;
+    renderMediaArea(step);
+  }
 
   const nameEl     = document.getElementById('playerExerciseName');
   const timerEl    = document.getElementById('playerTimer');
