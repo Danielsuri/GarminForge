@@ -39,9 +39,15 @@ fi
 
 cd "$SCRIPT_DIR"
 
-# Install / upgrade Python dependencies (picks up any new packages after git pull)
-echo "Installing dependencies..."
-"$VENV_BIN/pip" install -e ".[web]" -q
+# Install / upgrade Python dependencies only if pyproject.toml changed since last install
+MARKER="$SCRIPT_DIR/.venv/.last_install"
+if [[ ! -f "$MARKER" || "$SCRIPT_DIR/pyproject.toml" -nt "$MARKER" ]]; then
+    echo "Installing dependencies..."
+    "$VENV_BIN/pip" install -e ".[web]" -q
+    touch "$MARKER"
+else
+    echo "Dependencies up to date (skipping install)."
+fi
 
 # Run DB migrations before starting.
 # If a migration fails with "duplicate column" it means those columns were
