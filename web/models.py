@@ -47,6 +47,14 @@ class User(Base):
     fitness_rank: Mapped[float | None] = mapped_column(Float, nullable=True)
     # 1.0–10.0, null until questionnaire is completed. Updated via /my/rank-feedback.
 
+    # Strava integration
+    strava_athlete_id:      Mapped[str | None] = mapped_column(String(32), nullable=True)
+    strava_token_json:      Mapped[str | None] = mapped_column(Text, nullable=True)
+    strava_activities_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    strava_synced_at:       Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
     plans: Mapped[list[SavedPlan]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
@@ -162,6 +170,8 @@ class ProgramSession(Base):
     garmin_workout_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
     scheduled_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    actual_duration_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    strava_activity_id:      Mapped[str | None] = mapped_column(String(32), nullable=True)
 
     program: Mapped[Program] = relationship(back_populates="program_sessions")
     saved_plans: Mapped[list[SavedPlan]] = relationship(back_populates="program_session")
