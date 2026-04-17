@@ -51,16 +51,27 @@
       {% endif %}
 
       {% if forge_user %}
-        {% if authenticated %}
+        {% set strava_on = forge_user.strava_token_json %}
+        {% if authenticated and strava_on %}
+          <span class="koda-badge-connected">
+            <span class="koda-badge-dot"></span>
+            Garmin &amp; Strava
+          </span>
+        {% elif authenticated %}
           <span class="koda-badge-connected">
             <span class="koda-badge-dot"></span>
             {{ t('nav_garmin_connected') }}
           </span>
-        {% else %}
-          <span class="koda-badge-disconnected">
+        {% elif strava_on %}
+          <span class="koda-badge-connected">
             <span class="koda-badge-dot"></span>
-            {{ t('nav_garmin_not_connected') }}
+            Strava Connected
           </span>
+        {% else %}
+          <a href="{{ url_for('my_profile') }}" class="koda-badge-disconnected" style="text-decoration:none;">
+            <span class="koda-badge-dot"></span>
+            Connect a service
+          </a>
         {% endif %}
         <a href="{{ url_for('my_profile') }}" class="koda-avatar" title="{{ t('nav_profile') if t('nav_profile') else 'Profile' }}">
           {{ (forge_user.display_name or forge_user.email or 'K')[0]|upper }}
