@@ -77,6 +77,12 @@ def do_sync(user: User, db: Session) -> None:
     user.strava_token_json = json.dumps(client.token.as_dict())
     db.commit()
 
+    # Refresh future program sessions to match updated fitness_rank
+    from web.program_generator import refresh_future_program_sessions
+    refreshed = refresh_future_program_sessions(user, db)
+    if refreshed:
+        logger.info("Strava sync refreshed %d future sessions for user %s", refreshed, user.id)
+
     # Reschedule upcoming program sessions if user is fatigued
     recovery = recovery_score(compact)
     upcoming = (

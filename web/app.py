@@ -143,7 +143,26 @@ async def lifespan(app: FastAPI):  # type: ignore[type-arg]
         finally:
             db.close()
 
+    async def _nightly_session_refresh() -> None:
+        from web.program_generator import refresh_future_program_sessions
+
+        db = SessionLocal()
+        try:
+            users = db.query(User).filter(User.fitness_rank.isnot(None)).all()
+            for user in users:
+                try:
+                    refreshed = refresh_future_program_sessions(user, db)
+                    if refreshed:
+                        logger.info(
+                            "Nightly refresh: updated %d sessions for user %s", refreshed, user.id
+                        )
+                except Exception:
+                    logger.exception("Nightly session refresh error for user %s", user.id)
+        finally:
+            db.close()
+
     _scheduler.add_job(_nightly_strava_sync, "cron", hour=3, minute=0)
+    _scheduler.add_job(_nightly_session_refresh, "cron", hour=3, minute=30)
     _scheduler.start()
     yield
     _scheduler.shutdown(wait=False)
