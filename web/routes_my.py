@@ -7,6 +7,7 @@ User-specific routes for saved plans and workout progress:
   GET    /my/progress           — workout session history
   POST   /my/sessions           — log a completed session (called by Workout Player)
 """
+
 from __future__ import annotations
 
 import dataclasses
@@ -26,7 +27,13 @@ from web.models import ProgramSession, RankFeedback, SavedPlan, WorkoutSession
 from web.program_generator import refresh_future_program_sessions
 from web.rendering import render_template
 from web.translations import make_t
-from web.workout_generator import EQUIPMENT_OPTIONS, GOALS, ExerciseInfo, WorkoutPlan, _LOCAL_VIDEO_MAP
+from web.workout_generator import (
+    EQUIPMENT_OPTIONS,
+    GOALS,
+    ExerciseInfo,
+    WorkoutPlan,
+    _LOCAL_VIDEO_MAP,
+)
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/my")
@@ -40,37 +47,37 @@ _require_user = require_user
 # ---------------------------------------------------------------------------
 
 DIET_OPTIONS = [
-    {"value": "general",        "label": "diet_general"},
-    {"value": "vegetarian",     "label": "diet_vegetarian"},
-    {"value": "vegan",          "label": "diet_vegan"},
-    {"value": "keto",           "label": "diet_keto"},
-    {"value": "paleo",          "label": "diet_paleo"},
-    {"value": "mediterranean",  "label": "diet_mediterranean"},
-    {"value": "gluten_free",    "label": "diet_gluten_free"},
-    {"value": "high_protein",   "label": "diet_high_protein"},
+    {"value": "general", "label": "diet_general"},
+    {"value": "vegetarian", "label": "diet_vegetarian"},
+    {"value": "vegan", "label": "diet_vegan"},
+    {"value": "keto", "label": "diet_keto"},
+    {"value": "paleo", "label": "diet_paleo"},
+    {"value": "mediterranean", "label": "diet_mediterranean"},
+    {"value": "gluten_free", "label": "diet_gluten_free"},
+    {"value": "high_protein", "label": "diet_high_protein"},
 ]
 
 HEALTH_OPTIONS = [
-    {"value": "heart_condition",    "label": "health_heart_condition"},
-    {"value": "diabetes",           "label": "health_diabetes"},
-    {"value": "high_blood_pressure","label": "health_high_blood_pressure"},
-    {"value": "joint_problems",     "label": "health_joint_problems"},
-    {"value": "back_pain",          "label": "health_back_pain"},
-    {"value": "asthma",             "label": "health_asthma"},
+    {"value": "heart_condition", "label": "health_heart_condition"},
+    {"value": "diabetes", "label": "health_diabetes"},
+    {"value": "high_blood_pressure", "label": "health_high_blood_pressure"},
+    {"value": "joint_problems", "label": "health_joint_problems"},
+    {"value": "back_pain", "label": "health_back_pain"},
+    {"value": "asthma", "label": "health_asthma"},
 ]
 
 GOAL_OPTIONS = [
-    {"value": "lose_weight",       "label": "qgoal_lose_weight"},
-    {"value": "build_muscle",      "label": "qgoal_build_muscle"},
+    {"value": "lose_weight", "label": "qgoal_lose_weight"},
+    {"value": "build_muscle", "label": "qgoal_build_muscle"},
     {"value": "improve_endurance", "label": "qgoal_improve_endurance"},
-    {"value": "flexibility",       "label": "qgoal_flexibility"},
-    {"value": "general_health",    "label": "qgoal_general_health"},
+    {"value": "flexibility", "label": "qgoal_flexibility"},
+    {"value": "general_health", "label": "qgoal_general_health"},
 ]
 
 FITNESS_LEVELS = [
-    {"value": "Beginner",     "key": "fitness_beginner"},
+    {"value": "Beginner", "key": "fitness_beginner"},
     {"value": "Intermediate", "key": "fitness_intermediate"},
-    {"value": "Advanced",     "key": "fitness_advanced"},
+    {"value": "Advanced", "key": "fitness_advanced"},
 ]
 
 # Maps stored fitness_level value → translation key (for profile display)
@@ -106,6 +113,30 @@ async def questionnaire_redirect_post(request: Request):
 # ---------------------------------------------------------------------------
 
 
+def _build_strava_profile_ctx(user: "Any") -> dict[str, Any]:
+    """Build Strava-related context for the profile template."""
+    import json as _json
+    from web.strava_insights import recovery_score
+
+    strava_connected = bool(user.strava_token_json)
+    strava_recovery = None
+
+    if strava_connected and user.strava_activities_json:
+        try:
+            activities = _json.loads(user.strava_activities_json)
+            if activities:
+                strava_recovery = recovery_score(activities)
+        except Exception:
+            pass
+
+    return {
+        "strava_connected": strava_connected,
+        "strava_athlete_id": user.strava_athlete_id,
+        "strava_synced_at": user.strava_synced_at,
+        "strava_recovery": strava_recovery,
+    }
+
+
 @router.get("/profile", response_class=HTMLResponse)
 async def my_profile(request: Request, db: Session = Depends(get_db)):
     user = _require_user(request, db)
@@ -114,6 +145,7 @@ async def my_profile(request: Request, db: Session = Depends(get_db)):
 
     # Build translated label maps for the active language
     from web.translations import SUPPORTED_LANGS
+
     lang = "en"
     if user.preferred_lang in SUPPORTED_LANGS:
         lang = user.preferred_lang  # type: ignore[assignment]
@@ -128,6 +160,8 @@ async def my_profile(request: Request, db: Session = Depends(get_db)):
     goal_labels = {o["value"]: t(o["label"]) for o in GOAL_OPTIONS}
     eq_labels = {eq["tag"]: f"{eq['icon']} {eq['label']}" for eq in EQUIPMENT_OPTIONS}
 
+    strava_ctx = _build_strava_profile_ctx(user)
+
     return render_template(
         "my_profile.html",
         request,
@@ -141,6 +175,7 @@ async def my_profile(request: Request, db: Session = Depends(get_db)):
         user_health=_decode_json_field(user.health_conditions_json),
         user_goals=_decode_json_field(user.fitness_goals_json),
         user_equipment=_decode_json_field(user.preferred_equipment_json),
+        **strava_ctx,
     )
 
 
@@ -156,17 +191,13 @@ async def my_plans(request: Request, db: Session = Depends(get_db)):
         return RedirectResponse("/auth/login-forge", status_code=303)
     plans = (
         db.query(SavedPlan)
-        .options(
-            joinedload(SavedPlan.program_session).joinedload(ProgramSession.program)
-        )
+        .options(joinedload(SavedPlan.program_session).joinedload(ProgramSession.program))
         .filter_by(user_id=user.id)
         .order_by(SavedPlan.created_at.desc())
         .all()
     )
     goal_icons = {k: v["icon"] for k, v in GOALS.items()}
-    return render_template(
-        "my_plans.html", request, db=db, plans=plans, goal_icons=goal_icons
-    )
+    return render_template("my_plans.html", request, db=db, plans=plans, goal_icons=goal_icons)
 
 
 @router.post("/plans")
@@ -305,7 +336,9 @@ async def log_session(request: Request, db: Session = Depends(get_db)):
         return JSONResponse({"ok": False, "error": "Invalid JSON"}, status_code=400)
 
     if "plan_name" not in body or "started_at" not in body:
-        return JSONResponse({"ok": False, "error": "Missing plan_name or started_at"}, status_code=400)
+        return JSONResponse(
+            {"ok": False, "error": "Missing plan_name or started_at"}, status_code=400
+        )
 
     try:
         started_at = datetime.fromisoformat(body["started_at"])
@@ -342,11 +375,11 @@ async def log_session(request: Request, db: Session = Depends(get_db)):
 # ---------------------------------------------------------------------------
 
 _RANK_DELTAS: dict[tuple[str, str], float] = {
-    ("mid_workout",  "too_easy"):   +0.1,
-    ("mid_workout",  "too_hard"):   -0.1,
-    ("post_workout", "too_easy"):   +0.5,
-    ("post_workout", "just_right"):  0.0,
-    ("post_workout", "too_hard"):   -0.5,
+    ("mid_workout", "too_easy"): +0.1,
+    ("mid_workout", "too_hard"): -0.1,
+    ("post_workout", "too_easy"): +0.5,
+    ("post_workout", "just_right"): 0.0,
+    ("post_workout", "too_hard"): -0.5,
 }
 
 
@@ -368,15 +401,15 @@ async def rank_feedback(
 
     key = (body.trigger, body.feedback)
     if key not in _RANK_DELTAS:
-        raise HTTPException(status_code=400, detail="'just_right' feedback is only valid for post_workout")
+        raise HTTPException(
+            status_code=400, detail="'just_right' feedback is only valid for post_workout"
+        )
 
     delta = _RANK_DELTAS[key]
 
     if body.session_id is not None:
         session_exists = (
-            db.query(WorkoutSession)
-            .filter_by(id=body.session_id, user_id=user.id)
-            .first()
+            db.query(WorkoutSession).filter_by(id=body.session_id, user_id=user.id).first()
         )
         if session_exists is None:
             raise HTTPException(status_code=400, detail="session_id not found")
@@ -401,8 +434,13 @@ async def rank_feedback(
     # Regenerate future program sessions to reflect the new fitness rank
     refreshed = refresh_future_program_sessions(user, db)
     if refreshed:
-        logger.info("Refreshed %d future program sessions for user %s (rank %.1f → %.1f)",
-                    refreshed, user.id, rank_before, rank_after)
+        logger.info(
+            "Refreshed %d future program sessions for user %s (rank %.1f → %.1f)",
+            refreshed,
+            user.id,
+            rank_before,
+            rank_after,
+        )
 
     db.commit()
 

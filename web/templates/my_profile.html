@@ -76,6 +76,35 @@
           {% endif %}
         </div>
 
+        {# Strava status #}
+        <div style="margin-top:10px;">
+          {% if strava_connected %}
+            <div class="koda-badge koda-badge--slate" style="width:100%;justify-content:center;padding:8px 12px;font-size:11px;background:#1a0f00;border-color:#fc4c02;color:#fc4c02;">
+              <span style="width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block;margin-right:4px;"></span>
+              Strava Connected
+            </div>
+            {% if strava_synced_at %}
+            <div style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:6px;">
+              Synced {{ strava_synced_at.strftime('%b %d, %H:%M') }}
+            </div>
+            {% endif %}
+            <form method="post" action="/strava/sync" style="margin-top:8px;">
+              <button type="submit" class="btn-koda-ghost" style="width:100%;padding:6px 12px;font-size:11px;">
+                Sync Now
+              </button>
+            </form>
+            <form method="post" action="/strava/disconnect" style="margin-top:6px;">
+              <button type="submit" style="width:100%;background:none;border:none;color:var(--text-muted);font-size:10px;cursor:pointer;padding:4px;">
+                Disconnect
+              </button>
+            </form>
+          {% else %}
+            <a href="/strava/connect" class="btn-koda-ghost" style="width:100%;display:block;text-align:center;padding:8px 12px;font-size:11px;text-decoration:none;box-sizing:border-box;">
+              Connect Strava
+            </a>
+          {% endif %}
+        </div>
+
       </div>
     </div>
 
@@ -132,6 +161,41 @@
         {% endif %}
 
       </div>
+
+      {# Recovery card (only if Strava connected and recovery data exists) #}
+      {% if strava_connected and strava_recovery %}
+      <div class="koda-card mb-4">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:16px;">
+          Recovery Status
+        </div>
+        {% set pct = (strava_recovery.score * 100) | round | int %}
+        {% set bar_color = "#22c55e" if pct >= 70 else ("#f59e0b" if pct >= 40 else "#ef4444") %}
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="koda-info-label">Score</span>
+          <span class="koda-info-value">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:13px;">{{ pct }}<span style="color:var(--text-muted);font-size:11px;">%</span></span>
+            {% if strava_recovery.fatigued %}
+            <span class="koda-badge koda-badge--amber" style="font-size:10px;padding:2px 8px;margin-left:6px;">Rest</span>
+            {% else %}
+            <span class="koda-badge koda-badge--green" style="font-size:10px;padding:2px 8px;margin-left:6px;">Ready</span>
+            {% endif %}
+          </span>
+        </div>
+        <div style="background:var(--surface-2,#1e1e2e);border-radius:4px;height:6px;overflow:hidden;margin-bottom:12px;">
+          <div style="width:{{ pct }}%;height:100%;border-radius:4px;background:{{ bar_color }};transition:width .4s ease;"></div>
+        </div>
+        <div style="font-size:12px;color:var(--text-secondary);">{{ strava_recovery.summary }}</div>
+        {% if strava_recovery.recommended_rest_days > 0 %}
+        <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">
+          Next safe workout: {{ strava_recovery.next_safe_date.strftime('%b %d') }}
+        </div>
+        {% else %}
+        <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">
+          You&rsquo;re good to train today.
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
 
       {# Goals card #}
       {% if user_goals %}
