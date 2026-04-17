@@ -26,6 +26,27 @@
 
 {# ===== Form ===== #}
 <div class="container-xl px-3 px-lg-4 py-4" style="max-width:640px;">
+
+  {# Exercise list #}
+  {% if exercises %}
+  <div class="koda-card mb-4">
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;
+                color:var(--text-muted);margin-bottom:14px;">Exercises</div>
+    {% for ex in exercises %}
+    <div style="padding:6px 0;color:var(--text-secondary);font-size:14px;
+                border-bottom:1px solid var(--border);{% if loop.last %}border-bottom:none;{% endif %}">
+      {{ ex.label or ex.name }}
+      {% if ex.sets and ex.reps %}
+      <span style="color:var(--text-muted);font-size:12px;margin-left:8px;">
+        {{ ex.sets }} &times; {{ ex.reps }}
+      </span>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" action="/my/sessions/{{ session.id }}/complete">
   <form method="post" action="/my/sessions/{{ session.id }}/complete">
 
     {# Actual duration #}
@@ -60,7 +81,7 @@
       Log Workout
     </button>
 
-  </form>
+    </form>
 </div>
 
 {% endblock %}
