@@ -120,12 +120,19 @@ def _build_strava_profile_ctx(user: "Any") -> dict[str, Any]:
 
     strava_connected = bool(user.strava_token_json)
     strava_recovery = None
+    strava_last_activity = None
 
     if strava_connected and user.strava_activities_json:
         try:
             activities = _json.loads(user.strava_activities_json)
             if activities:
                 strava_recovery = recovery_score(activities)
+                # Most recent activity by start_date
+                strava_last_activity = max(
+                    activities,
+                    key=lambda a: a.get("start_date") or "",
+                    default=None,
+                )
         except Exception:
             pass
 
@@ -134,6 +141,7 @@ def _build_strava_profile_ctx(user: "Any") -> dict[str, Any]:
         "strava_athlete_id": user.strava_athlete_id,
         "strava_synced_at": user.strava_synced_at,
         "strava_recovery": strava_recovery,
+        "strava_last_activity": strava_last_activity,
     }
 
 
