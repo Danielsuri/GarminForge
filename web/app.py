@@ -28,6 +28,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import Depends, FastAPI, Form, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -47,7 +48,7 @@ from garminforge.exceptions import (
 
 # Web modules
 from web.auth_utils import get_current_user, logout_session
-from web.db import get_db, init_db
+from web.db import SessionLocal, get_db, init_db
 from web.garmin_sso import browser_login, exchange_ticket, make_token_b64, portal_login
 from web.models import Program, User
 from web.rendering import render_template
@@ -94,6 +95,8 @@ _TOKEN_STORE: dict[str, str] = {}
 _SAVED_TOKEN_PATH = Path.home() / ".garminforge_token"
 _REMEMBERED_TOKEN_ID = "remembered"
 
+_scheduler = AsyncIOScheduler()
+
 
 def _save_token_to_disk(token_b64: str) -> None:
     try:
@@ -121,7 +124,27 @@ def _load_remembered_token() -> bool:
 async def lifespan(app: FastAPI):  # type: ignore[type-arg]
     init_db()
     _load_remembered_token()
+
+    async def _nightly_strava_sync() -> None:
+        from web.routes_strava import do_sync  # lazy import avoids circular import
+        from garminforge.exceptions import StravaAuthError, StravaRateLimitError
+        db = SessionLocal()
+        try:
+            users = db.query(User).filter(User.strava_token_json.isnot(None)).all()
+            for user in users:
+                try:
+                    do_sync(user, db)
+                except (StravaAuthError, StravaRateLimitError) as exc:
+                    logger.warning("Nightly Strava sync skipped for %s: %s", user.id, exc)
+                except Exception:
+                    logger.exception("Nightly Strava sync error for user %s", user.id)
+        finally:
+            db.close()
+
+    _scheduler.add_job(_nightly_strava_sync, "cron", hour=3, minute=0)
+    _scheduler.start()
     yield
+    _scheduler.shutdown(wait=False)
 
 
 app = FastAPI(title="Koda", docs_url=None, redoc_url=None, lifespan=lifespan)
