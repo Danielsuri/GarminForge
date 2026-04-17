@@ -57,6 +57,7 @@ from web.routes_my import router as my_router
 from web.routes_onboarding import router as onboarding_router
 from web.routes_programs import router as programs_router
 from web.routes_strava import router as strava_router
+from web.strava_insights import RecoveryStatus, recovery_score
 from web.translations import SUPPORTED_LANGS
 from web.workout_generator import (
     EQUIPMENT_OPTIONS,
@@ -128,6 +129,7 @@ async def lifespan(app: FastAPI):  # type: ignore[type-arg]
     async def _nightly_strava_sync() -> None:
         from web.routes_strava import do_sync  # lazy import avoids circular import
         from garminforge.exceptions import StravaAuthError, StravaRateLimitError
+
         db = SessionLocal()
         try:
             users = db.query(User).filter(User.strava_token_json.isnot(None)).all()
@@ -267,15 +269,12 @@ async def index(
         return RedirectResponse("/onboarding", status_code=303)
 
     # Find active program
-    active_program = (
-        db.query(Program)
-        .filter_by(user_id=forge_user.id, status="active")
-        .first()
-    )
+    active_program = db.query(Program).filter_by(user_id=forge_user.id, status="active").first()
 
     # No active program → auto-generate one, then redirect
     if active_program is None:
         from web.program_generator import auto_generate_program
+
         active_program = auto_generate_program(forge_user, db)
 
     # Find today's or next upcoming session
@@ -287,7 +286,11 @@ async def index(
     )
     if today_session is None:
         upcoming = sorted(
-            [s for s in sessions if s.scheduled_date and s.scheduled_date >= today and not s.completed_at],
+            [
+                s
+                for s in sessions
+                if s.scheduled_date and s.scheduled_date >= today and not s.completed_at
+            ],
             key=lambda s: s.scheduled_date,
         )
         today_session = upcoming[0] if upcoming else None
@@ -373,9 +376,7 @@ async def auth_finalize(request: Request, db: Session = Depends(get_db)):
         return _error_redirect(request, state.get("error", "Login failed."))
     _store_token(request, state["token_b64"], db)
     request.session["flash_success"] = "Connected to Garmin successfully!"
-    return HTMLResponse(
-        '<html><body><script>window.location.replace("/")</script></body></html>'
-    )
+    return HTMLResponse('<html><body><script>window.location.replace("/")</script></body></html>')
 
 
 @app.get("/auth/mfa", response_class=HTMLResponse)
@@ -617,6 +618,11 @@ async def workout_generate(
         fitness_rank = forge_user.fitness_rank
         health_conditions = json.loads(forge_user.health_conditions_json or "[]")
 
+    strava_recovery: RecoveryStatus | None = None
+    if forge_user is not None and forge_user.strava_activities_json:
+        activities = json.loads(forge_user.strava_activities_json)
+        strava_recovery = recovery_score(activities)
+
     try:
         plan = generate(
             equipment=equipment,
@@ -624,6 +630,7 @@ async def workout_generate(
             duration_minutes=duration,
             fitness_rank=fitness_rank,
             health_conditions=health_conditions or None,
+            recovery=strava_recovery,
         )
     except Exception as exc:
         logger.exception("Workout generation failed")
@@ -675,7 +682,7 @@ async def workout_upload(
             scheduled_on = schedule_date
 
         request.session["flash_success"] = (
-            f"Workout \"{payload.get('workoutName')}\" uploaded to Garmin Connect!"
+            f'Workout "{payload.get("workoutName")}" uploaded to Garmin Connect!'
             + (f" Scheduled for {scheduled_on}." if scheduled_on else "")
         )
         return RedirectResponse("/", status_code=303)
@@ -742,7 +749,9 @@ async def workout_rebuild(request: Request) -> JSONResponse:
         if not isinstance(ex, dict):
             return JSONResponse({"error": f"exercises[{i}] must be an object."}, status_code=400)
         if missing := _required_ex_fields - ex.keys():
-            return JSONResponse({"error": f"exercises[{i}] missing fields: {sorted(missing)}"}, status_code=400)
+            return JSONResponse(
+                {"error": f"exercises[{i}] missing fields: {sorted(missing)}"}, status_code=400
+            )
 
     duration_minutes = int(body.get("duration_minutes", 45))
     workout_name = str(body.get("workout_name", "Workout"))

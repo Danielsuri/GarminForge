@@ -21,6 +21,7 @@ from typing import Any
 
 from garminforge.workouts.strength import StrengthWorkout, ExerciseBlock
 from web.exercise_links import get_exercise_link
+from web.strava_insights import RecoveryStatus
 
 # ---------------------------------------------------------------------------
 # Goal definitions
@@ -1834,7 +1835,8 @@ def _generate_session(
         max_diff = fitness_rank + 2
         for low_band in (2, 3, 4, 5):
             band_pool = [
-                ex for ex in available
+                ex
+                for ex in available
                 if ex.difficulty <= max_diff and ex.difficulty >= fitness_rank - low_band
             ]
             if len(band_pool) >= num:
@@ -1973,6 +1975,7 @@ def generate(
     fitness_rank: float | None = None,
     health_conditions: list[str] | None = None,
     seed: int | None = None,
+    recovery: RecoveryStatus | None = None,
 ) -> WorkoutPlan:
     """Generate a balanced workout.
 
@@ -1992,9 +1995,18 @@ def generate(
         Exercises in ``_HEALTH_EXCLUSIONS`` for each condition are removed.
     seed:
         Optional random seed for reproducible generation.
+    recovery:
+        Optional recovery status from Strava. When ``recovery.fatigued`` is True,
+        exercise difficulty is capped at ``max(fitness_rank - 1.0, 1.0)`` and
+        session duration is shortened by ~12%.
     """
     if goal not in GOALS:
         raise ValueError(f"Unknown goal {goal!r}. Choose from: {list(GOALS)}")
+
+    if recovery is not None and recovery.fatigued:
+        if fitness_rank is not None:
+            fitness_rank = max(fitness_rank - 1.0, 1.0)
+        duration_minutes = int(duration_minutes * 0.88)
 
     return _generate_session(
         equipment,
