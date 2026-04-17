@@ -7,6 +7,7 @@ Program routes for multi-week training program management:
   DELETE /my/programs/{id}      — delete a program (cascades to program_sessions)
   GET    /my/programs/{id}      — program detail view
 """
+
 from __future__ import annotations
 
 import dataclasses
@@ -15,13 +16,13 @@ import logging
 from datetime import date, timedelta
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, Request
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi import APIRouter, Depends, Form, Request
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 from sqlalchemy.orm import Session, joinedload
 
 from web.auth_utils import require_user
 from web.db import get_db
-from web.models import Program, ProgramSession
+from web.models import Program, ProgramSession, User
 from web.program_generator import generate_program
 from web.rendering import render_template
 from web.workout_generator import EQUIPMENT_OPTIONS, GOALS, _LOCAL_VIDEO_MAP
@@ -89,8 +90,14 @@ async def preview_program(request: Request, db: Session = Depends(get_db)):
     except Exception:
         return JSONResponse({"ok": False, "error": "Invalid JSON"}, status_code=400)
 
-    required = {"goal", "equipment", "duration_weeks", "weekly_workout_days", "duration_minutes",
-                "periodization_type"}
+    required = {
+        "goal",
+        "equipment",
+        "duration_weeks",
+        "weekly_workout_days",
+        "duration_minutes",
+        "periodization_type",
+    }
     missing = required - body.keys()
     if missing:
         return JSONResponse({"ok": False, "error": f"Missing fields: {missing}"}, status_code=400)
@@ -112,35 +119,39 @@ async def preview_program(request: Request, db: Session = Depends(get_db)):
     # sessions contain ExerciseInfo dataclasses + raw dicts (garmin_payload).
     sessions_data = []
     for s in plan.sessions:
-        sessions_data.append({
-            "week_num": s.week_num,
-            "day_num": s.day_num,
-            "focus": s.focus,
-            "workout_name": s.workout_name,
-            "phase": s.phase,
-            "sets": s.sets,
-            "reps_low": s.reps_low,
-            "reps_high": s.reps_high,
-            "rest_seconds": s.rest_seconds,
-            "exercises": [dataclasses.asdict(ex) for ex in s.exercises],
-            "garmin_payload": s.garmin_payload,
-        })
+        sessions_data.append(
+            {
+                "week_num": s.week_num,
+                "day_num": s.day_num,
+                "focus": s.focus,
+                "workout_name": s.workout_name,
+                "phase": s.phase,
+                "sets": s.sets,
+                "reps_low": s.reps_low,
+                "reps_high": s.reps_high,
+                "rest_seconds": s.rest_seconds,
+                "exercises": [dataclasses.asdict(ex) for ex in s.exercises],
+                "garmin_payload": s.garmin_payload,
+            }
+        )
 
-    return JSONResponse({
-        "ok": True,
-        "program": {
-            "name": plan.name,
-            "goal": plan.goal,
-            "goal_label": plan.goal_label,
-            "goal_icon": plan.goal_icon,
-            "periodization_type": plan.periodization_type,
-            "duration_weeks": plan.duration_weeks,
-            "weekly_workout_days": plan.weekly_workout_days,
-            "duration_minutes": plan.duration_minutes,
-            "equipment": plan.equipment,
-            "sessions": sessions_data,
-        },
-    })
+    return JSONResponse(
+        {
+            "ok": True,
+            "program": {
+                "name": plan.name,
+                "goal": plan.goal,
+                "goal_label": plan.goal_label,
+                "goal_icon": plan.goal_icon,
+                "periodization_type": plan.periodization_type,
+                "duration_weeks": plan.duration_weeks,
+                "weekly_workout_days": plan.weekly_workout_days,
+                "duration_minutes": plan.duration_minutes,
+                "equipment": plan.equipment,
+                "sessions": sessions_data,
+            },
+        }
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -154,10 +165,7 @@ async def list_programs(request: Request, db: Session = Depends(get_db)):
     if user is None:
         return RedirectResponse("/auth/login-forge", status_code=303)
     programs = (
-        db.query(Program)
-        .filter_by(user_id=user.id)
-        .order_by(Program.created_at.desc())
-        .all()
+        db.query(Program).filter_by(user_id=user.id).order_by(Program.created_at.desc()).all()
     )
     goal_icons = {k: v["icon"] for k, v in GOALS.items()}
     return render_template(
@@ -293,9 +301,7 @@ async def program_detail(program_id: str, request: Request, db: Session = Depend
         request.session["flash_error"] = "Program not found."
         return RedirectResponse("/my/programs", status_code=303)
 
-    sessions_sorted = sorted(
-        program.program_sessions, key=lambda s: (s.week_num, s.day_num)
-    )
+    sessions_sorted = sorted(program.program_sessions, key=lambda s: (s.week_num, s.day_num))
     # Parse exercises per session for inline display
     sessions_exercises: dict[str, list[dict]] = {}
     for s in sessions_sorted:
@@ -335,9 +341,7 @@ async def session_preview(
         request.session["flash_error"] = "Program not found."
         return RedirectResponse("/my/programs", status_code=303)
 
-    session_obj = next(
-        (s for s in program.program_sessions if s.id == session_id), None
-    )
+    session_obj = next((s for s in program.program_sessions if s.id == session_id), None)
     if session_obj is None:
         request.session["flash_error"] = "Session not found."
         return RedirectResponse(f"/my/programs/{program_id}", status_code=303)
@@ -374,3 +378,144 @@ async def session_preview(
         duration_minutes=duration_minutes,
         muscle_map_svg=_MUSCLE_MAP_SVG,
     )
+
+
+# ---------------------------------------------------------------------------
+# Workout completion
+# ---------------------------------------------------------------------------
+
+
+def _mark_complete(
+    session_obj: ProgramSession,
+    *,
+    actual_duration: int,
+    post_to_strava: bool,
+    user: User,
+    db: Session,
+) -> None:
+    """Commit completion data and optionally post to Strava."""
+    import os
+    from datetime import datetime, timezone
+
+    session_obj.completed_at = datetime.now(timezone.utc)
+    session_obj.actual_duration_minutes = actual_duration
+
+    if post_to_strava and user.strava_token_json and not session_obj.strava_activity_id:
+        try:
+            from garminforge.exceptions import StravaAuthError, StravaRateLimitError
+            from web.strava_client import strava_client_from_user
+
+            client_id = os.environ.get("STRAVA_CLIENT_ID", "")
+            client_secret = os.environ.get("STRAVA_CLIENT_SECRET", "")
+            strava = strava_client_from_user(user, client_id, client_secret)
+            start_dt = session_obj.completed_at
+            result = strava.create_activity(
+                name=session_obj.focus,
+                sport_type="WeightTraining",
+                start_date_local=start_dt.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                elapsed_time=actual_duration * 60,
+                description=(
+                    f"GarminForge — Week {session_obj.week_num}, Day {session_obj.day_num}"
+                ),
+            )
+            session_obj.strava_activity_id = str(result["id"])
+            user.strava_token_json = json.dumps(strava.token.as_dict())
+        except (StravaAuthError, StravaRateLimitError):
+            pass  # Don't block completion on Strava errors
+
+    db.commit()
+
+    # Trigger recovery recalc and reschedule if fatigued
+    if user.strava_activities_json:
+        from web.strava_insights import recovery_score, reschedule_if_needed
+
+        activities = json.loads(user.strava_activities_json)
+        recovery = recovery_score(activities)
+        upcoming = (
+            (
+                db.query(ProgramSession)
+                .filter_by(user_id=user.id)
+                .filter(ProgramSession.completed_at.is_(None))
+                .all()
+            )
+            if hasattr(ProgramSession, "user_id")
+            else []
+        )
+        if upcoming:
+            reschedule_if_needed(upcoming, recovery, db)
+
+
+@router.get("/sessions/{session_id}/complete", response_class=HTMLResponse)
+async def session_complete_get(
+    session_id: str, request: Request, db: Session = Depends(get_db)
+) -> Response:
+    user = _require_user(request, db)
+    if user is None:
+        return RedirectResponse("/auth/login-forge", status_code=303)
+
+    session_obj = db.query(ProgramSession).filter_by(id=session_id).first()
+    if session_obj is None or session_obj.program.user_id != user.id:
+        request.session["flash_error"] = "Session not found."
+        return RedirectResponse("/my/programs", status_code=303)
+
+    if session_obj.completed_at is not None:
+        request.session["flash_error"] = "Session already completed."
+        return RedirectResponse(f"/my/programs/{session_obj.program_id}", status_code=303)
+
+    try:
+        garmin_payload = json.loads(session_obj.garmin_payload_json)
+    except Exception:
+        garmin_payload = {}
+    duration_minutes = int(garmin_payload.get("estimatedDurationInSecs", 2700)) // 60
+
+    try:
+        exercises = json.loads(session_obj.exercises_json)
+    except Exception:
+        exercises = []
+
+    return render_template(
+        "workout_complete.html",
+        request,
+        db=db,
+        session=session_obj,
+        duration_minutes=duration_minutes,
+        exercises=exercises,
+        strava_connected=bool(user.strava_token_json),
+    )
+
+
+@router.post("/sessions/{session_id}/complete", response_class=HTMLResponse)
+async def session_complete_post(
+    session_id: str,
+    request: Request,
+    actual_duration: int = Form(...),
+    post_to_strava: bool = Form(default=False),
+    db: Session = Depends(get_db),
+) -> Response:
+    user = _require_user(request, db)
+    if user is None:
+        return RedirectResponse("/auth/login-forge", status_code=303)
+
+    session_obj = db.query(ProgramSession).filter_by(id=session_id).first()
+    if session_obj is None or session_obj.program.user_id != user.id:
+        request.session["flash_error"] = "Session not found."
+        return RedirectResponse("/my/programs", status_code=303)
+
+    if session_obj.completed_at is not None:
+        request.session["flash_error"] = "Session already completed."
+        return RedirectResponse(f"/my/programs/{session_obj.program_id}", status_code=303)
+
+    if actual_duration < 1:
+        request.session["flash_error"] = "Duration must be at least 1 minute."
+        return RedirectResponse(f"/my/sessions/{session_id}/complete", status_code=303)
+
+    _mark_complete(
+        session_obj,
+        actual_duration=actual_duration,
+        post_to_strava=post_to_strava,
+        user=user,
+        db=db,
+    )
+
+    request.session["flash_success"] = "Workout logged!"
+    return RedirectResponse("/my/profile", status_code=303)
