@@ -1,4 +1,5 @@
 """Unit tests for scripts/exercisedb_map.garmin_to_exercisedb_name()."""
+
 from __future__ import annotations
 
 import pathlib
@@ -7,7 +8,7 @@ import sys
 import pytest
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent / "scripts"))
-from exercisedb_map import garmin_to_exercisedb_name, MANUAL_OVERRIDES
+from exercisedb_map import garmin_to_exercisedb_name
 
 
 class TestAutoConversion:

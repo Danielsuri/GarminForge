@@ -6,6 +6,7 @@ HTTP-level integration tests for the workout editing API endpoints:
 
 Uses FastAPI's TestClient — no running server required.
 """
+
 from __future__ import annotations
 
 import dataclasses
@@ -33,6 +34,7 @@ def sample_exercises():
 # ---------------------------------------------------------------------------
 # GET /workout/exercises
 # ---------------------------------------------------------------------------
+
 
 class TestExercisesEndpoint:
     def test_returns_200_with_list(self, client):
@@ -95,14 +97,18 @@ class TestExercisesEndpoint:
 # POST /workout/rebuild
 # ---------------------------------------------------------------------------
 
+
 class TestRebuildEndpoint:
     def test_returns_payload_json_string(self, client, sample_exercises):
-        resp = client.post("/workout/rebuild", json={
-            "exercises": sample_exercises,
-            "goal": "build_muscle",
-            "duration_minutes": 45,
-            "workout_name": "Test Workout",
-        })
+        resp = client.post(
+            "/workout/rebuild",
+            json={
+                "exercises": sample_exercises,
+                "goal": "build_muscle",
+                "duration_minutes": 45,
+                "workout_name": "Test Workout",
+            },
+        )
         assert resp.status_code == 200
         data = resp.json()
         assert "payload_json" in data
@@ -111,32 +117,41 @@ class TestRebuildEndpoint:
         assert payload["workoutName"] == "Test Workout"
 
     def test_payload_has_strength_sport_type(self, client, sample_exercises):
-        resp = client.post("/workout/rebuild", json={
-            "exercises": sample_exercises,
-            "goal": "build_muscle",
-            "duration_minutes": 45,
-            "workout_name": "Test",
-        })
+        resp = client.post(
+            "/workout/rebuild",
+            json={
+                "exercises": sample_exercises,
+                "goal": "build_muscle",
+                "duration_minutes": 45,
+                "workout_name": "Test",
+            },
+        )
         payload = json.loads(resp.json()["payload_json"])
         assert payload["sportType"]["sportTypeId"] == 5
 
     def test_unknown_goal_returns_400(self, client, sample_exercises):
-        resp = client.post("/workout/rebuild", json={
-            "exercises": sample_exercises,
-            "goal": "not_real",
-            "duration_minutes": 45,
-            "workout_name": "Test",
-        })
+        resp = client.post(
+            "/workout/rebuild",
+            json={
+                "exercises": sample_exercises,
+                "goal": "not_real",
+                "duration_minutes": 45,
+                "workout_name": "Test",
+            },
+        )
         assert resp.status_code == 400
         assert "error" in resp.json()
 
     def test_empty_exercises_returns_400(self, client):
-        resp = client.post("/workout/rebuild", json={
-            "exercises": [],
-            "goal": "build_muscle",
-            "duration_minutes": 45,
-            "workout_name": "Test",
-        })
+        resp = client.post(
+            "/workout/rebuild",
+            json={
+                "exercises": [],
+                "goal": "build_muscle",
+                "duration_minutes": 45,
+                "workout_name": "Test",
+            },
+        )
         assert resp.status_code == 400
 
     def test_invalid_json_body_returns_400(self, client):
@@ -151,38 +166,48 @@ class TestRebuildEndpoint:
     def test_all_goals_rebuild_successfully(self, client, goal):
         plan = generate(["bodyweight"], goal, 45, seed=42)
         exercises = [dataclasses.asdict(e) for e in plan.exercises]
-        resp = client.post("/workout/rebuild", json={
-            "exercises": exercises,
-            "goal": goal,
-            "duration_minutes": 45,
-            "workout_name": "Test",
-        })
+        resp = client.post(
+            "/workout/rebuild",
+            json={
+                "exercises": exercises,
+                "goal": goal,
+                "duration_minutes": 45,
+                "workout_name": "Test",
+            },
+        )
         assert resp.status_code == 200, f"goal={goal!r}: {resp.json()}"
         payload = json.loads(resp.json()["payload_json"])
         assert "workoutSegments" in payload
 
     def test_single_exercise_ok(self, client, sample_exercises):
-        resp = client.post("/workout/rebuild", json={
-            "exercises": sample_exercises[:1],
-            "goal": "build_muscle",
-            "duration_minutes": 30,
-            "workout_name": "Solo",
-        })
+        resp = client.post(
+            "/workout/rebuild",
+            json={
+                "exercises": sample_exercises[:1],
+                "goal": "build_muscle",
+                "duration_minutes": 30,
+                "workout_name": "Solo",
+            },
+        )
         assert resp.status_code == 200
 
     def test_exercise_order_preserved_in_payload(self, client, sample_exercises):
         reversed_ex = list(reversed(sample_exercises))
-        resp = client.post("/workout/rebuild", json={
-            "exercises": reversed_ex,
-            "goal": "build_muscle",
-            "duration_minutes": 45,
-            "workout_name": "Test",
-        })
+        resp = client.post(
+            "/workout/rebuild",
+            json={
+                "exercises": reversed_ex,
+                "goal": "build_muscle",
+                "duration_minutes": 45,
+                "workout_name": "Test",
+            },
+        )
         payload = json.loads(resp.json()["payload_json"])
         steps = payload["workoutSegments"][0]["workoutSteps"]
         circuit = next(s for s in steps if s.get("stepType", {}).get("stepTypeKey") == "repeat")
         exercise_steps = [
-            s for s in circuit["workoutSteps"]
+            s
+            for s in circuit["workoutSteps"]
             if s.get("stepType", {}).get("stepTypeKey") == "interval"
         ]
         actual = [s["exerciseName"] for s in exercise_steps]
@@ -193,6 +218,7 @@ class TestRebuildEndpoint:
 # ---------------------------------------------------------------------------
 # POST /workout/upload (redirect path, no real Garmin connection needed)
 # ---------------------------------------------------------------------------
+
 
 class TestUploadEndpoint:
     def test_unauthenticated_redirects_with_error(self, client):

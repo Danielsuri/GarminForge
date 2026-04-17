@@ -1,6 +1,7 @@
 """
 Database engine, session factory, and Base for GarminForge.
 """
+
 from __future__ import annotations
 
 import os

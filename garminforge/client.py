@@ -41,7 +41,6 @@ from typing import Any
 from garminconnect import Garmin
 
 from garminforge.auth import TokenStore, load_client, with_backoff, _garth
-from garminforge.exceptions import AuthenticationError, TooManyRequestsError
 
 logger = logging.getLogger(__name__)
 

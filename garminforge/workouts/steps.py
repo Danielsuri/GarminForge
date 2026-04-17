@@ -220,9 +220,7 @@ def interval_step(
     provided.  If none is given, defaults to lap-button.
     """
     if sum(x is not None for x in (duration_seconds, distance_meters, reps)) > 1:
-        raise ValueError(
-            "Provide at most one of duration_seconds, distance_meters, or reps."
-        )
+        raise ValueError("Provide at most one of duration_seconds, distance_meters, or reps.")
     if duration_seconds is not None:
         end_condition = _time_condition()
         end_condition_value: float | None = duration_seconds
@@ -320,9 +318,7 @@ def repeat_group(
         Position of this repeat group within its parent segment.
     """
     # Re-number nested steps.
-    renumbered = [
-        {**s, "stepOrder": i + 1} for i, s in enumerate(steps)
-    ]
+    renumbered = [{**s, "stepOrder": i + 1} for i, s in enumerate(steps)]
     return {
         "type": "RepeatGroupDTO",
         "stepOrder": step_order,

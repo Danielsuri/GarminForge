@@ -4,6 +4,7 @@ Revision ID: 0005
 Revises: 0004
 Create Date: 2026-04-12
 """
+
 from __future__ import annotations
 
 from typing import Sequence, Union
@@ -22,10 +23,19 @@ def upgrade() -> None:
     op.create_table(
         "rank_feedbacks",
         sa.Column("id", sa.String(36), primary_key=True),
-        sa.Column("user_id", sa.String(36), sa.ForeignKey("users.id", ondelete="CASCADE"),
-                  nullable=False, index=True),
-        sa.Column("session_id", sa.String(36), sa.ForeignKey("workout_sessions.id", ondelete="SET NULL"),
-                  nullable=True),
+        sa.Column(
+            "user_id",
+            sa.String(36),
+            sa.ForeignKey("users.id", ondelete="CASCADE"),
+            nullable=False,
+            index=True,
+        ),
+        sa.Column(
+            "session_id",
+            sa.String(36),
+            sa.ForeignKey("workout_sessions.id", ondelete="SET NULL"),
+            nullable=True,
+        ),
         sa.Column("trigger", sa.String(20), nullable=False),
         sa.Column("feedback", sa.String(20), nullable=False),
         sa.Column("delta", sa.Float(), nullable=False),

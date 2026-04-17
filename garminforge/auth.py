@@ -39,6 +39,7 @@ def _garth(client: Garmin):
         return client.garth
     return _garth_module.client
 
+
 logger = logging.getLogger(__name__)
 
 # Default token directory — override with GARMINTOKENS env var.
@@ -109,9 +110,7 @@ class TokenStore:
             raise AuthenticationError(str(exc)) from exc
         except TypeError as exc:
             logger.error("Token load TypeError: %s", exc)
-            raise AuthenticationError(
-                f"Token format error: {exc}"
-            ) from exc
+            raise AuthenticationError(f"Token format error: {exc}") from exc
 
     def save(self, client: Garmin) -> str | None:
         """Persist tokens from *client*'s garth instance.
@@ -244,16 +243,17 @@ def with_backoff(
             return func(*args, **kwargs)
         except GarminConnectAuthenticationError as exc:
             raise AuthenticationError(str(exc)) from exc
-        except GarminConnectTooManyRequestsError as exc:
+        except GarminConnectTooManyRequestsError:
             if attempt == retries:
                 raise
-            wait = delay * (2 ** attempt)
+            wait = delay * (2**attempt)
             logger.warning("Rate limited (429); retrying in %.0fs…", wait)
             time.sleep(wait)
         except GarminConnectConnectionError as exc:
             if attempt == retries:
                 from garminforge.exceptions import ConnectionError as ForgeConnErr
+
                 raise ForgeConnErr(str(exc)) from exc
-            wait = delay * (2 ** attempt)
+            wait = delay * (2**attempt)
             logger.warning("Connection error; retrying in %.0fs…", wait)
             time.sleep(wait)

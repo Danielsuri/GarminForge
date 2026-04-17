@@ -22,6 +22,7 @@ import sys
 
 try:
     from dotenv import load_dotenv
+
     load_dotenv()
 except ImportError:
     pass  # python-dotenv not installed; rely on shell environment
@@ -34,9 +35,11 @@ logging.basicConfig(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="GarminForge web server")
-    parser.add_argument("--host",   default="0.0.0.0",   help="Bind address (default: 0.0.0.0)")
-    parser.add_argument("--port",   type=int, default=8000, help="Port (default: 8000)")
-    parser.add_argument("--reload", action="store_true",   help="Auto-reload on code changes (dev mode)")
+    parser.add_argument("--host", default="0.0.0.0", help="Bind address (default: 0.0.0.0)")
+    parser.add_argument("--port", type=int, default=8000, help="Port (default: 8000)")
+    parser.add_argument(
+        "--reload", action="store_true", help="Auto-reload on code changes (dev mode)"
+    )
     args = parser.parse_args()
 
     try:
@@ -55,6 +58,7 @@ def main() -> None:
     if args.reload:
         # Suppress watchfiles noise from OneDrive sync artifacts and __pycache__ writes.
         import logging as _logging
+
         _logging.getLogger("watchfiles.main").setLevel(_logging.WARNING)
 
     print(f"Starting GarminForge at http://{args.host}:{args.port}")

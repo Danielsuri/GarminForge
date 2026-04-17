@@ -16,6 +16,7 @@ Start it with:  python run.py --port 8765
 Run:
   pytest tests/test_editing_e2e.py -v
 """
+
 from __future__ import annotations
 
 import pytest
@@ -34,6 +35,7 @@ def pytest_configure(config):  # type: ignore[override]
 def _server_available() -> bool:
     try:
         import urllib.request
+
         urllib.request.urlopen(BASE_URL + "/", timeout=2)
         return True
     except Exception:
@@ -92,7 +94,9 @@ class TestDashboardGenerate:
     def test_regenerate_keeps_editing_functional(self, preview_page):
         """Clicking Regenerate a second time should re-inject scripts correctly."""
         preview_page.click("#generateBtn")
-        preview_page.wait_for_function('!!document.getElementById("workoutPreviewCard")', timeout=10_000)
+        preview_page.wait_for_function(
+            '!!document.getElementById("workoutPreviewCard")', timeout=10_000
+        )
         preview_page.wait_for_timeout(1200)
         t = preview_page.evaluate("typeof window.removeExercise")
         assert t == "function"
@@ -116,10 +120,7 @@ class TestRemoveExercise:
         """After removing exercise 1, the remaining exercises renumber from 1."""
         preview_page.locator("button[onclick*='removeExercise']").first.click()
         preview_page.wait_for_timeout(500)
-        step_numbers = [
-            int(el.inner_text())
-            for el in preview_page.locator(".step-number").all()
-        ]
+        step_numbers = [int(el.inner_text()) for el in preview_page.locator(".step-number").all()]
         assert step_numbers == list(range(1, len(step_numbers) + 1))
 
     def test_cannot_remove_last_exercise(self, preview_page):
@@ -161,18 +162,14 @@ class TestReplaceModal:
 
     def test_selecting_replacement_changes_exercise_name(self, preview_page):
         first_name = (
-            preview_page.locator(".exercise-item")
-            .first.locator(".fw-semibold")
-            .first.inner_text()
+            preview_page.locator(".exercise-item").first.locator(".fw-semibold").first.inner_text()
         )
         preview_page.locator("button[onclick*='openReplaceModal']").first.click()
         preview_page.wait_for_timeout(800)
         preview_page.locator("#replaceModalBody button").first.click()
         preview_page.wait_for_timeout(500)
         new_name = (
-            preview_page.locator(".exercise-item")
-            .first.locator(".fw-semibold")
-            .first.inner_text()
+            preview_page.locator(".exercise-item").first.locator(".fw-semibold").first.inner_text()
         )
         assert new_name != first_name
 

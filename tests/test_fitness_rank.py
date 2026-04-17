@@ -1,4 +1,5 @@
 """Tests for fitness rank data model and rank computation."""
+
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -195,7 +196,9 @@ def test_rank_band_widens_when_pool_too_small():
     pool_by_name = {ex.name: ex for ex in _POOL}
     # At rank=10 with band=2 only difficulty>=8 is in-band.
     # If any returned exercise has difficulty<8, the widening path fired.
-    difficulties = [pool_by_name[ex.name].difficulty for ex in plan.exercises if ex.name in pool_by_name]
+    difficulties = [
+        pool_by_name[ex.name].difficulty for ex in plan.exercises if ex.name in pool_by_name
+    ]
     assert any(d < 8 for d in difficulties), (
         f"Expected at least one difficulty<8 exercise (band-widening proof), got difficulties={difficulties}"
     )
@@ -211,7 +214,9 @@ def test_generate_with_heart_condition_excludes_alternating_squat_wave():
         health_conditions=["heart_condition"],
         seed=42,
     )
-    assert len(plan.exercises) > 0, "Expected non-empty plan (bodyweight exercises should fill the pool)"
+    assert len(plan.exercises) > 0, (
+        "Expected non-empty plan (bodyweight exercises should fill the pool)"
+    )
     names = {ex.name for ex in plan.exercises}
     assert "ALTERNATING_WAVE" not in names
     assert "ALTERNATING_SQUAT_WAVE" not in names
@@ -223,7 +228,6 @@ def test_generate_with_heart_condition_excludes_alternating_squat_wave():
 from fastapi.testclient import TestClient
 from web.app import app
 from web.db import get_db
-from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 
@@ -252,8 +256,13 @@ def _make_test_client(fitness_rank: float):
 
     db = SessionLocal()
     from web.models import User as _User
-    user = _User(email="t@t.com", hashed_password="x", fitness_rank=fitness_rank,
-                 questionnaire_completed=True)
+
+    user = _User(
+        email="t@t.com",
+        hashed_password="x",
+        fitness_rank=fitness_rank,
+        questionnaire_completed=True,
+    )
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -281,6 +290,7 @@ def _make_test_client(fitness_rank: float):
 def _cleanup_test_client(original_require_user):
     """Restore patched state after a test."""
     import web.routes_my as _rm
+
     _rm._require_user = original_require_user
     app.dependency_overrides.pop(get_db, None)
 
@@ -288,7 +298,9 @@ def _cleanup_test_client(original_require_user):
 def test_rank_feedback_too_easy_post_increases_rank():
     client, user_id, SL, routes_my, orig = _make_test_client(3.0)
     try:
-        resp = client.patch("/my/rank-feedback", json={"trigger": "post_workout", "feedback": "too_easy"})
+        resp = client.patch(
+            "/my/rank-feedback", json={"trigger": "post_workout", "feedback": "too_easy"}
+        )
         assert resp.status_code == 200
         data = resp.json()
         assert data["rank_before"] == 3.0
@@ -304,7 +316,9 @@ def test_rank_feedback_too_easy_post_increases_rank():
 def test_rank_feedback_too_hard_post_decreases_rank():
     client, _, _, routes_my, orig = _make_test_client(5.0)
     try:
-        resp = client.patch("/my/rank-feedback", json={"trigger": "post_workout", "feedback": "too_hard"})
+        resp = client.patch(
+            "/my/rank-feedback", json={"trigger": "post_workout", "feedback": "too_hard"}
+        )
         assert resp.status_code == 200
         assert resp.json()["rank_after"] == 4.5
     finally:
@@ -314,7 +328,9 @@ def test_rank_feedback_too_hard_post_decreases_rank():
 def test_rank_feedback_just_right_no_change():
     client, _, _, routes_my, orig = _make_test_client(5.0)
     try:
-        resp = client.patch("/my/rank-feedback", json={"trigger": "post_workout", "feedback": "just_right"})
+        resp = client.patch(
+            "/my/rank-feedback", json={"trigger": "post_workout", "feedback": "just_right"}
+        )
         assert resp.status_code == 200
         assert resp.json()["rank_after"] == 5.0
     finally:
@@ -324,7 +340,9 @@ def test_rank_feedback_just_right_no_change():
 def test_rank_feedback_mid_workout_too_easy():
     client, _, _, routes_my, orig = _make_test_client(5.0)
     try:
-        resp = client.patch("/my/rank-feedback", json={"trigger": "mid_workout", "feedback": "too_easy"})
+        resp = client.patch(
+            "/my/rank-feedback", json={"trigger": "mid_workout", "feedback": "too_easy"}
+        )
         assert resp.status_code == 200
         assert resp.json()["rank_after"] == pytest.approx(5.1)
     finally:
@@ -334,7 +352,9 @@ def test_rank_feedback_mid_workout_too_easy():
 def test_rank_feedback_clamped_at_max():
     client, _, _, routes_my, orig = _make_test_client(9.8)
     try:
-        resp = client.patch("/my/rank-feedback", json={"trigger": "post_workout", "feedback": "too_easy"})
+        resp = client.patch(
+            "/my/rank-feedback", json={"trigger": "post_workout", "feedback": "too_easy"}
+        )
         assert resp.status_code == 200
         assert resp.json()["rank_after"] == 10.0
     finally:
@@ -344,7 +364,9 @@ def test_rank_feedback_clamped_at_max():
 def test_rank_feedback_clamped_at_min():
     client, _, _, routes_my, orig = _make_test_client(1.2)
     try:
-        resp = client.patch("/my/rank-feedback", json={"trigger": "post_workout", "feedback": "too_hard"})
+        resp = client.patch(
+            "/my/rank-feedback", json={"trigger": "post_workout", "feedback": "too_hard"}
+        )
         assert resp.status_code == 200
         assert resp.json()["rank_after"] == 1.0
     finally:
@@ -354,7 +376,9 @@ def test_rank_feedback_clamped_at_min():
 def test_rank_feedback_mid_just_right_invalid():
     client, _, _, routes_my, orig = _make_test_client(5.0)
     try:
-        resp = client.patch("/my/rank-feedback", json={"trigger": "mid_workout", "feedback": "just_right"})
+        resp = client.patch(
+            "/my/rank-feedback", json={"trigger": "mid_workout", "feedback": "just_right"}
+        )
         assert resp.status_code == 400
     finally:
         _cleanup_test_client(orig)

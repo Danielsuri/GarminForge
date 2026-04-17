@@ -4,6 +4,7 @@ All functions are pure and stateless — they operate on compact activity dicts
 (the shape stored in User.strava_activities_json) and return plain values or
 dataclasses. Database writes are isolated to reschedule_if_needed().
 """
+
 from __future__ import annotations
 
 import logging
@@ -57,10 +58,7 @@ def calibrate_fitness_rank(
         return current_rank  # type: ignore[return-value]
 
     cutoff = datetime.now(timezone.utc) - timedelta(days=30)
-    recent = [
-        a for a in activities
-        if _parse_date(a.get("start_date", "")) >= cutoff
-    ]
+    recent = [a for a in activities if _parse_date(a.get("start_date", "")) >= cutoff]
 
     if not recent:
         return current_rank if current_rank is not None else 1.0
@@ -77,7 +75,7 @@ def calibrate_fitness_rank(
     avg_suffer = sum(suffer_scores) / len(suffer_scores)
     intensity_score = min(avg_suffer / 100 * 10, 10.0)
 
-    derived = (volume_score * 0.5 + consistency_score * 0.3 + intensity_score * 0.2)
+    derived = volume_score * 0.5 + consistency_score * 0.3 + intensity_score * 0.2
     derived = max(1.0, min(derived, 10.0))
 
     if current_rank is None:
@@ -101,10 +99,7 @@ class RecoveryStatus:
 def recovery_score(activities: list[dict[str, Any]]) -> RecoveryStatus:
     """Derive recovery status from activities in the past 48 hours."""
     cutoff = datetime.now(timezone.utc) - timedelta(hours=_RECOVERY_WINDOW_HOURS)
-    recent = [
-        a for a in activities
-        if _parse_date(a.get("start_date", "")) >= cutoff
-    ]
+    recent = [a for a in activities if _parse_date(a.get("start_date", "")) >= cutoff]
 
     if not recent:
         return RecoveryStatus(
@@ -120,9 +115,7 @@ def recovery_score(activities: list[dict[str, Any]]) -> RecoveryStatus:
     hr_threshold_hard = _DEFAULT_MAX_HR * 0.85
     hr_threshold_moderate = _DEFAULT_MAX_HR * 0.70
 
-    most_recent = sorted(
-        recent, key=lambda a: a.get("start_date", ""), reverse=True
-    )[0]
+    most_recent = sorted(recent, key=lambda a: a.get("start_date", ""), reverse=True)[0]
     sport = most_recent.get("sport_type", "activity")
     hours_since = (
         datetime.now(timezone.utc) - _parse_date(most_recent.get("start_date", ""))
@@ -145,9 +138,7 @@ def recovery_score(activities: list[dict[str, Any]]) -> RecoveryStatus:
     else:
         rest_days = 0
         score = 0.8
-        summary = (
-            f"Light {sport.lower()} {hours_since:.0f}h ago — ready to train."
-        )
+        summary = f"Light {sport.lower()} {hours_since:.0f}h ago — ready to train."
 
     return RecoveryStatus(
         score=score,
@@ -189,7 +180,7 @@ def reschedule_if_needed(
     if modified:
         db.commit()
 
-    return modified  # type: ignore[return-value]
+    return modified
 
 
 def _parse_date(date_str: str) -> datetime:
@@ -197,8 +188,6 @@ def _parse_date(date_str: str) -> datetime:
     if not date_str:
         return datetime.min.replace(tzinfo=timezone.utc)
     try:
-        return datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ").replace(
-            tzinfo=timezone.utc
-        )
+        return datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
     except ValueError:
         return datetime.min.replace(tzinfo=timezone.utc)

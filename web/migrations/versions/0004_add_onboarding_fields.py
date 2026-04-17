@@ -4,6 +4,7 @@ Revision ID: 0004
 Revises: 0003
 Create Date: 2026-04-11
 """
+
 from __future__ import annotations
 
 from typing import Sequence, Union

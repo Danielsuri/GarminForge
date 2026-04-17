@@ -7,6 +7,7 @@ GET  /strava/callback     Handle OAuth2 callback, store tokens, initial sync
 POST /strava/sync         Manual "Sync Now" — fetch activities, update cache
 POST /strava/disconnect   Remove Strava connection from user account
 """
+
 from __future__ import annotations
 
 import json
@@ -90,9 +91,7 @@ def do_sync(user: User, db: Session) -> None:
 
 
 @router.get("/connect")
-async def strava_connect(
-    request: Request, db: Session = Depends(get_db)
-) -> RedirectResponse:
+async def strava_connect(request: Request, db: Session = Depends(get_db)) -> RedirectResponse:
     """Redirect to Strava to begin OAuth2 authorization."""
     user = get_current_user(request, db)
     if user is None:
@@ -165,9 +164,7 @@ async def strava_callback(
 
 
 @router.post("/sync")
-async def strava_sync(
-    request: Request, db: Session = Depends(get_db)
-) -> RedirectResponse:
+async def strava_sync(request: Request, db: Session = Depends(get_db)) -> RedirectResponse:
     """Manual sync: fetch latest activities, update cache, recalibrate rank."""
     user = get_current_user(request, db)
     if user is None:
@@ -192,9 +189,7 @@ async def strava_sync(
 
 
 @router.post("/disconnect")
-async def strava_disconnect(
-    request: Request, db: Session = Depends(get_db)
-) -> RedirectResponse:
+async def strava_disconnect(request: Request, db: Session = Depends(get_db)) -> RedirectResponse:
     """Remove Strava connection and clear all cached data."""
     user = get_current_user(request, db)
     if user is None:

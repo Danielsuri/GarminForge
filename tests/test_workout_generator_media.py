@@ -1,9 +1,9 @@
 """Unit tests for web.workout_generator._build_media_map()."""
+
 from __future__ import annotations
 
 import pathlib
 
-import pytest
 
 from web.workout_generator import _build_media_map
 

@@ -1,6 +1,7 @@
 """
 SQLAlchemy ORM models for GarminForge user management and progress tracking.
 """
+
 from __future__ import annotations
 
 import uuid
@@ -23,7 +24,9 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(320), unique=True, index=True, nullable=False)
     hashed_password: Mapped[str | None] = mapped_column(String(128), nullable=True)
     display_name: Mapped[str | None] = mapped_column(String(120), nullable=True)
-    google_sub: Mapped[str | None] = mapped_column(String(128), unique=True, nullable=True, index=True)
+    google_sub: Mapped[str | None] = mapped_column(
+        String(128), unique=True, nullable=True, index=True
+    )
     apple_sub: Mapped[str | None] = mapped_column(String(128), unique=True, nullable=True)
     garmin_token_b64: Mapped[str | None] = mapped_column(Text, nullable=True)
     preferred_lang: Mapped[str | None] = mapped_column(String(5), nullable=True)
@@ -32,8 +35,12 @@ class User(Base):
     # Onboarding questionnaire
     questionnaire_completed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     age: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    age_range: Mapped[str | None] = mapped_column(String(10), nullable=True)      # "18-29" | "30-39" | "40-49" | "50+"
-    preferred_days_json: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON list e.g. '["Mon","Wed","Fri"]'
+    age_range: Mapped[str | None] = mapped_column(
+        String(10), nullable=True
+    )  # "18-29" | "30-39" | "40-49" | "50+"
+    preferred_days_json: Mapped[str | None] = mapped_column(
+        Text, nullable=True
+    )  # JSON list e.g. '["Mon","Wed","Fri"]'
     height_cm: Mapped[float | None] = mapped_column(Float, nullable=True)
     weight_kg: Mapped[float | None] = mapped_column(Float, nullable=True)
     diet_json: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -48,10 +55,10 @@ class User(Base):
     # 1.0–10.0, null until questionnaire is completed. Updated via /my/rank-feedback.
 
     # Strava integration
-    strava_athlete_id:      Mapped[str | None] = mapped_column(String(32), nullable=True)
-    strava_token_json:      Mapped[str | None] = mapped_column(Text, nullable=True)
+    strava_athlete_id: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    strava_token_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     strava_activities_json: Mapped[str | None] = mapped_column(Text, nullable=True)
-    strava_synced_at:       Mapped[datetime | None] = mapped_column(
+    strava_synced_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
 
@@ -171,7 +178,7 @@ class ProgramSession(Base):
     scheduled_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     actual_duration_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    strava_activity_id:      Mapped[str | None] = mapped_column(String(32), nullable=True)
+    strava_activity_id: Mapped[str | None] = mapped_column(String(32), nullable=True)
 
     program: Mapped[Program] = relationship(back_populates="program_sessions")
     saved_plans: Mapped[list[SavedPlan]] = relationship(back_populates="program_session")

@@ -33,10 +33,11 @@ from web.workout_generator import (
 # Phase parameters
 # ---------------------------------------------------------------------------
 
+
 class PhaseParams(NamedTuple):
     sets: int
-    reps_low: int        # lower bound of rep range (for display)
-    reps_high: int       # upper bound; passed to _generate_session as override_reps
+    reps_low: int  # lower bound of rep range (for display)
+    reps_high: int  # upper bound; passed to _generate_session as override_reps
     rest_seconds: int
 
 
@@ -49,17 +50,17 @@ _LINEAR_PHASES: dict[int, list[str]] = {
 }
 
 _PHASE_PARAMS: dict[str, PhaseParams] = {
-    "acc":    PhaseParams(sets=3, reps_low=12, reps_high=15, rest_seconds=60),
+    "acc": PhaseParams(sets=3, reps_low=12, reps_high=15, rest_seconds=60),
     "deload": PhaseParams(sets=2, reps_low=12, reps_high=15, rest_seconds=60),
-    "int":    PhaseParams(sets=4, reps_low=6,  reps_high=10, rest_seconds=90),
-    "peak":   PhaseParams(sets=5, reps_low=3,  reps_high=5,  rest_seconds=120),
+    "int": PhaseParams(sets=4, reps_low=6, reps_high=10, rest_seconds=90),
+    "peak": PhaseParams(sets=5, reps_low=3, reps_high=5, rest_seconds=120),
 }
 
 # Undulating: cycles through day_slot mod 3
 _UNDULATING_SLOTS: list[PhaseParams] = [
-    PhaseParams(sets=5, reps_low=3,  reps_high=5,  rest_seconds=120),  # strength
-    PhaseParams(sets=4, reps_low=8,  reps_high=12, rest_seconds=90),   # hypertrophy
-    PhaseParams(sets=3, reps_low=12, reps_high=15, rest_seconds=60),   # endurance
+    PhaseParams(sets=5, reps_low=3, reps_high=5, rest_seconds=120),  # strength
+    PhaseParams(sets=4, reps_low=8, reps_high=12, rest_seconds=90),  # hypertrophy
+    PhaseParams(sets=3, reps_low=12, reps_high=15, rest_seconds=60),  # endurance
 ]
 
 
@@ -115,11 +116,12 @@ def _phase_params(
 # Split patterns
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True)
 class SplitDay:
-    key: str               # internal identifier
-    label: str             # full focus label, e.g. "Upper Body — Push"
-    short: str             # abbreviated, used in workout_name, e.g. "Push"
+    key: str  # internal identifier
+    label: str  # full focus label, e.g. "Upper Body — Push"
+    short: str  # abbreviated, used in workout_name, e.g. "Push"
     muscle_groups: list[str]
 
 
@@ -131,20 +133,20 @@ _SPLITS: dict[int, list[SplitDay]] = {
     3: [
         SplitDay("push", "Upper Body — Push", "Push", ["push", "shoulders", "arms_tri"]),
         SplitDay("pull", "Upper Body — Pull", "Pull", ["pull", "arms_bi"]),
-        SplitDay("legs", "Lower Body",         "Legs", ["squat", "hinge", "lunge", "calves"]),
+        SplitDay("legs", "Lower Body", "Legs", ["squat", "hinge", "lunge", "calves"]),
     ],
     4: [
         SplitDay("upper_push", "Upper Body — Horizontal Push", "Upper Push", ["push", "shoulders"]),
-        SplitDay("lower_a",    "Lower Body",                   "Lower",      ["squat", "hinge", "lunge"]),
-        SplitDay("upper_pull", "Upper Body — Vertical Pull",   "Upper Pull", ["pull", "arms_bi"]),
-        SplitDay("lower_b",    "Lower Body",                   "Lower",      ["squat", "hinge", "calves"]),
+        SplitDay("lower_a", "Lower Body", "Lower", ["squat", "hinge", "lunge"]),
+        SplitDay("upper_pull", "Upper Body — Vertical Pull", "Upper Pull", ["pull", "arms_bi"]),
+        SplitDay("lower_b", "Lower Body", "Lower", ["squat", "hinge", "calves"]),
     ],
     5: [
-        SplitDay("push",  "Upper Body — Push", "Push",  ["push", "shoulders", "arms_tri"]),
-        SplitDay("pull",  "Upper Body — Pull", "Pull",  ["pull", "arms_bi"]),
-        SplitDay("legs",  "Lower Body",        "Legs",  ["squat", "hinge", "lunge", "calves"]),
-        SplitDay("upper", "Upper Body",        "Upper", ["push", "pull", "shoulders"]),
-        SplitDay("lower", "Lower Body",        "Lower", ["squat", "hinge"]),
+        SplitDay("push", "Upper Body — Push", "Push", ["push", "shoulders", "arms_tri"]),
+        SplitDay("pull", "Upper Body — Pull", "Pull", ["pull", "arms_bi"]),
+        SplitDay("legs", "Lower Body", "Legs", ["squat", "hinge", "lunge", "calves"]),
+        SplitDay("upper", "Upper Body", "Upper", ["push", "pull", "shoulders"]),
+        SplitDay("lower", "Lower Body", "Lower", ["squat", "hinge"]),
     ],
 }
 
@@ -153,14 +155,16 @@ _SPLITS: dict[int, list[SplitDay]] = {
 # Dataclasses
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class SessionPlan:
     """One training session within a multi-week program."""
+
     week_num: int
     day_num: int
-    focus: str               # "Upper Body — Push"
-    workout_name: str        # "Week 2 Day 1 · Push — 45 min"
-    phase: str               # "acc" | "deload" | "int" | "peak" | "strength" | etc.
+    focus: str  # "Upper Body — Push"
+    workout_name: str  # "Week 2 Day 1 · Push — 45 min"
+    phase: str  # "acc" | "deload" | "int" | "peak" | "strength" | etc.
     sets: int
     reps_low: int
     reps_high: int
@@ -172,6 +176,7 @@ class SessionPlan:
 @dataclass
 class ProgramPlan:
     """A full multi-week periodized training program."""
+
     name: str
     goal: str
     goal_label: str
@@ -181,12 +186,13 @@ class ProgramPlan:
     weekly_workout_days: int
     duration_minutes: int
     equipment: list[str]
-    sessions: list[SessionPlan]   # length = duration_weeks × weekly_workout_days
+    sessions: list[SessionPlan]  # length = duration_weeks × weekly_workout_days
 
 
 # ---------------------------------------------------------------------------
 # Progressive-overload helpers
 # ---------------------------------------------------------------------------
+
 
 def _session_duration(
     week: int,
@@ -212,6 +218,7 @@ def _session_duration(
 # Seed helper
 # ---------------------------------------------------------------------------
 
+
 def _session_seed(base_seed: int | None, week: int, day_idx: int) -> int | None:
     """Deterministic per-session seed so preview is reproducible."""
     if base_seed is None:
@@ -222,6 +229,7 @@ def _session_seed(base_seed: int | None, week: int, day_idx: int) -> int | None:
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
+
 
 def generate_program(
     goal: str,
@@ -290,8 +298,9 @@ def generate_program(
 
             # Resolve the raw phase key for duration scaling (deload detection)
             if periodization_type == "linear":
-                raw_phase_key = (_LINEAR_PHASES.get(duration_weeks_clamped, _LINEAR_PHASES[8])
-                                 [min(week - 1, duration_weeks_clamped - 1)])
+                raw_phase_key = _LINEAR_PHASES.get(duration_weeks_clamped, _LINEAR_PHASES[8])[
+                    min(week - 1, duration_weeks_clamped - 1)
+                ]
             elif periodization_type == "block":
                 raw_phase_key = _block_phase_key(week, duration_weeks_clamped)
             else:
@@ -325,25 +334,29 @@ def generate_program(
                     "int": "Intensification",
                     "peak": "Peak",
                 }.get(
-                    (_LINEAR_PHASES.get(duration_weeks_clamped, _LINEAR_PHASES[8])[week - 1]
-                     if periodization_type == "linear"
-                     else _block_phase_key(week, duration_weeks_clamped)),
+                    (
+                        _LINEAR_PHASES.get(duration_weeks_clamped, _LINEAR_PHASES[8])[week - 1]
+                        if periodization_type == "linear"
+                        else _block_phase_key(week, duration_weeks_clamped)
+                    ),
                     "Training",
                 )
 
-            sessions.append(SessionPlan(
-                week_num=week,
-                day_num=day_idx + 1,
-                focus=split_day.label,
-                workout_name=name,
-                phase=phase_label,
-                sets=phase.sets,
-                reps_low=phase.reps_low,
-                reps_high=phase.reps_high,
-                rest_seconds=phase.rest_seconds,
-                exercises=plan.exercises,
-                garmin_payload=plan.garmin_payload,
-            ))
+            sessions.append(
+                SessionPlan(
+                    week_num=week,
+                    day_num=day_idx + 1,
+                    focus=split_day.label,
+                    workout_name=name,
+                    phase=phase_label,
+                    sets=phase.sets,
+                    reps_low=phase.reps_low,
+                    reps_high=phase.reps_high,
+                    rest_seconds=phase.rest_seconds,
+                    exercises=plan.exercises,
+                    garmin_payload=plan.garmin_payload,
+                )
+            )
 
     program_name = f"{duration_weeks}-Week {goal_cfg['label']}"
 
@@ -384,17 +397,22 @@ def _block_phase_key(week_num: int, duration_weeks: int) -> str:
 # ---------------------------------------------------------------------------
 
 _GOAL_PERIODIZATION: dict[str, str] = {
-    "burn_fat":       "linear",
-    "lose_weight":    "linear",
-    "build_muscle":   "block",
+    "burn_fat": "linear",
+    "lose_weight": "linear",
+    "build_muscle": "block",
     "build_strength": "block",
     "general_fitness": "undulating",
-    "endurance":      "undulating",
+    "endurance": "undulating",
 }
 
 _DAY_TO_WEEKDAY: dict[str, int] = {
-    "Mon": 0, "Tue": 1, "Wed": 2, "Thu": 3,
-    "Fri": 4, "Sat": 5, "Sun": 6,
+    "Mon": 0,
+    "Tue": 1,
+    "Wed": 2,
+    "Thu": 3,
+    "Fri": 4,
+    "Sat": 5,
+    "Sun": 6,
 }
 
 
@@ -533,13 +551,9 @@ def refresh_future_program_sessions(user: User, db: Session) -> int:
 
     Returns the number of sessions regenerated.
     """
-    from web.models import Program, ProgramSession  # avoid circular at module level
+    from web.models import Program  # avoid circular at module level
 
-    program = (
-        db.query(Program)
-        .filter_by(user_id=user.id, status="active")
-        .first()
-    )
+    program = db.query(Program).filter_by(user_id=user.id, status="active").first()
     if program is None:
         return 0
 
@@ -576,10 +590,9 @@ def refresh_future_program_sessions(user: User, db: Session) -> int:
         phase = _phase_params(ps.week_num, duration_weeks_clamped, periodization_type, day_idx)
 
         if periodization_type == "linear":
-            raw_phase_key = (
-                _LINEAR_PHASES.get(duration_weeks_clamped, _LINEAR_PHASES[8])
-                [min(ps.week_num - 1, duration_weeks_clamped - 1)]
-            )
+            raw_phase_key = _LINEAR_PHASES.get(duration_weeks_clamped, _LINEAR_PHASES[8])[
+                min(ps.week_num - 1, duration_weeks_clamped - 1)
+            ]
         elif periodization_type == "block":
             raw_phase_key = _block_phase_key(ps.week_num, duration_weeks_clamped)
         else:
@@ -601,22 +614,24 @@ def refresh_future_program_sessions(user: User, db: Session) -> int:
         )
 
         ps.garmin_payload_json = json.dumps(plan.garmin_payload)
-        ps.exercises_json = json.dumps([
-            {
-                "category": e.category,
-                "name": e.name,
-                "label": e.label,
-                "sets": e.sets,
-                "reps": e.reps,
-                "duration_sec": e.duration_sec,
-                "rest_seconds": e.rest_seconds,
-                "muscle_group": e.muscle_group,
-                "primary_muscles": e.primary_muscles,
-                "secondary_muscles": e.secondary_muscles,
-                "video_url": e.video_url,
-            }
-            for e in plan.exercises
-        ])
+        ps.exercises_json = json.dumps(
+            [
+                {
+                    "category": e.category,
+                    "name": e.name,
+                    "label": e.label,
+                    "sets": e.sets,
+                    "reps": e.reps,
+                    "duration_sec": e.duration_sec,
+                    "rest_seconds": e.rest_seconds,
+                    "muscle_group": e.muscle_group,
+                    "primary_muscles": e.primary_muscles,
+                    "secondary_muscles": e.secondary_muscles,
+                    "video_url": e.video_url,
+                }
+                for e in plan.exercises
+            ]
+        )
         updated += 1
 
     db.commit()

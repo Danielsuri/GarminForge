@@ -32,6 +32,8 @@ python run.py --port 8080 --reload   # dev mode with auto-reload
 Environment variables:
 - `SECRET_KEY` — session signing key (auto-generated if omitted; set a stable value in production)
 - `GARMINTOKENS` — path to token directory (default: `~/.garminconnect`)
+- `STRAVA_CLIENT_ID` — Strava developer dashboard → My API Application
+- `STRAVA_CLIENT_SECRET` — Strava developer dashboard → My API Application
 
 ## Linting / type checking / tests
 

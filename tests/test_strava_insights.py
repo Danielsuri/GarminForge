@@ -1,4 +1,5 @@
 """Tests for web.strava_insights."""
+
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta, timezone
@@ -39,6 +40,7 @@ def _activity(
 
 # compact_activity
 
+
 def test_compact_strips_extra_fields() -> None:
     raw = _activity()
     raw["extra_field"] = "should_be_removed"
@@ -53,20 +55,35 @@ def test_compact_strips_extra_fields() -> None:
 def test_compact_preserves_all_required_fields() -> None:
     raw = _activity()
     result = compact_activity(raw)
-    for field in ("id", "name", "sport_type", "start_date", "elapsed_time",
-                  "distance", "average_heartrate", "max_heartrate", "suffer_score"):
+    for field in (
+        "id",
+        "name",
+        "sport_type",
+        "start_date",
+        "elapsed_time",
+        "distance",
+        "average_heartrate",
+        "max_heartrate",
+        "suffer_score",
+    ):
         assert field in result
 
 
 def test_compact_handles_missing_optional_fields() -> None:
-    raw = {"id": 1, "name": "Minimal", "sport_type": "Run",
-           "start_date": "2026-01-01T10:00:00Z", "elapsed_time": 1800}
+    raw = {
+        "id": 1,
+        "name": "Minimal",
+        "sport_type": "Run",
+        "start_date": "2026-01-01T10:00:00Z",
+        "elapsed_time": 1800,
+    }
     result = compact_activity(raw)
     assert result["id"] == 1
     assert result.get("average_heartrate") is None
 
 
 # calibrate_fitness_rank
+
 
 def test_calibrate_returns_current_rank_when_no_activities() -> None:
     result = calibrate_fitness_rank([], current_rank=5.0)
@@ -80,8 +97,9 @@ def test_calibrate_blends_with_existing_rank() -> None:
 
 
 def test_calibrate_clamps_to_valid_range() -> None:
-    activities = [_activity(suffer_score=200, elapsed_time=7200, hours_ago=i * 12)
-                  for i in range(30)]
+    activities = [
+        _activity(suffer_score=200, elapsed_time=7200, hours_ago=i * 12) for i in range(30)
+    ]
     result = calibrate_fitness_rank(activities, current_rank=10.0)
     assert result <= 10.0
 
@@ -95,6 +113,7 @@ def test_calibrate_returns_1_when_no_activities_and_no_rank() -> None:
 
 
 # recovery_score
+
 
 def test_recovery_fully_fresh_when_no_recent_activity() -> None:
     activities = [_activity(hours_ago=72), _activity(hours_ago=96)]
@@ -138,6 +157,7 @@ def test_recovery_summary_is_non_empty_string() -> None:
 
 # reschedule_if_needed
 
+
 def _make_session(scheduled_date: date) -> MagicMock:
     s = MagicMock()
     s.scheduled_date = scheduled_date
@@ -148,8 +168,11 @@ def test_reschedule_does_nothing_when_rested() -> None:
     tomorrow = date.today() + timedelta(days=1)
     session = _make_session(tomorrow)
     recovery = RecoveryStatus(
-        score=0.9, fatigued=False, recommended_rest_days=0,
-        next_safe_date=date.today(), summary="Fresh"
+        score=0.9,
+        fatigued=False,
+        recommended_rest_days=0,
+        next_safe_date=date.today(),
+        summary="Fresh",
     )
     db = MagicMock()
     reschedule_if_needed([session], recovery, db)
@@ -161,8 +184,11 @@ def test_reschedule_delays_sessions_in_recovery_window() -> None:
     next_safe = date.today() + timedelta(days=2)
     session = _make_session(tomorrow)
     recovery = RecoveryStatus(
-        score=0.2, fatigued=True, recommended_rest_days=2,
-        next_safe_date=next_safe, summary="Exhausted"
+        score=0.2,
+        fatigued=True,
+        recommended_rest_days=2,
+        next_safe_date=next_safe,
+        summary="Exhausted",
     )
     db = MagicMock()
     reschedule_if_needed([session], recovery, db)
@@ -175,8 +201,11 @@ def test_reschedule_does_not_pull_sessions_earlier() -> None:
     session = _make_session(far_future)
     next_safe = date.today() + timedelta(days=2)
     recovery = RecoveryStatus(
-        score=0.2, fatigued=True, recommended_rest_days=2,
-        next_safe_date=next_safe, summary="Exhausted"
+        score=0.2,
+        fatigued=True,
+        recommended_rest_days=2,
+        next_safe_date=next_safe,
+        summary="Exhausted",
     )
     db = MagicMock()
     reschedule_if_needed([session], recovery, db)

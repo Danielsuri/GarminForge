@@ -1,4 +1,5 @@
 """Tests for web.strava_client."""
+
 from __future__ import annotations
 
 import json
@@ -89,12 +90,14 @@ def test_call_returns_json_on_200() -> None:
 
 def test_strava_client_from_user() -> None:
     user = MagicMock()
-    user.strava_token_json = json.dumps({
-        "access_token": "acc",
-        "refresh_token": "ref",
-        "expires_at": 9999999999,
-        "token_type": "Bearer",
-    })
+    user.strava_token_json = json.dumps(
+        {
+            "access_token": "acc",
+            "refresh_token": "ref",
+            "expires_at": 9999999999,
+            "token_type": "Bearer",
+        }
+    )
     client = strava_client_from_user(user, client_id="cid", client_secret="csec")
     assert isinstance(client, StravaClient)
     assert client.token.access_token == "acc"

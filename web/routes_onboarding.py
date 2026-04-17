@@ -3,6 +3,7 @@ Shared onboarding questionnaire route:
   GET  /onboarding — render questionnaire (guest or logged-in)
   POST /onboarding — save answers (guest → session; logged-in → DB + auto-program)
 """
+
 from __future__ import annotations
 
 import json
@@ -25,40 +26,60 @@ router = APIRouter()
 
 # Goal options — label field is a translation key resolved in the template via t()
 GOAL_OPTIONS = [
-    {"value": "burn_fat",        "label": "goal_label_burn_fat",       "image": "/static/img/burn-fat.png"},
-    {"value": "lose_weight",     "label": "goal_label_lose_weight",    "image": "/static/img/lose-weight.png"},
-    {"value": "build_muscle",    "label": "goal_label_build_muscle",   "image": "/static/img/build-mucsle.png"},
-    {"value": "build_strength",  "label": "goal_label_build_strength", "image": "/static/img/build-strength.png"},
-    {"value": "general_fitness", "label": "goal_label_general_fitness","image": "/static/img/general-fitness.png"},
-    {"value": "endurance",       "label": "goal_label_endurance",      "image": "/static/img/muscular-endurance.png"},
+    {"value": "burn_fat", "label": "goal_label_burn_fat", "image": "/static/img/burn-fat.png"},
+    {
+        "value": "lose_weight",
+        "label": "goal_label_lose_weight",
+        "image": "/static/img/lose-weight.png",
+    },
+    {
+        "value": "build_muscle",
+        "label": "goal_label_build_muscle",
+        "image": "/static/img/build-mucsle.png",
+    },
+    {
+        "value": "build_strength",
+        "label": "goal_label_build_strength",
+        "image": "/static/img/build-strength.png",
+    },
+    {
+        "value": "general_fitness",
+        "label": "goal_label_general_fitness",
+        "image": "/static/img/general-fitness.png",
+    },
+    {
+        "value": "endurance",
+        "label": "goal_label_endurance",
+        "image": "/static/img/muscular-endurance.png",
+    },
 ]
 
 AGE_RANGES = ["18-29", "30-39", "40-49", "50+"]
 
 DIET_OPTIONS = [
-    {"value": "general",       "label": "diet_general"},
-    {"value": "vegetarian",    "label": "diet_vegetarian"},
-    {"value": "vegan",         "label": "diet_vegan"},
-    {"value": "keto",          "label": "diet_keto"},
-    {"value": "paleo",         "label": "diet_paleo"},
+    {"value": "general", "label": "diet_general"},
+    {"value": "vegetarian", "label": "diet_vegetarian"},
+    {"value": "vegan", "label": "diet_vegan"},
+    {"value": "keto", "label": "diet_keto"},
+    {"value": "paleo", "label": "diet_paleo"},
     {"value": "mediterranean", "label": "diet_mediterranean"},
-    {"value": "gluten_free",   "label": "diet_gluten_free"},
-    {"value": "high_protein",  "label": "diet_high_protein"},
+    {"value": "gluten_free", "label": "diet_gluten_free"},
+    {"value": "high_protein", "label": "diet_high_protein"},
 ]
 
 HEALTH_OPTIONS = [
-    {"value": "heart_condition",     "label": "health_heart_condition"},
-    {"value": "diabetes",            "label": "health_diabetes"},
+    {"value": "heart_condition", "label": "health_heart_condition"},
+    {"value": "diabetes", "label": "health_diabetes"},
     {"value": "high_blood_pressure", "label": "health_high_blood_pressure"},
-    {"value": "joint_problems",      "label": "health_joint_problems"},
-    {"value": "back_pain",           "label": "health_back_pain"},
-    {"value": "asthma",              "label": "health_asthma"},
+    {"value": "joint_problems", "label": "health_joint_problems"},
+    {"value": "back_pain", "label": "health_back_pain"},
+    {"value": "asthma", "label": "health_asthma"},
 ]
 
 FITNESS_LEVELS = [
-    {"value": "Beginner",     "label": "fitness_beginner",     "desc": "fitness_beginner_desc"},
+    {"value": "Beginner", "label": "fitness_beginner", "desc": "fitness_beginner_desc"},
     {"value": "Intermediate", "label": "fitness_intermediate", "desc": "fitness_intermediate_desc"},
-    {"value": "Advanced",     "label": "fitness_advanced",     "desc": "fitness_advanced_desc"},
+    {"value": "Advanced", "label": "fitness_advanced", "desc": "fitness_advanced_desc"},
 ]
 
 DAYS_OF_WEEK = [
@@ -91,9 +112,9 @@ def _parse_float(val: str | None) -> float | None:
 
 
 _FITNESS_RANK_BASE: dict[str, float] = {
-    "beginner":     2.0,
+    "beginner": 2.0,
     "intermediate": 5.0,
-    "advanced":     8.0,
+    "advanced": 8.0,
 }
 
 
@@ -111,15 +132,15 @@ def compute_initial_rank(
 
 def _apply_answers(user: User, answers: dict) -> None:  # type: ignore[type-arg]
     """Write parsed questionnaire answers onto a User ORM object (does not commit)."""
-    user.fitness_goals_json = answers.get("fitness_goals_json")            # type: ignore[assignment]
-    user.age_range = answers.get("age_range") or None                       # type: ignore[assignment]
-    user.fitness_level = answers.get("fitness_level") or None               # type: ignore[assignment]
-    user.preferred_days_json = answers.get("preferred_days_json")           # type: ignore[assignment]
-    user.preferred_equipment_json = answers.get("preferred_equipment_json") # type: ignore[assignment]
-    user.height_cm = answers.get("height_cm")                               # type: ignore[assignment]
-    user.weight_kg = answers.get("weight_kg")                               # type: ignore[assignment]
-    user.diet_json = answers.get("diet_json")                               # type: ignore[assignment]
-    user.health_conditions_json = answers.get("health_conditions_json")     # type: ignore[assignment]
+    user.fitness_goals_json = answers.get("fitness_goals_json")  # type: ignore[assignment]
+    user.age_range = answers.get("age_range") or None  # type: ignore[assignment]
+    user.fitness_level = answers.get("fitness_level") or None  # type: ignore[assignment]
+    user.preferred_days_json = answers.get("preferred_days_json")  # type: ignore[assignment]
+    user.preferred_equipment_json = answers.get("preferred_equipment_json")  # type: ignore[assignment]
+    user.height_cm = answers.get("height_cm")  # type: ignore[assignment]
+    user.weight_kg = answers.get("weight_kg")  # type: ignore[assignment]
+    user.diet_json = answers.get("diet_json")  # type: ignore[assignment]
+    user.health_conditions_json = answers.get("health_conditions_json")  # type: ignore[assignment]
 
     # Compute fitness rank from questionnaire (always recompute on questionnaire save/retake)
     _conditions = json.loads(user.health_conditions_json or "[]")
@@ -144,15 +165,23 @@ def _questionnaire_context(user: User | None, pending: dict) -> dict:  # type: i
         is_guest=(user is None),
         is_retake=(user is not None and user.questionnaire_completed),
         google_enabled=google_enabled,
-        existing_goals=_decode(user.fitness_goals_json if user else pending.get("fitness_goals_json")),
+        existing_goals=_decode(
+            user.fitness_goals_json if user else pending.get("fitness_goals_json")
+        ),
         existing_age_range=(user.age_range if user else pending.get("age_range", "")),
         existing_fitness_level=(user.fitness_level if user else pending.get("fitness_level", "")),
-        existing_days=_decode(user.preferred_days_json if user else pending.get("preferred_days_json")),
-        existing_equipment=_decode(user.preferred_equipment_json if user else pending.get("preferred_equipment_json")),
+        existing_days=_decode(
+            user.preferred_days_json if user else pending.get("preferred_days_json")
+        ),
+        existing_equipment=_decode(
+            user.preferred_equipment_json if user else pending.get("preferred_equipment_json")
+        ),
         existing_height_cm=(user.height_cm if user else pending.get("height_cm")),
         existing_weight_kg=(user.weight_kg if user else pending.get("weight_kg")),
         existing_diet=_decode(user.diet_json if user else pending.get("diet_json")),
-        existing_health=_decode(user.health_conditions_json if user else pending.get("health_conditions_json")),
+        existing_health=_decode(
+            user.health_conditions_json if user else pending.get("health_conditions_json")
+        ),
     )
 
 
@@ -170,15 +199,15 @@ async def onboarding_post(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request, db)
 
     answers: dict = {  # type: ignore[type-arg]
-        "fitness_goals_json":       json.dumps(form.getlist("fitness_goals")),
-        "age_range":                form.get("age_range", ""),
-        "fitness_level":            form.get("fitness_level", ""),
-        "preferred_days_json":      json.dumps(form.getlist("preferred_days")),
+        "fitness_goals_json": json.dumps(form.getlist("fitness_goals")),
+        "age_range": form.get("age_range", ""),
+        "fitness_level": form.get("fitness_level", ""),
+        "preferred_days_json": json.dumps(form.getlist("preferred_days")),
         "preferred_equipment_json": json.dumps(form.getlist("equipment")),
-        "height_cm":                _parse_float(form.get("height_cm")),
-        "weight_kg":                _parse_float(form.get("weight_kg")),
-        "diet_json":                json.dumps(form.getlist("diet")),
-        "health_conditions_json":   json.dumps(form.getlist("health_conditions")),
+        "height_cm": _parse_float(form.get("height_cm")),
+        "weight_kg": _parse_float(form.get("weight_kg")),
+        "diet_json": json.dumps(form.getlist("diet")),
+        "health_conditions_json": json.dumps(form.getlist("health_conditions")),
     }
 
     if user is None:
@@ -198,7 +227,9 @@ async def onboarding_post(request: Request, db: Session = Depends(get_db)):
             auto_generate_program(user, db)
         except Exception:
             logger.exception("Failed to auto-generate program for user %s", user.id)
-            request.session["flash_error"] = "Profile saved, but program generation failed. Try again from your profile."
+            request.session["flash_error"] = (
+                "Profile saved, but program generation failed. Try again from your profile."
+            )
 
     request.session["flash_success"] = "Profile updated."
     return RedirectResponse("/", status_code=303)
@@ -266,6 +297,8 @@ async def register_from_questionnaire(
         auto_generate_program(user, db)
     except Exception:
         logger.exception("Failed to auto-generate program on registration for user %s", user.id)
-        request.session["flash_error"] = "Account created! Program generation failed — visit your profile to set up your plan."
+        request.session["flash_error"] = (
+            "Account created! Program generation failed — visit your profile to set up your plan."
+        )
 
     return RedirectResponse("/", status_code=303)

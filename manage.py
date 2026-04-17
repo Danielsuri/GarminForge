@@ -12,6 +12,7 @@ Usage:
 Environment:
     GARMINFORGE_DB_PATH — path to SQLite database (default: ~/.garminforge.db)
 """
+
 from __future__ import annotations
 
 import argparse
@@ -20,6 +21,7 @@ import sys
 
 try:
     from dotenv import load_dotenv
+
     load_dotenv()
 except ImportError:
     pass
@@ -27,6 +29,7 @@ except ImportError:
 
 def _get_db():
     from web.db import SessionLocal
+
     return SessionLocal()
 
 
@@ -41,6 +44,7 @@ def _fmt_row(label: str, value: object) -> None:
 
 def cmd_list(args: argparse.Namespace) -> None:
     from web.models import User
+
     db = _get_db()
     try:
         users = db.query(User).order_by(User.created_at).all()
@@ -51,7 +55,9 @@ def cmd_list(args: argparse.Namespace) -> None:
         print("No users found.")
         return
 
-    header = f"{'EMAIL':<36}  {'NAME':<22}  {'GOOGLE':<6}  {'APPLE':<6}  {'VERIFIED':<8}  {'CREATED'}"
+    header = (
+        f"{'EMAIL':<36}  {'NAME':<22}  {'GOOGLE':<6}  {'APPLE':<6}  {'VERIFIED':<8}  {'CREATED'}"
+    )
     print(header)
     print("-" * len(header))
     for u in users:
@@ -68,6 +74,7 @@ def cmd_list(args: argparse.Namespace) -> None:
 
 def cmd_show(args: argparse.Namespace) -> None:
     from web.models import User
+
     db = _get_db()
     try:
         user = db.query(User).filter_by(email=args.email.strip().lower()).first()
@@ -98,6 +105,7 @@ def cmd_show(args: argparse.Namespace) -> None:
 def cmd_create(args: argparse.Namespace) -> None:
     from web.auth_utils import hash_password
     from web.models import User
+
     db = _get_db()
     try:
         email = args.email.strip().lower()
@@ -126,6 +134,7 @@ def cmd_create(args: argparse.Namespace) -> None:
 
 def cmd_delete(args: argparse.Namespace) -> None:
     from web.models import User
+
     db = _get_db()
     try:
         email = args.email.strip().lower()
@@ -150,6 +159,7 @@ def cmd_delete(args: argparse.Namespace) -> None:
 def cmd_set_password(args: argparse.Namespace) -> None:
     from web.auth_utils import hash_password
     from web.models import User
+
     db = _get_db()
     try:
         email = args.email.strip().lower()

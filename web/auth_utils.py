@@ -1,6 +1,7 @@
 """
 GarminForge account auth helpers: password hashing, session management, token migration.
 """
+
 from __future__ import annotations
 
 import logging

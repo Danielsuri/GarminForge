@@ -1,4 +1,5 @@
 """Tests for web/program_generator.py."""
+
 from __future__ import annotations
 
 import pytest
@@ -12,6 +13,7 @@ from web.program_generator import (
 # ---------------------------------------------------------------------------
 # _phase_params — linear
 # ---------------------------------------------------------------------------
+
 
 class TestLinearPhaseParams:
     def test_8week_accumulation(self) -> None:
@@ -50,6 +52,7 @@ class TestLinearPhaseParams:
 # _phase_params — undulating
 # ---------------------------------------------------------------------------
 
+
 class TestUndulatingPhaseParams:
     def test_day0_is_strength(self) -> None:
         p = _phase_params(1, 8, "undulating", 0)
@@ -80,6 +83,7 @@ class TestUndulatingPhaseParams:
 # ---------------------------------------------------------------------------
 # _phase_params — block
 # ---------------------------------------------------------------------------
+
 
 class TestBlockPhaseParams:
     def test_8week_accumulation(self) -> None:
@@ -112,6 +116,7 @@ class TestBlockPhaseParams:
 # ---------------------------------------------------------------------------
 # generate_program
 # ---------------------------------------------------------------------------
+
 
 class TestGenerateProgram:
     def test_session_count(self) -> None:
@@ -183,7 +188,7 @@ class TestGenerateProgram:
             periodization_type="linear",
         )
         # Week 1 = acc (3 sets), Week 5 = int (4 sets), Week 8 = peak (5 sets)
-        week1_sets = plan.sessions[0].sets   # week 1, day 1
+        week1_sets = plan.sessions[0].sets  # week 1, day 1
         week5_sets = plan.sessions[4 * 3].sets  # week 5, day 1
         week8_sets = plan.sessions[7 * 3].sets  # week 8, day 1
         assert week1_sets == 3

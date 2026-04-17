@@ -1,6 +1,7 @@
 """
 Shared Jinja2 template renderer used by app.py and the route modules.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -77,5 +78,12 @@ def render_template(
     return templates.TemplateResponse(
         request,
         template,
-        {"authenticated": authenticated, "forge_user": forge_user, "lang": lang, "t": make_t(lang), "app_version": APP_VERSION, **ctx},
+        {
+            "authenticated": authenticated,
+            "forge_user": forge_user,
+            "lang": lang,
+            "t": make_t(lang),
+            "app_version": APP_VERSION,
+            **ctx,
+        },
     )

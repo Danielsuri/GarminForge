@@ -4,6 +4,7 @@ Tests for /my/questionnaire redirect behaviour.
 The questionnaire has moved to /onboarding.  These routes now simply
 redirect callers to the new location — no auth required, no DB access.
 """
+
 from __future__ import annotations
 
 import pytest

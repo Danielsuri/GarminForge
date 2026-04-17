@@ -6,6 +6,7 @@ Two login strategies (tried in order):
    Fast, no browser needed. Fails if Garmin serves a CAPTCHA.
 2. browser_login() — headed Playwright fallback. Always works but opens a browser window.
 """
+
 import logging
 import re
 import time
@@ -58,6 +59,7 @@ def portal_login(email: str, password: str) -> tuple[dict, dict]:
     # Cloudflare Bot Management on sso.garmin.com (plain requests always 403).
     try:
         from curl_cffi import requests as cffi_requests
+
         sess = cffi_requests.Session(impersonate="chrome124")
     except ImportError:
         raise ValueError("curl_cffi not installed — cannot do headless login.")
@@ -67,7 +69,9 @@ def portal_login(email: str, password: str) -> tuple[dict, dict]:
     r = sess.get(_PORTAL_SIGN_IN, timeout=15)
     logger.info("Portal sign-in page: status=%s cookies=%s", r.status_code, list(r.cookies.keys()))
     if r.status_code >= 400:
-        raise ValueError(f"Sign-in page blocked (HTTP {r.status_code}) — Cloudflare still blocking.")
+        raise ValueError(
+            f"Sign-in page blocked (HTTP {r.status_code}) — Cloudflare still blocking."
+        )
 
     # Step 2: POST credentials as JSON
     logger.debug("Portal login: POST %s", _PORTAL_LOGIN_API)
@@ -113,12 +117,16 @@ def portal_login(email: str, password: str) -> tuple[dict, dict]:
         if status_type not in ("", "SUCCESS", None) and not data.get("serviceTicketId"):
             raise ValueError(f"Portal login blocked: {status_type}")
         # serviceTicketId is the ticket on success
-        ticket = data.get("serviceTicketId") or data.get("ticket") or data.get("serviceTicket") or ""
+        ticket = (
+            data.get("serviceTicketId") or data.get("ticket") or data.get("serviceTicket") or ""
+        )
         if ticket and str(ticket).startswith("ST-"):
             logger.info("Portal login: got ticket directly from response.")
             return exchange_ticket(str(ticket))
         # Some versions return a URL containing the ticket
-        ticket_url = data.get("serviceURL") or data.get("serviceTicketUrl") or data.get("redirectUrl") or ""
+        ticket_url = (
+            data.get("serviceURL") or data.get("serviceTicketUrl") or data.get("redirectUrl") or ""
+        )
         if ticket_url:
             m = re.search(r"ticket=(ST-[A-Za-z0-9\-]+)", str(ticket_url))
             if m:
@@ -135,7 +143,9 @@ def portal_login(email: str, password: str) -> tuple[dict, dict]:
             return exchange_ticket(m.group(1))
         raise ValueError(f"Redirect without ticket: {location!r}")
 
-    raise ValueError(f"Portal login returned unexpected status {resp.status_code}: {resp.text[:200]}")
+    raise ValueError(
+        f"Portal login returned unexpected status {resp.status_code}: {resp.text[:200]}"
+    )
 
 
 def browser_login(email: str = "", password: str = "") -> tuple[dict, dict]:
@@ -176,7 +186,9 @@ def browser_login(email: str = "", password: str = "") -> tuple[dict, dict]:
                 if not ticket:
                     try:
                         content = page.content()
-                        m = re.search(r"serviceTicket['\"]?\s*:\s*['\"]?(ST-[A-Za-z0-9\-]+)", content)
+                        m = re.search(
+                            r"serviceTicket['\"]?\s*:\s*['\"]?(ST-[A-Za-z0-9\-]+)", content
+                        )
                         if m:
                             ticket = m.group(1)
                     except Exception:
@@ -202,6 +214,7 @@ def make_token_b64(oauth1: dict, oauth2: dict) -> str:
     """Encode tokens in the format garth's loads() expects: base64([oauth1, oauth2])."""
     import base64 as _b64
     import json as _json
+
     return _b64.b64encode(_json.dumps([oauth1, oauth2]).encode()).decode()
 
 

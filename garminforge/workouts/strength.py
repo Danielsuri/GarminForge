@@ -37,6 +37,7 @@ from garminforge.exceptions import StepLimitExceededError
 from garminforge.workouts import steps as S
 from garminforge.workouts.exercises import validate as validate_exercise
 
+
 def _estimate_duration(steps: list[S.Step]) -> int:
     """Recursively sum timed step durations (in seconds) across all steps."""
     total = 0
@@ -202,20 +203,24 @@ class StrengthWorkout:
         actual_rounds = rounds if rounds is not None else blocks[0].sets
         inner: list[S.Step] = []
         for block in blocks:
-            inner.append(S.exercise_step(
-                category=block.category,
-                name=block.name,
-                reps=block.reps,
-                duration_seconds=block.duration_seconds,
-                description=block.description,
-                step_order=len(inner) + 1,
-            ))
+            inner.append(
+                S.exercise_step(
+                    category=block.category,
+                    name=block.name,
+                    reps=block.reps,
+                    duration_seconds=block.duration_seconds,
+                    description=block.description,
+                    step_order=len(inner) + 1,
+                )
+            )
             if block.rest_seconds is not None:
-                inner.append(S.rest_step(
-                    duration_seconds=block.rest_seconds,
-                    description=f"Rest {int(block.rest_seconds)}s",
-                    step_order=len(inner) + 2,
-                ))
+                inner.append(
+                    S.rest_step(
+                        duration_seconds=block.rest_seconds,
+                        description=f"Rest {int(block.rest_seconds)}s",
+                        step_order=len(inner) + 2,
+                    )
+                )
         group = S.repeat_group(
             sets=actual_rounds,
             steps=inner,
@@ -239,7 +244,9 @@ class StrengthWorkout:
             nested.append(
                 S.rest_step(
                     duration_seconds=block.rest_seconds,
-                    description=f"Rest {int(block.rest_seconds)}s" if block.rest_seconds else "Rest",
+                    description=f"Rest {int(block.rest_seconds)}s"
+                    if block.rest_seconds
+                    else "Rest",
                     step_order=2,
                 )
             )
@@ -280,9 +287,7 @@ class StrengthWorkout:
             self._validate()
 
         # Re-number top-level steps.
-        renumbered = [
-            {**s, "stepOrder": i + 1} for i, s in enumerate(self._top_steps)
-        ]
+        renumbered = [{**s, "stepOrder": i + 1} for i, s in enumerate(self._top_steps)]
 
         payload: dict[str, Any] = {
             "workoutName": self.name[:80],
@@ -312,6 +317,7 @@ class StrengthWorkout:
             name = step.get("exerciseName", "")
             if cat and name and not validate_exercise(cat, name):
                 import warnings
+
                 warnings.warn(
                     f"Exercise {cat}/{name} is not in the local catalog.  "
                     "Upload may succeed if it exists in Garmin's server-side catalog.",

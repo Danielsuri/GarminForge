@@ -1,8 +1,8 @@
 """Tests for onboarding questionnaire fields."""
+
 import json
 from unittest.mock import MagicMock
 
-import pytest
 from fastapi.testclient import TestClient
 from web.app import app
 from web.models import User, Program, ProgramSession

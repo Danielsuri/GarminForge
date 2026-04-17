@@ -19,6 +19,7 @@ Environment variables:
                                               (e.g. https://garminforge.yourdomain.com)
                                               Required if running behind a reverse proxy.
 """
+
 from __future__ import annotations
 
 import base64
@@ -135,13 +136,19 @@ async def register_submit(
 
     if not email or "@" not in email:
         return render_template(
-            "register.html", request, db=db, flash_error="Please enter a valid email address.",
-            **_social_flags()
+            "register.html",
+            request,
+            db=db,
+            flash_error="Please enter a valid email address.",
+            **_social_flags(),
         )
     if len(password) < 8:
         return render_template(
-            "register.html", request, db=db, flash_error="Password must be at least 8 characters.",
-            **_social_flags()
+            "register.html",
+            request,
+            db=db,
+            flash_error="Password must be at least 8 characters.",
+            **_social_flags(),
         )
     if db.query(User).filter_by(email=email).first():
         return render_template(
@@ -149,7 +156,7 @@ async def register_submit(
             request,
             db=db,
             flash_error="An account with this email already exists.",
-            **_social_flags()
+            **_social_flags(),
         )
 
     user = User(
@@ -170,6 +177,7 @@ async def register_submit(
     if pending:
         from web.routes_onboarding import _apply_answers
         from web.program_generator import auto_generate_program
+
         _apply_answers(user, pending)
         user.questionnaire_completed = True  # type: ignore[assignment]
         db.commit()
@@ -283,11 +291,8 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
 
 def _apple_configured() -> bool:
     return all(
-        os.environ.get(k)
-        for k in ["APPLE_CLIENT_ID", "APPLE_TEAM_ID", "APPLE_KEY_ID"]
-    ) and bool(
-        os.environ.get("APPLE_PRIVATE_KEY") or os.environ.get("APPLE_PRIVATE_KEY_PATH")
-    )
+        os.environ.get(k) for k in ["APPLE_CLIENT_ID", "APPLE_TEAM_ID", "APPLE_KEY_ID"]
+    ) and bool(os.environ.get("APPLE_PRIVATE_KEY") or os.environ.get("APPLE_PRIVATE_KEY_PATH"))
 
 
 def _apple_private_key() -> str:
@@ -342,17 +347,17 @@ async def apple_redirect(request: Request):
     state = secrets.token_urlsafe(16)
     request.session["apple_state"] = state
 
-    params = urllib.parse.urlencode({
-        "client_id": os.environ["APPLE_CLIENT_ID"],
-        "redirect_uri": _callback_url(request, "/auth/apple/callback"),
-        "response_type": "code",
-        "scope": "name email",
-        "response_mode": "form_post",
-        "state": state,
-    })
-    return RedirectResponse(
-        f"https://appleid.apple.com/auth/authorize?{params}", status_code=302
+    params = urllib.parse.urlencode(
+        {
+            "client_id": os.environ["APPLE_CLIENT_ID"],
+            "redirect_uri": _callback_url(request, "/auth/apple/callback"),
+            "response_type": "code",
+            "scope": "name email",
+            "response_mode": "form_post",
+            "state": state,
+        }
     )
+    return RedirectResponse(f"https://appleid.apple.com/auth/authorize?{params}", status_code=302)
 
 
 @router.post("/apple/callback")

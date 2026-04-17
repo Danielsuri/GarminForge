@@ -1,4 +1,5 @@
 """Strava API v3 HTTP client with automatic token refresh."""
+
 from __future__ import annotations
 
 import json
@@ -90,11 +91,9 @@ class StravaClient:
         if response.status_code == 401:
             raise StravaAuthError(f"Strava returned 401 for {method} {path}")
         if response.status_code == 429:
-            raise StravaRateLimitError(
-                "Strava rate limit reached (100 req/15 min or 1 000/day)."
-            )
+            raise StravaRateLimitError("Strava rate limit reached (100 req/15 min or 1 000/day).")
         response.raise_for_status()
-        return response.json()  # type: ignore[no-any-return]
+        return response.json()
 
     def _call(self, method: str, path: str, **kwargs: Any) -> Any:
         """Make an authenticated request; raise typed exceptions on error.
