@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import secrets
 from datetime import datetime, timezone
 
 import httpx
@@ -97,6 +98,9 @@ async def strava_connect(request: Request, db: Session = Depends(get_db)) -> Red
     if user is None:
         return RedirectResponse("/auth/login-forge", status_code=303)
 
+    state = secrets.token_urlsafe(24)
+    request.session["strava_oauth_state"] = state
+
     callback = _callback_url(request)
     url = (
         f"{_AUTHORIZE_URL}"
@@ -105,6 +109,7 @@ async def strava_connect(request: Request, db: Session = Depends(get_db)) -> Red
         f"&response_type=code"
         f"&scope={_SCOPES}"
         f"&approval_prompt=auto"
+        f"&state={state}"
     )
     return RedirectResponse(url, status_code=303)
 
@@ -114,12 +119,20 @@ async def strava_callback(
     request: Request,
     code: str = "",
     error: str = "",
+    state: str = "",
     db: Session = Depends(get_db),
 ) -> RedirectResponse:
     """Exchange authorization code for tokens, store them, run initial sync."""
     user = get_current_user(request, db)
     if user is None:
         return RedirectResponse("/auth/login-forge", status_code=303)
+
+    # Verify CSRF state token
+    expected_state = request.session.pop("strava_oauth_state", None)
+    if not expected_state or not secrets.compare_digest(expected_state, state):
+        logger.warning("Strava OAuth state mismatch — possible CSRF")
+        request.session["flash"] = "Strava connection failed: invalid state."
+        return RedirectResponse("/my/profile", status_code=303)
 
     if error:
         logger.warning("Strava OAuth error: %s", error)

@@ -620,8 +620,12 @@ async def workout_generate(
 
     strava_recovery: RecoveryStatus | None = None
     if forge_user is not None and forge_user.strava_activities_json:
-        activities = json.loads(forge_user.strava_activities_json)
-        strava_recovery = recovery_score(activities)
+        try:
+            activities = json.loads(forge_user.strava_activities_json)
+            if activities:
+                strava_recovery = recovery_score(activities)
+        except Exception:
+            pass
 
     try:
         plan = generate(

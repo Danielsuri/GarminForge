@@ -429,20 +429,22 @@ def _mark_complete(
     if user.strava_activities_json:
         from web.strava_insights import recovery_score, reschedule_if_needed
 
-        activities = json.loads(user.strava_activities_json)
-        recovery = recovery_score(activities)
-        upcoming = (
-            (
+        try:
+            activities = json.loads(user.strava_activities_json)
+        except Exception:
+            activities = []
+        if activities:
+            recovery = recovery_score(activities)
+            upcoming = (
                 db.query(ProgramSession)
-                .filter_by(user_id=user.id)
-                .filter(ProgramSession.completed_at.is_(None))
+                .filter(
+                    ProgramSession.program.has(user_id=user.id),  # type: ignore[attr-defined]
+                    ProgramSession.completed_at.is_(None),
+                )
                 .all()
             )
-            if hasattr(ProgramSession, "user_id")
-            else []
-        )
-        if upcoming:
-            reschedule_if_needed(upcoming, recovery, db)
+            if upcoming:
+                reschedule_if_needed(upcoming, recovery, db)
 
 
 @router.get("/sessions/{session_id}/complete", response_class=HTMLResponse)

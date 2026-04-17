@@ -106,8 +106,8 @@ class StravaClient:
         with httpx.Client(timeout=20) as client:
             response = client.request(method, url, headers=headers, **kwargs)
 
-        if response.status_code >= 500:
-            # One retry on server errors
+        if response.status_code >= 500 and method.upper() == "GET":
+            # One retry on server errors (GET only — POST is not idempotent)
             with httpx.Client(timeout=20) as client:
                 response = client.request(method, url, headers=headers, **kwargs)
 
