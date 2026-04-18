@@ -701,6 +701,7 @@
   window.toggleEqDropdown = function () {
     const trigger = document.getElementById('eqTrigger');
     const panel   = document.getElementById('eqPanel');
+    const dots    = document.getElementById('wizDots');
     const open    = panel.classList.toggle('open');
     trigger.classList.toggle('open', open);
     if (open) {
@@ -708,6 +709,9 @@
       panel.style.top   = (r.bottom + 6) + 'px';
       panel.style.left  = r.left + 'px';
       panel.style.width = r.width + 'px';
+      if (dots) dots.style.visibility = 'hidden';
+    } else {
+      if (dots) dots.style.visibility = '';
     }
   };
 
@@ -734,6 +738,8 @@
     if (dd && !dd.contains(e.target)) {
       document.getElementById('eqPanel').classList.remove('open');
       document.getElementById('eqTrigger').classList.remove('open');
+      const dots = document.getElementById('wizDots');
+      if (dots) dots.style.visibility = '';
     }
   });
 

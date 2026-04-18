@@ -307,9 +307,15 @@ a:hover { color: var(--color-brand-pale); }
 /* Mobile nav drawer */
 .koda-nav-drawer {
   display: none;
+  position: fixed;
+  top: 54px;
+  left: 0;
+  right: 0;
+  z-index: 1029;
   background: var(--color-surface);
   border-bottom: 1px solid var(--border-brand-faint);
   padding: 12px 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 .koda-nav-drawer.open { display: block; }

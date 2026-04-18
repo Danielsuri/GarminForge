@@ -26,31 +26,31 @@ router = APIRouter()
 
 # Goal options — label field is a translation key resolved in the template via t()
 GOAL_OPTIONS = [
-    {"value": "burn_fat", "label": "goal_label_burn_fat", "image": "/static/img/burn-fat.png"},
+    {"value": "burn_fat", "label": "goal_label_burn_fat", "image": "/static/img/burn-fat.webp"},
     {
         "value": "lose_weight",
         "label": "goal_label_lose_weight",
-        "image": "/static/img/lose-weight.png",
+        "image": "/static/img/lose-weight.webp",
     },
     {
         "value": "build_muscle",
         "label": "goal_label_build_muscle",
-        "image": "/static/img/build-mucsle.png",
+        "image": "/static/img/build-mucsle.webp",
     },
     {
         "value": "build_strength",
         "label": "goal_label_build_strength",
-        "image": "/static/img/build-strength.png",
+        "image": "/static/img/build-strength.webp",
     },
     {
         "value": "general_fitness",
         "label": "goal_label_general_fitness",
-        "image": "/static/img/general-fitness.png",
+        "image": "/static/img/general-fitness.webp",
     },
     {
         "value": "endurance",
         "label": "goal_label_endurance",
-        "image": "/static/img/muscular-endurance.png",
+        "image": "/static/img/muscular-endurance.webp",
     },
 ]
 
