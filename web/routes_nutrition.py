@@ -53,7 +53,7 @@ def _send_pending_push(user: User, db: Session) -> None:
     if not vapid_private:
         return
     try:
-        from pywebpush import WebPushException, webpush
+        from pywebpush import WebPushException, webpush  # type: ignore[import-untyped]
 
         vapid_email = os.environ.get("VAPID_CLAIM_EMAIL", "mailto:admin@garminforge.com")
         now = datetime.utcnow()
@@ -111,6 +111,7 @@ async def save_nutrition_profile(
 @router.get("/nutrition", response_class=HTMLResponse)
 async def nutrition_page(
     request: Request,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ) -> HTMLResponse:
     user = require_user(request, db)
@@ -127,8 +128,7 @@ async def nutrition_page(
         db.add(plan)
         db.commit()
         db.refresh(plan)
-        bt = BackgroundTasks()
-        bt.add_task(generate_weekly_plan, user, db)
+        background_tasks.add_task(generate_weekly_plan, user, db)
 
     plan_data: dict[str, Any] = {}
     if plan.status == "ready" and plan.plan_json:
