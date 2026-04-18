@@ -42,12 +42,8 @@ PLAN_SCHEMA_EXAMPLE = """{
 
 
 def last_sunday(today: date) -> date:
-    """Return the most recent Monday (ISO week start), inclusive of today if today is Monday.
-
-    Despite the name, this function returns the ISO week-start (Monday) so that
-    week_start aligns with the nutrition plan's Sunday-indexed week dates.
-    """
-    days_back = today.weekday()  # Mon=0, Tue=1, …, Sun=6
+    """Return the most recent Sunday (inclusive of today if today is Sunday)."""
+    days_back = today.isoweekday() % 7  # Sun=0, Mon=1, ..., Sat=6
     return date.fromordinal(today.toordinal() - days_back)
 
 

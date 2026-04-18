@@ -48,7 +48,7 @@ def _make_user(db: Session) -> User:
 
 
 VALID_PLAN = json.dumps({
-    "days": [{"date": "2026-04-13", "meals": [
+    "days": [{"date": "2026-04-12", "meals": [
         {"type": "breakfast", "name": "Avocado eggs", "kcal": 420,
          "macros": {"protein_g": 22, "carbs_g": 6, "fat_g": 20}},
     ]}],
@@ -58,8 +58,8 @@ VALID_PLAN = json.dumps({
 
 
 def test_last_sunday() -> None:
-    assert last_sunday(date(2026, 4, 18)) == date(2026, 4, 13)  # Saturday
-    assert last_sunday(date(2026, 4, 13)) == date(2026, 4, 13)  # Sunday itself
+    assert last_sunday(date(2026, 4, 18)) == date(2026, 4, 12)  # Saturday → previous Sunday
+    assert last_sunday(date(2026, 4, 12)) == date(2026, 4, 12)  # Sunday itself
 
 
 def test_generate_creates_plan(db: Session) -> None:
@@ -73,14 +73,14 @@ def test_generate_creates_plan(db: Session) -> None:
             md.fromordinal = date.fromordinal
             plan = generate_weekly_plan(user, db)
     assert plan.status == "ready"
-    assert plan.week_start == date(2026, 4, 13)
+    assert plan.week_start == date(2026, 4, 12)
     assert mock_provider.complete.called
 
 
 def test_generate_returns_cached(db: Session) -> None:
     user = _make_user(db)
     existing = NutritionPlan(
-        user_id=user.id, week_start=date(2026, 4, 13), status="ready", plan_json=VALID_PLAN
+        user_id=user.id, week_start=date(2026, 4, 12), status="ready", plan_json=VALID_PLAN
     )
     db.add(existing)
     db.commit()
@@ -98,11 +98,11 @@ def test_generate_returns_cached(db: Session) -> None:
 def test_get_todays_meals(db: Session) -> None:
     user = _make_user(db)
     plan = NutritionPlan(
-        user_id=user.id, week_start=date(2026, 4, 13), status="ready", plan_json=VALID_PLAN
+        user_id=user.id, week_start=date(2026, 4, 12), status="ready", plan_json=VALID_PLAN
     )
     db.add(plan)
     db.commit()
-    meals = get_todays_meals(plan, today=date(2026, 4, 13))
+    meals = get_todays_meals(plan, today=date(2026, 4, 12))
     assert len(meals) == 1
     assert meals[0]["name"] == "Avocado eggs"
 
@@ -125,7 +125,7 @@ def test_reminders_create_notifications(db: Session) -> None:
 def test_get_todays_reminder(db: Session) -> None:
     user = _make_user(db)
     plan = NutritionPlan(
-        user_id=user.id, week_start=date(2026, 4, 13), status="ready", plan_json=VALID_PLAN
+        user_id=user.id, week_start=date(2026, 4, 12), status="ready", plan_json=VALID_PLAN
     )
     db.add(plan)
     db.commit()
