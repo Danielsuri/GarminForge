@@ -143,6 +143,7 @@ async def nutrition_page(
 
     return render_template(
         "nutrition.html", request, db=db,
+        active_page="nutrition",
         plan=plan,
         plan_data=plan_data,
         today_str=str(date.today()),

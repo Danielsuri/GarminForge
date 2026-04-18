@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}{{ t("nutrition_page_title") }}{% endblock %}
+{% block content %}
+<div class="container-xl py-4" style="max-width:900px">
+
+  <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-3">
+    <div>
+      <h1 style="font-size:24px;font-weight:800;color:#fff;margin-bottom:4px">🥗 {{ t("nutrition_page_title") }}</h1>
+      <div style="font-size:13px;color:rgba(255,255,255,.4)">{{ t("nutrition_page_subtitle") }}</div>
+    </div>
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:6px 14px;font-size:12px;color:rgba(255,255,255,.4);display:flex;align-items:center;gap:8px">
+      <div style="width:6px;height:6px;border-radius:50%;background:#16a34a;box-shadow:0 0 6px #16a34a"></div>
+      {{ t("nutrition_week_of") }} {{ plan.week_start.strftime("%b %d") }}
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.3);margin-bottom:24px">
+    ✨ {{ t("nutrition_last_generated") }}: {{ plan.generated_at.strftime("%b %d, %Y at %H:%M") if plan.generated_at else "—" }}
+    <form action="/nutrition/regenerate" method="POST" class="ms-auto">
+      <button type="submit" style="padding:4px 12px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid rgba(124,58,237,.3);background:rgba(124,58,237,.1);color:#a78bfa;cursor:pointer">
+        {{ t("nutrition_regenerate") }}
+      </button>
+    </form>
+  </div>
+
+  {% if plan.status == "generating" %}
+    <meta http-equiv="refresh" content="4">
+    <div class="text-center py-5" style="color:rgba(255,255,255,.4)">{{ t("nutrition_card_generating") }}</div>
+
+  {% elif plan.status == "ready" %}
+    <div style="display:flex;gap:0;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:4px;margin-bottom:28px;width:fit-content">
+      <button class="nutr-tab active" onclick="switchNutrTab('plan',this)">📅 {{ t("nutrition_tab_plan") }}</button>
+      <button class="nutr-tab" onclick="switchNutrTab('groceries',this)">🛒 {{ t("nutrition_tab_groceries") }}</button>
+      <button class="nutr-tab" onclick="switchNutrTab('reminders',this)">🔔 {{ t("nutrition_tab_reminders") }}</button>
+    </div>
+
+    {# ── Plan tab ── #}
+    <div class="nutr-panel" id="tab-plan">
+      {% set dot_colors = {'breakfast':'#f59e0b','lunch':'#3b82f6','dinner':'#8b5cf6','snack':'#10b981'} %}
+      {% for day in plan_data.get('days',[]) %}
+        {% set is_today = day.date == today_str %}
+        <div style="display:grid;grid-template-columns:88px 1fr;margin-bottom:12px">
+          <div style="padding:16px 12px 16px 0;font-size:12px;font-weight:700;color:{{ '#a78bfa' if is_today else 'rgba(255,255,255,.3)' }};text-transform:uppercase;letter-spacing:.06em;border-right:1px solid rgba(255,255,255,.06)">
+            {{ day.date[5:] }}
+            <div style="font-size:20px;font-weight:800;color:{{ '#a78bfa' if is_today else 'rgba(255,255,255,.6)' }}">{{ day.date[8:] }}</div>
+            {% if is_today %}<div style="font-size:9px;background:rgba(124,58,237,.2);color:#a78bfa;border-radius:4px;padding:1px 5px;font-weight:700;width:fit-content;margin-top:2px">TODAY</div>{% endif %}
+          </div>
+          <div style="padding:12px 0 12px 16px;display:flex;flex-direction:column;gap:8px">
+            {% for meal in day.get('meals',[]) %}
+            <div style="background:{{ 'rgba(124,58,237,.05)' if is_today else '#111827' }};border:1px solid {{ 'rgba(124,58,237,.2)' if is_today else 'rgba(255,255,255,.06)' }};border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:12px">
+              <div style="width:7px;height:7px;border-radius:50%;background:{{ dot_colors.get(meal.type,'#a78bfa') }};flex-shrink:0"></div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.3)">{{ t("meal_"+meal.type) }}</div>
+                <div style="font-size:13px;font-weight:600;color:#fff">{{ meal.name }}</div>
+                {% if meal.get('macros') %}
+                <div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:3px;display:flex;gap:10px">
+                  <span style="color:#f87171">P {{ meal.macros.protein_g|int }}g</span>
+                  <span style="color:#fbbf24">C {{ meal.macros.carbs_g|int }}g</span>
+                  <span style="color:#60a5fa">F {{ meal.macros.fat_g|int }}g</span>
+                </div>
+                {% endif %}
+              </div>
+              {% if meal.get('kcal') %}<div style="font-size:11px;color:rgba(255,255,255,.3);white-space:nowrap">{{ meal.kcal }} kcal</div>{% endif %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {# ── Groceries tab ── #}
+    <div class="nutr-panel d-none" id="tab-groceries">
+      <div class="d-flex gap-2 mb-4">
+        <button class="btn btn-sm" style="background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.35);color:#a78bfa;font-size:12px;font-weight:600" onclick="copyGroceries()">📋 {{ t("nutrition_copy_list") }}</button>
+      </div>
+      {% for cat_key, cat_label in [('protein','🥩 '+t('grocery_protein')),('vegetables','🥬 '+t('grocery_vegetables')),('dairy_fats','🧀 '+t('grocery_dairy_fats')),('pantry','🫙 '+t('grocery_pantry'))] %}
+        {% set items = plan_data.get('groceries',[])|selectattr('category','equalto',cat_key)|list %}
+        {% if items %}
+        <div style="margin-bottom:24px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.3);margin-bottom:10px;display:flex;align-items:center;gap:8px">{{ cat_label }}<div style="flex:1;height:1px;background:rgba(255,255,255,.06)"></div></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px">
+            {% for item in items %}
+            <div class="groc-item" style="background:#111827;border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleGroc(this)">
+              <div class="groc-chk" style="width:18px;height:18px;border-radius:5px;border:1.5px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0"></div>
+              <div>
+                <div style="font-size:13px;color:rgba(255,255,255,.75);font-weight:500">{{ item.item }}</div>
+                <div style="font-size:11px;color:rgba(255,255,255,.3)">{{ item.qty }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    {# ── Reminders tab ── #}
+    <div class="nutr-panel d-none" id="tab-reminders">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        {% for r in plan_data.get('reminders',[]) %}
+          {% set upcoming = r.day >= today_str %}
+          <div style="background:#111827;border:1px solid {{ 'rgba(124,58,237,.2)' if upcoming else 'rgba(255,255,255,.06)' }};border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:14px">
+            <div style="min-width:52px;text-align:center">
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.3)">{{ r.day[5:7] }}/{{ r.day[8:] }}</div>
+              <div style="font-size:20px;font-weight:800;color:{{ '#a78bfa' if upcoming else 'rgba(255,255,255,.5)' }};line-height:1.2">{{ r.day[8:] }}</div>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:3px">{{ r.text }}</div>
+            </div>
+            {% if r.day == today_str %}
+              <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(124,58,237,.15);color:#a78bfa;border:1px solid rgba(124,58,237,.25);white-space:nowrap;align-self:center">Today</span>
+            {% elif upcoming %}
+              <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.3);white-space:nowrap;align-self:center">Upcoming</span>
+            {% else %}
+              <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.25);white-space:nowrap;align-self:center">Done</span>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  {% else %}
+    <div class="text-center py-5" style="color:rgba(255,255,255,.3)">{{ t("nutrition_plan_error") }} <a href="/nutrition/regenerate" style="color:#a78bfa">{{ t("nutrition_retry") }}</a></div>
+  {% endif %}
+
+</div>
+
+<style>
+.nutr-tab{padding:8px 20px;border-radius:9px;font-size:13px;font-weight:500;color:rgba(255,255,255,.4);cursor:pointer;border:none;background:transparent;transition:.15s}
+.nutr-tab.active{background:rgba(124,58,237,.2);color:#a78bfa;font-weight:600}
+.groc-item.checked{opacity:.4}
+.groc-item.checked .groc-chk{background:#16a34a !important;border-color:#16a34a !important;color:#fff}
+</style>
+
+<script>
+function switchNutrTab(name,el){
+  document.querySelectorAll('.nutr-tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.nutr-panel').forEach(function(p){p.classList.add('d-none');});
+  el.classList.add('active');
+  document.getElementById('tab-'+name).classList.remove('d-none');
+}
+function toggleGroc(el){
+  el.classList.toggle('checked');
+  var chk=el.querySelector('.groc-chk');
+  chk.textContent=el.classList.contains('checked')?'✓':'';
+}
+function copyGroceries(){
+  var lines=Array.from(document.querySelectorAll('#tab-groceries .groc-item')).map(function(el){
+    var divs=el.querySelectorAll('div > div');
+    var name=divs[0]?divs[0].textContent.trim():'';
+    var qty=divs[1]?divs[1].textContent.trim():'';
+    return '- '+name+(qty?' ('+qty+')':'');
+  });
+  navigator.clipboard.writeText(lines.join('\n')).then(function(){alert('Copied!');});
+}
+
+if('serviceWorker' in navigator && 'PushManager' in navigator){
+  fetch('/push/vapid-public-key').then(function(r){return r.json();}).then(function(d){
+    var publicKey=d.publicKey;
+    if(!publicKey) return;
+    Notification.requestPermission().then(function(perm){
+      if(perm!=='granted') return;
+      navigator.serviceWorker.register('/static/js/sw.js').then(function(reg){
+        reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:publicKey})
+          .then(function(sub){
+            fetch('/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subscription:sub.toJSON()})});
+          });
+      });
+    });
+  });
+}
+</script>
+{% endblock %}

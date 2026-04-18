@@ -39,6 +39,10 @@
          class="koda-nav-link{% if active_page == 'progress' %} active{% endif %}">
         {{ t('nav_progress') }}
       </a>
+      <a href="/nutrition"
+         class="koda-nav-link{% if active_page == 'nutrition' %} active{% endif %}">
+        {{ t('nav_nutrition') }}
+      </a>
     </div>
     {% endif %}
 
@@ -94,6 +98,7 @@
     <a href="{{ url_for('my_plans') }}" class="koda-nav-link d-block mb-1">{{ t('nav_my_plans') }}</a>
     <a href="{{ url_for('list_programs') }}" class="koda-nav-link d-block mb-1">{{ t('nav_programs') }}</a>
     <a href="{{ url_for('my_progress') }}" class="koda-nav-link d-block mb-1">{{ t('nav_progress') }}</a>
+    <a href="/nutrition" class="koda-nav-link d-block mb-1">{{ t('nav_nutrition') }}</a>
     <a href="{{ url_for('my_profile') }}" class="koda-nav-link d-block mb-1">{{ t('nav_profile') }}</a>
     <a href="{{ url_for('logout') }}" class="koda-nav-link d-block mt-2" style="color:var(--text-muted)">{{ t('nav_logout') }}</a>
   </div>
