@@ -2,7 +2,8 @@
 from __future__ import annotations
 
 import json
-from datetime import date
+from collections.abc import Generator
+from datetime import date, datetime
 
 import pytest
 from sqlalchemy import create_engine
@@ -13,7 +14,7 @@ from web.models import NutritionPlan, Notification, User
 
 
 @pytest.fixture()
-def db() -> Session:
+def db() -> Generator[Session, None, None]:
     engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False})
     Base.metadata.create_all(engine)
     SessionLocal = sessionmaker(bind=engine)
@@ -46,8 +47,6 @@ def test_nutrition_plan_created(db: Session) -> None:
 
 
 def test_notification_created(db: Session) -> None:
-    from datetime import datetime
-
     user = _make_user(db)
     plan = NutritionPlan(
         user_id=user.id,

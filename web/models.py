@@ -221,7 +221,7 @@ class Notification(Base):
         String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
     nutrition_plan_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("nutrition_plans.id", ondelete="CASCADE"), nullable=False
+        String(36), ForeignKey("nutrition_plans.id", ondelete="CASCADE"), nullable=False, index=True
     )
     scheduled_for: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     channel: Mapped[str] = mapped_column(String(10), nullable=False, default="both")
