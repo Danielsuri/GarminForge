@@ -141,11 +141,7 @@
     btn.addEventListener('click', function() {
       drawer.classList.toggle('open');
     });
-    // Close drawer when user scrolls
-    window.addEventListener('scroll', function() {
-      drawer.classList.remove('open');
-    }, { passive: true });
-    // Close drawer when clicking outside
+    // Close drawer when clicking/touching outside
     document.addEventListener('click', function(e) {
       if (!drawer.contains(e.target) && e.target !== btn) {
         drawer.classList.remove('open');
