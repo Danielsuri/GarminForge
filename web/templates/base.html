@@ -88,18 +88,17 @@
       {% endif %}
     </div>
   </div>
+  {% if forge_user %}
+  <div class="koda-nav-drawer" id="kodaDrawer">
+    <a href="{{ url_for('index') }}" class="koda-nav-link d-block mb-1">{{ t('nav_generate') }}</a>
+    <a href="{{ url_for('my_plans') }}" class="koda-nav-link d-block mb-1">{{ t('nav_my_plans') }}</a>
+    <a href="{{ url_for('list_programs') }}" class="koda-nav-link d-block mb-1">{{ t('nav_programs') }}</a>
+    <a href="{{ url_for('my_progress') }}" class="koda-nav-link d-block mb-1">{{ t('nav_progress') }}</a>
+    <a href="{{ url_for('my_profile') }}" class="koda-nav-link d-block mb-1">{{ t('nav_profile') }}</a>
+    <a href="{{ url_for('logout') }}" class="koda-nav-link d-block mt-2" style="color:var(--text-muted)">{{ t('nav_logout') }}</a>
+  </div>
+  {% endif %}
 </nav>
-
-{% if forge_user %}
-<div class="koda-nav-drawer" id="kodaDrawer">
-  <a href="{{ url_for('index') }}" class="koda-nav-link d-block mb-1">{{ t('nav_generate') }}</a>
-  <a href="{{ url_for('my_plans') }}" class="koda-nav-link d-block mb-1">{{ t('nav_my_plans') }}</a>
-  <a href="{{ url_for('list_programs') }}" class="koda-nav-link d-block mb-1">{{ t('nav_programs') }}</a>
-  <a href="{{ url_for('my_progress') }}" class="koda-nav-link d-block mb-1">{{ t('nav_progress') }}</a>
-  <a href="{{ url_for('my_profile') }}" class="koda-nav-link d-block mb-1">{{ t('nav_profile') }}</a>
-  <a href="{{ url_for('logout') }}" class="koda-nav-link d-block mt-2" style="color:var(--text-muted)">{{ t('nav_logout') }}</a>
-</div>
-{% endif %}
 
 <main class="{% block main_class %}container-xl py-4{% endblock %}">
   {% if flash_error %}
