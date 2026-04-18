@@ -62,6 +62,10 @@ class User(Base):
         DateTime(timezone=True), nullable=True
     )
 
+    # Nutrition
+    nutrition_profile_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    push_subscription_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+
     plans: Mapped[list[SavedPlan]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
@@ -69,6 +73,12 @@ class User(Base):
         back_populates="user", cascade="all, delete-orphan"
     )
     programs: Mapped[list[Program]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+    nutrition_plans: Mapped[list["NutritionPlan"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+    notifications: Mapped[list["Notification"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
 
@@ -182,3 +192,44 @@ class ProgramSession(Base):
 
     program: Mapped[Program] = relationship(back_populates="program_sessions")
     saved_plans: Mapped[list[SavedPlan]] = relationship(back_populates="program_session")
+
+
+class NutritionPlan(Base):
+    __tablename__ = "nutrition_plans"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    week_start: Mapped[date] = mapped_column(Date, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="generating")
+    # "generating" | "ready" | "error"
+    plan_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    generated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    user: Mapped["User"] = relationship(back_populates="nutrition_plans")
+    notifications: Mapped[list["Notification"]] = relationship(
+        back_populates="nutrition_plan", cascade="all, delete-orphan"
+    )
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    nutrition_plan_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("nutrition_plans.id", ondelete="CASCADE"), nullable=False
+    )
+    scheduled_for: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    channel: Mapped[str] = mapped_column(String(10), nullable=False, default="both")
+    # "push" | "inapp" | "both"
+    title_key: Mapped[str] = mapped_column(String(80), nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    read_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    user: Mapped["User"] = relationship(back_populates="notifications")
+    nutrition_plan: Mapped["NutritionPlan"] = relationship(back_populates="notifications")
