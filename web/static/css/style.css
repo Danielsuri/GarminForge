@@ -304,11 +304,11 @@ a:hover { color: var(--color-brand-pale); }
   margin-inline-start: auto;
 }
 
-/* Mobile nav drawer — absolute inside the sticky navbar so it sticks with it */
+/* Mobile nav drawer — fixed to viewport so it's always full-width below the navbar */
 .koda-nav-drawer {
   display: none;
-  position: absolute;
-  top: 100%;
+  position: fixed;
+  top: 54px;
   left: 0;
   right: 0;
   z-index: 1029;
