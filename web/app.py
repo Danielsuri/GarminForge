@@ -56,6 +56,7 @@ from web.routes_auth import router as forge_auth_router
 from web.routes_my import router as my_router
 from web.routes_onboarding import router as onboarding_router
 from web.routes_programs import router as programs_router
+from web.routes_nutrition import router as nutrition_router
 from web.routes_strava import router as strava_router
 from web.strava_insights import RecoveryStatus, recovery_score
 from web.translations import SUPPORTED_LANGS
@@ -183,6 +184,7 @@ app.include_router(my_router)
 app.include_router(onboarding_router)
 app.include_router(programs_router)
 app.include_router(strava_router)
+app.include_router(nutrition_router)
 
 
 # ---------------------------------------------------------------------------
