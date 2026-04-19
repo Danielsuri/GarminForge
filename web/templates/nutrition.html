@@ -16,11 +16,17 @@
 
   <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.3);margin-bottom:24px">
     ✨ {{ t("nutrition_last_generated") }}: {{ plan.generated_at.strftime("%b %d, %Y at %H:%M") if plan.generated_at else "—" }}
-    <form action="/nutrition/regenerate" method="POST" class="ms-auto">
-      <button type="submit" style="padding:4px 12px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid rgba(124,58,237,.3);background:rgba(124,58,237,.1);color:#a78bfa;cursor:pointer">
-        {{ t("nutrition_regenerate") }}
+    <div class="ms-auto d-flex gap-2">
+      <button data-bs-toggle="modal" data-bs-target="#nutritionWizardModal"
+              style="padding:4px 12px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:rgba(255,255,255,.5);cursor:pointer">
+        ⚙ {{ t("nutrition_edit_prefs") }}
       </button>
-    </form>
+      <form action="/nutrition/regenerate" method="POST">
+        <button type="submit" style="padding:4px 12px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid rgba(124,58,237,.3);background:rgba(124,58,237,.1);color:#a78bfa;cursor:pointer">
+          {{ t("nutrition_regenerate") }}
+        </button>
+      </form>
+    </div>
   </div>
 
   {% if plan.status == "generating" %}
@@ -202,5 +208,205 @@ if('serviceWorker' in navigator && 'PushManager' in navigator){
     });
   });
 }
+</script>
+
+{# ── Nutrition Wizard Modal (edit preferences) ── #}
+{% set np = nutrition_profile %}
+<div class="modal fade" id="nutritionWizardModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:540px">
+    <div class="modal-content border-0"
+         style="background:#111827;border-radius:20px;overflow:hidden;
+                box-shadow:0 32px 80px rgba(0,0,0,.6),0 0 0 1px rgba(124,58,237,.15)">
+
+      <div style="background:linear-gradient(135deg,#1a1040,#111827);
+                  border-bottom:1px solid rgba(255,255,255,.06);padding:24px 28px 20px">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div style="width:40px;height:40px;background:linear-gradient(135deg,#7c3aed,#a78bfa);
+                      border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px">🥗</div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:4px">{{ t("nutrition_wizard_title") }}</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.45)">{{ t("nutrition_wizard_subtitle") }}</div>
+        <div class="d-flex gap-2 mt-3">
+          {% for i in range(4) %}
+          <div class="nw-pdot" style="flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.1)"></div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="modal-body p-0">
+        {# Step 1 — meals + cooking #}
+        <div class="nw-step p-4" data-step="1">
+          <div class="nw-lbl">{{ t("nutrition_step_meals") }}</div>
+          <div class="nw-chips mb-4" id="nw-meals">
+            {% for n in [2,3,4,5] %}
+            <button class="nw-chip{% if np and np.meals_per_day == n %} active{% elif not np and n==3 %} active{% endif %}" data-val="{{ n }}">{{ n }}{% if n==5 %}+{% endif %} meals</button>
+            {% endfor %}
+          </div>
+          <div class="nw-lbl">{{ t("nutrition_step_cooking") }}</div>
+          <div class="nw-rcards" id="nw-cooking">
+            {% for c in [('quick','⚡','&lt;20 min'),('medium','🍳','20–45 min'),('elaborate','👨‍🍳','45 min+'),('mixed','🔀','Varies')] %}
+            <div class="nw-rcard{% if np and np.cooking_time == c[0] %} active{% elif not np and c[0]=='medium' %} active{% endif %}" data-val="{{ c[0] }}">
+              <div style="font-size:22px;margin-bottom:6px">{{ c[1] }}</div>
+              <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:2px">{{ c[0]|capitalize }}</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.4)">{{ c[2] }}</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        {# Step 2 — calorie mode #}
+        <div class="nw-step p-4 d-none" data-step="2">
+          <div class="nw-lbl">{{ t("nutrition_step_calories") }}</div>
+          <div class="nw-rlist" id="nw-calorie">
+            {% for v,icon,title,desc in [('ideas','💡','Just give me meal ideas','No calorie counts'),('macros','📊','Show macros per meal','Protein · Carbs · Fat'),('budget','🎯','Full calorie budget','Daily targets for my goal')] %}
+            <div class="nw-ritem{% if np and np.calorie_mode == v %} active{% elif not np and v=='macros' %} active{% endif %}" data-val="{{ v }}" style="display:flex;align-items:center;gap:12px">
+              <span style="font-size:22px">{{ icon }}</span>
+              <div><div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:2px">{{ title }}</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.4)">{{ desc }}</div></div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        {# Step 3 — allergies #}
+        <div class="nw-step p-4 d-none" data-step="3">
+          <div class="nw-lbl">{{ t("nutrition_step_restrictions") }}</div>
+          <div class="nw-chips" id="nw-allergies">
+            {% set saved_allergies = np.allergies if np else [] %}
+            {% for a in ['gluten','dairy','nuts','eggs','soy','shellfish','fish','sesame'] %}
+            <button class="nw-chip{% if a in saved_allergies %} active{% endif %}" data-val="{{ a }}">{{ a|capitalize }}</button>
+            {% endfor %}
+            <button class="nw-chip{% if 'kosher' in saved_allergies %} active{% endif %}" data-val="kosher" style="border-color:rgba(234,179,8,.3);color:#fbbf24">✡ {{ t("nutrition_kosher") }}</button>
+          </div>
+        </div>
+
+        {# Step 4 — avoid + cant resist #}
+        <div class="nw-step p-4 d-none" data-step="4">
+          <div class="nw-lbl mb-1">{{ t("nutrition_avoid_label") }}</div>
+          <div class="nw-tagwrap" id="nw-avoid-wrap" data-field="avoid">
+            {% if np %}{% for item in np.avoid %}<span class="nw-tag nw-tag-avoid" data-val="{{ item }}">{{ item }} <span style="opacity:.6;font-size:10px;cursor:pointer" onclick="this.closest('.nw-tag').remove()">✕</span></span>{% endfor %}{% endif %}
+            <input class="nw-taginput" placeholder="{{ t('nutrition_avoid_hint') }}" data-target="nw-avoid-wrap">
+          </div>
+          <div class="nw-taghint mb-3">{{ t("nutrition_avoid_hint") }}</div>
+          <div class="nw-lbl mb-1">{{ t("nutrition_resist_label") }}</div>
+          <div class="nw-tagwrap" id="nw-resist-wrap" data-field="cant_resist">
+            {% if np %}{% for item in np.cant_resist %}<span class="nw-tag nw-tag-resist" data-val="{{ item }}">{{ item }} <span style="opacity:.6;font-size:10px;cursor:pointer" onclick="this.closest('.nw-tag').remove()">✕</span></span>{% endfor %}{% endif %}
+            <input class="nw-taginput" placeholder="{{ t('nutrition_resist_hint') }}" data-target="nw-resist-wrap">
+          </div>
+          <div class="nw-taghint">{{ t("nutrition_resist_hint") }}</div>
+        </div>
+      </div>
+
+      <div class="modal-footer border-0 px-4 pb-4 pt-2 justify-content-between">
+        <button class="btn btn-outline-secondary btn-sm" id="nw-back" style="display:none" onclick="nwPrev()">← Back</button>
+        <button class="btn btn-sm ms-auto" id="nw-next"
+                style="background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-weight:600;
+                       padding:8px 22px;border-radius:8px;box-shadow:0 4px 14px rgba(124,58,237,.3)"
+                onclick="nwNext()">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.nw-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#a78bfa;margin-bottom:10px}
+.nw-chips{display:flex;flex-wrap:wrap;gap:8px}
+.nw-chip{padding:7px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);font-size:13px;color:rgba(255,255,255,.6);cursor:pointer;transition:.15s}
+.nw-chip.active{background:rgba(124,58,237,.2);border-color:rgba(124,58,237,.5);color:#a78bfa;font-weight:600}
+.nw-rcards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.nw-rcard,.nw-ritem{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:14px;cursor:pointer;transition:.15s}
+.nw-ritem{display:flex;align-items:center;gap:12px}
+.nw-rlist{display:flex;flex-direction:column;gap:10px}
+.nw-rcard.active,.nw-ritem.active{background:rgba(124,58,237,.12);border-color:rgba(124,58,237,.4)}
+.nw-tagwrap{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:8px 12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:44px}
+.nw-taginput{flex:1;min-width:80px;background:transparent;border:none;outline:none;color:rgba(255,255,255,.6);font-size:13px}
+.nw-taginput::placeholder{color:rgba(255,255,255,.2)}
+.nw-tag{padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:4px;cursor:pointer}
+.nw-tag-avoid{background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);color:#f87171}
+.nw-tag-resist{background:rgba(22,163,74,.15);border:1px solid rgba(22,163,74,.3);color:#4ade80}
+.nw-taghint{font-size:11px;color:rgba(255,255,255,.25)}
+</style>
+
+<script>
+(function(){
+  var _s=1;
+  function _upd(){
+    document.querySelectorAll('.nw-pdot').forEach(function(d,i){
+      d.style.background=i<_s?'#7c3aed':'rgba(255,255,255,.1)';
+    });
+    document.getElementById('nw-back').style.display=_s>1?'block':'none';
+    document.getElementById('nw-next').textContent=_s===4?'{{ t("nutrition_cta_generate") }} ✨':'Next →';
+  }
+  window.nwNext=function(){
+    if(_s<4){
+      document.querySelector('.nw-step[data-step="'+_s+'"]').classList.add('d-none');
+      _s++;
+      document.querySelector('.nw-step[data-step="'+_s+'"]').classList.remove('d-none');
+      _upd();
+    } else { _submit(); }
+  };
+  window.nwPrev=function(){
+    if(_s>1){
+      document.querySelector('.nw-step[data-step="'+_s+'"]').classList.add('d-none');
+      _s--;
+      document.querySelector('.nw-step[data-step="'+_s+'"]').classList.remove('d-none');
+      _upd();
+    }
+  };
+  document.querySelectorAll('.nw-rcards,.nw-rlist').forEach(function(g){
+    g.querySelectorAll('.nw-rcard,.nw-ritem').forEach(function(c){
+      c.addEventListener('click',function(){
+        g.querySelectorAll('.nw-rcard,.nw-ritem').forEach(function(x){x.classList.remove('active');});
+        c.classList.add('active');
+      });
+    });
+  });
+  document.querySelectorAll('.nw-chips .nw-chip').forEach(function(c){
+    c.addEventListener('click',function(){c.classList.toggle('active');});
+  });
+  document.querySelectorAll('.nw-taginput').forEach(function(inp){
+    inp.addEventListener('keydown',function(e){
+      if(e.key!=='Enter'&&e.key!==',') return;
+      e.preventDefault();
+      var v=inp.value.trim().replace(/,$/,'');
+      if(!v) return;
+      var wrap=inp.closest('.nw-tagwrap');
+      var cls=wrap.dataset.field==='avoid'?'nw-tag-avoid':'nw-tag-resist';
+      var tag=document.createElement('span');
+      tag.className='nw-tag '+cls;
+      tag.dataset.val=v;
+      var txt=document.createTextNode(v+' ');
+      var x=document.createElement('span');
+      x.textContent='✕';
+      x.style.cssText='opacity:.6;font-size:10px;cursor:pointer';
+      x.addEventListener('click',function(){tag.remove();});
+      tag.appendChild(txt);
+      tag.appendChild(x);
+      wrap.insertBefore(tag,inp);
+      inp.value='';
+    });
+  });
+  function _getActiveVal(g){var a=g.querySelector('.nw-rcard.active,.nw-ritem.active');return a?a.dataset.val:null;}
+  function _getChips(g){return Array.from(g.querySelectorAll('.nw-chip.active')).map(function(c){return c.dataset.val;});}
+  function _getTags(id){return Array.from(document.querySelectorAll('#'+id+' .nw-tag')).map(function(t){return t.dataset.val;});}
+  function _submit(){
+    var btn=document.getElementById('nw-next');
+    btn.disabled=true;
+    btn.textContent='Saving…';
+    var body={
+      meals_per_day:parseInt(document.querySelector('#nw-meals .nw-chip.active')?.dataset.val||'3'),
+      cooking_time:_getActiveVal(document.getElementById('nw-cooking'))||'medium',
+      calorie_mode:_getActiveVal(document.getElementById('nw-calorie'))||'macros',
+      allergies:_getChips(document.getElementById('nw-allergies')),
+      avoid:_getTags('nw-avoid-wrap'),
+      cant_resist:_getTags('nw-resist-wrap'),
+    };
+    fetch('/nutrition/profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+      .then(function(){window.location.href='/nutrition/regenerate';})
+      .catch(function(){btn.disabled=false;btn.textContent='Try again';});
+  }
+  _upd();
+})();
 </script>
 {% endblock %}

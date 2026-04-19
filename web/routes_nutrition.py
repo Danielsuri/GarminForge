@@ -134,6 +134,11 @@ async def nutrition_page(
     if plan.status == "ready" and plan.plan_json:
         plan_data = json.loads(plan.plan_json)
 
+    # Pass saved profile to template so the wizard can pre-fill current values
+    nutrition_profile: dict[str, Any] | None = None
+    if user.nutrition_profile_json:
+        nutrition_profile = json.loads(user.nutrition_profile_json)
+
     unread_count = (
         db.query(Notification)
         .filter_by(user_id=user.id)
@@ -148,6 +153,7 @@ async def nutrition_page(
         plan_data=plan_data,
         today_str=str(date.today()),
         unread_count=unread_count,
+        nutrition_profile=nutrition_profile,
     )
 
 
