@@ -73,8 +73,18 @@
       <div class="d-flex gap-2 mb-4">
         <button class="btn btn-sm" style="background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.35);color:#a78bfa;font-size:12px;font-weight:600" onclick="copyGroceries()">📋 {{ t("nutrition_copy_list") }}</button>
       </div>
+      {% set all_groceries = plan_data.get('groceries', []) %}
+      {% if not all_groceries %}
+        <div style="text-align:center;padding:40px 24px;color:rgba(255,255,255,.3)">
+          <div style="font-size:28px;margin-bottom:10px">🛒</div>
+          <div style="font-size:13px;margin-bottom:16px">Grocery list wasn't generated with this plan.</div>
+          <form action="/nutrition/regenerate" method="POST" style="display:inline">
+            <button type="submit" style="padding:6px 16px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid rgba(124,58,237,.3);background:rgba(124,58,237,.1);color:#a78bfa;cursor:pointer">Regenerate plan</button>
+          </form>
+        </div>
+      {% else %}
       {% for cat_key, cat_label in [('protein','🥩 '+t('grocery_protein')),('vegetables','🥬 '+t('grocery_vegetables')),('dairy_fats','🧀 '+t('grocery_dairy_fats')),('pantry','🫙 '+t('grocery_pantry'))] %}
-        {% set items = plan_data.get('groceries',[])|selectattr('category','equalto',cat_key)|list %}
+        {% set items = all_groceries|selectattr('category','equalto',cat_key)|list %}
         {% if items %}
         <div style="margin-bottom:24px">
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.3);margin-bottom:10px;display:flex;align-items:center;gap:8px">{{ cat_label }}<div style="flex:1;height:1px;background:rgba(255,255,255,.06)"></div></div>
@@ -92,10 +102,32 @@
         </div>
         {% endif %}
       {% endfor %}
+      {# Fallback: show all groceries uncategorised if none matched known categories #}
+      {% set matched = all_groceries|selectattr('category','in',['protein','vegetables','dairy_fats','pantry'])|list %}
+      {% if not matched %}
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px">
+          {% for item in all_groceries %}
+          <div class="groc-item" style="background:#111827;border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleGroc(this)">
+            <div class="groc-chk" style="width:18px;height:18px;border-radius:5px;border:1.5px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0"></div>
+            <div>
+              <div style="font-size:13px;color:rgba(255,255,255,.75);font-weight:500">{{ item.item }}</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.3)">{{ item.get('qty', '') }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% endif %}
     </div>
 
     {# ── Reminders tab ── #}
     <div class="nutr-panel d-none" id="tab-reminders">
+      {% if not plan_data.get('reminders') %}
+        <div style="text-align:center;padding:40px 24px;color:rgba(255,255,255,.3)">
+          <div style="font-size:28px;margin-bottom:10px">🔔</div>
+          <div style="font-size:13px">No reminders were generated with this plan.</div>
+        </div>
+      {% else %}
       <div style="display:flex;flex-direction:column;gap:10px">
         {% for r in plan_data.get('reminders',[]) %}
           {% set upcoming = r.day >= today_str %}
@@ -117,6 +149,7 @@
           </div>
         {% endfor %}
       </div>
+      {% endif %}
     </div>
 
   {% else %}

@@ -151,7 +151,7 @@ async def nutrition_page(
     )
 
 
-@router.post("/nutrition/regenerate")
+@router.api_route("/nutrition/regenerate", methods=["GET", "POST"])
 async def regenerate_plan(
     request: Request,
     background_tasks: BackgroundTasks,

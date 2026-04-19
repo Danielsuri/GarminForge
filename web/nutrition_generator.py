@@ -18,7 +18,7 @@ from web.models import Notification, NutritionPlan, User
 
 logger = logging.getLogger(__name__)
 
-PLAN_SCHEMA_EXAMPLE = """{
+DAYS_SCHEMA_EXAMPLE = """{
   "days": [
     {
       "date": "YYYY-MM-DD",
@@ -31,7 +31,10 @@ PLAN_SCHEMA_EXAMPLE = """{
         }
       ]
     }
-  ],
+  ]
+}"""
+
+GROCERIES_SCHEMA_EXAMPLE = """{
   "groceries": [
     {"item": "Chicken breast", "qty": "600g", "category": "protein|vegetables|dairy_fats|pantry"}
   ],
@@ -40,6 +43,9 @@ PLAN_SCHEMA_EXAMPLE = """{
   ]
 }"""
 
+# Keep for backwards compat / tests
+PLAN_SCHEMA_EXAMPLE = DAYS_SCHEMA_EXAMPLE
+
 
 def last_sunday(today: date) -> date:
     """Return the most recent Sunday (inclusive of today if today is Sunday)."""
@@ -47,12 +53,31 @@ def last_sunday(today: date) -> date:
     return date.fromordinal(today.toordinal() - days_back)
 
 
-def _build_prompt(user: User) -> str:
+def _user_context(user: User) -> tuple[dict[str, Any], list[str], list[str], list[str], str]:
+    """Extract commonly needed user fields."""
     profile: dict[str, Any] = json.loads(user.nutrition_profile_json or "{}")
     diet: list[str] = json.loads(user.diet_json or "[]")
     goals: list[str] = json.loads(user.fitness_goals_json or "[]")
     health: list[str] = json.loads(user.health_conditions_json or "[]")
     lang = user.preferred_lang or "en"
+    return profile, diet, goals, health, lang
+
+
+def _lang_instruction(lang: str) -> str:
+    if lang == "he":
+        return (
+            "כתוב את כל הטקסט הקריא (שמות ארוחות, מצרכים, תזכורות) בעברית. "
+            "מפתחות ה-JSON חייבים להישאר באנגלית."
+        )
+    return (
+        f"Write all human-readable text (meal names, grocery items, reminder text) in {lang}. "
+        "JSON keys must stay in English."
+    )
+
+
+def _build_days_prompt(user: User) -> str:
+    """Prompt for the meal plan only (days + meals). Kept short so small models don't truncate."""
+    profile, diet, goals, health, lang = _user_context(user)
 
     week_start = last_sunday(date.today())
     week_dates = [str(date.fromordinal(week_start.toordinal() + i)) for i in range(7)]
@@ -67,20 +92,12 @@ def _build_prompt(user: User) -> str:
         "budget": "Include kcal and macros per meal plus daily totals after the meals array.",
     }.get(calorie_mode, "Include kcal and macros for every meal.")
 
-    # Send language instruction in the target language so the model is unambiguous
-    if lang == "he":
-        lang_instruction = (
-            "כתוב את כל הטקסט הקריא (שמות ארוחות, מצרכים, תזכורות) בעברית. "
-            "מפתחות ה-JSON חייבים להישאר באנגלית."
-        )
-    else:
-        lang_instruction = (
-            f"Write all human-readable text (meal names, grocery items, reminder text) in {lang}. "
-            "JSON keys must stay in English."
-        )
-
     return f"""You are a professional nutritionist. Generate a 7-day meal plan as valid JSON.
-IMPORTANT: Respond with ONLY the JSON — no explanation, no markdown, no code fences.
+
+CRITICAL RULES:
+1. Start your response with {{ and end with }}.
+2. No preamble, no explanation, no markdown, no code fences. Only raw JSON.
+3. The top-level object must have exactly one key: "days".
 
 User profile:
 - Diet: {", ".join(diet) or "general"}
@@ -94,11 +111,38 @@ User profile:
 - Calorie tracking: {calorie_mode}. {calorie_instruction}
 
 Week dates (Sunday–Saturday): {", ".join(week_dates)}
-{lang_instruction}
-Include smart reminders (defrost, batch cook, weekend meal prep).
+{_lang_instruction(lang)}
 
 JSON schema:
-{PLAN_SCHEMA_EXAMPLE}"""
+{DAYS_SCHEMA_EXAMPLE}"""
+
+
+def _build_groceries_prompt(user: User, days_json: str) -> str:
+    """Prompt for groceries + reminders, given the already-generated days.
+    Kept deliberately short so small models don't exceed their token budget.
+    """
+    profile, diet, goals, health, lang = _user_context(user)
+    allergy_str = ", ".join(profile.get("allergies", [])) or "none"
+
+    return f"""Given the meal plan below, output ONLY a JSON object with two keys: "groceries" and "reminders".
+
+RULES:
+- Start with {{ end with }}. No preamble, no markdown.
+- groceries: array of max 12 items, each: {{"item":"...","qty":"...","category":"protein|vegetables|dairy_fats|pantry"}}
+- reminders: array of max 3 items, each: {{"day":"YYYY-MM-DD","text":"..."}}
+- Consolidate duplicate ingredients across all days.
+- Allergies to exclude: {allergy_str}
+- {_lang_instruction(lang)}
+
+Meal plan (summary — use ingredient names from meals):
+{days_json}
+
+Output only the JSON object, nothing else."""
+
+
+# Keep old name as alias so existing tests pass without changes
+def _build_prompt(user: User) -> str:
+    return _build_days_prompt(user)
 
 
 def generate_weekly_plan(user: User, db: Session) -> NutritionPlan:
@@ -120,14 +164,54 @@ def generate_weekly_plan(user: User, db: Session) -> NutritionPlan:
     db.refresh(plan)
 
     try:
-        raw_json = get_ai_provider().complete(_build_prompt(user))
-        plan.plan_json = raw_json
+        provider = get_ai_provider()
+
+        # ── Call 1: meal plan (days only) ──────────────────────────────────
+        days_raw = provider.complete(_build_days_prompt(user))
+        logger.info("Days response (first 400 chars): %s", days_raw[:400])
+
+        days_parsed: Any = json.loads(days_raw)
+        if isinstance(days_parsed, list):
+            logger.warning("Model returned bare list for days; wrapping")
+            days_parsed = {"days": days_parsed}
+        elif not isinstance(days_parsed, dict) or "days" not in days_parsed:
+            raise ValueError(f"Days response missing 'days' key. Got: {days_raw[:200]}")
+
+        days_list: list[dict[str, Any]] = days_parsed["days"]
+
+        # ── Call 2: groceries + reminders ──────────────────────────────────
+        groceries: list[dict[str, Any]] = []
+        reminders: list[dict[str, Any]] = []
+        try:
+            gr_raw = provider.complete(_build_groceries_prompt(user, json.dumps({"days": days_list})))
+            logger.info("Groceries response (first 400 chars): %s", gr_raw[:400])
+            gr_parsed: Any = json.loads(gr_raw)
+            if isinstance(gr_parsed, dict) and "groceries" in gr_parsed:
+                groceries = gr_parsed.get("groceries", [])
+                reminders = gr_parsed.get("reminders", [])
+            elif isinstance(gr_parsed, list):
+                # Model returned the groceries array directly
+                groceries = gr_parsed
+            elif isinstance(gr_parsed, dict) and "item" in gr_parsed:
+                # Model returned a single grocery item — extraction hit inner object
+                logger.warning("Groceries truncated; got single item. Storing as one-item list.")
+                groceries = [gr_parsed]
+            else:
+                logger.warning("Groceries response unrecognised structure: %s", gr_raw[:200])
+        except Exception as gr_exc:
+            logger.warning("Groceries/reminders generation failed (non-fatal): %s", gr_exc)
+
+        plan_data: dict[str, Any] = {
+            "days": days_list,
+            "groceries": groceries,
+            "reminders": reminders,
+        }
+        plan.plan_json = json.dumps(plan_data)
         plan.status = "ready"
         plan.generated_at = datetime.utcnow()
         db.commit()
 
-        plan_data: dict[str, Any] = json.loads(raw_json)
-        for reminder in plan_data.get("reminders", []):
+        for reminder in reminders:
             day_str: str = reminder.get("day", "")
             body: str = reminder.get("text", "")
             if not day_str or not body:
