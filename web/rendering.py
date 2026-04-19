@@ -31,6 +31,13 @@ def _detect_version() -> str:
 APP_VERSION: str = _detect_version()
 
 
+def _sanitize_str(value: object) -> object:
+    """Replace lone surrogate characters in string values (survive Garmin API data)."""
+    if isinstance(value, str):
+        return value.encode("utf-8", errors="replace").decode("utf-8")
+    return value
+
+
 def render_template(
     template: str,
     request: Request,
@@ -75,15 +82,22 @@ def render_template(
     if "flash_success" not in ctx:
         ctx["flash_success"] = request.session.pop("flash_success", None)
 
-    return templates.TemplateResponse(
-        request,
-        template,
-        {
-            "authenticated": authenticated,
-            "forge_user": forge_user,
-            "lang": lang,
-            "t": make_t(lang),
-            "app_version": APP_VERSION,
-            **ctx,
-        },
-    )
+    context: dict[str, object] = {
+        "authenticated": authenticated,
+        "forge_user": forge_user,
+        "lang": lang,
+        "t": make_t(lang),
+        "app_version": APP_VERSION,
+        **ctx,
+    }
+
+    # Render to string first so we can strip lone surrogates that Garmin API
+    # data occasionally embeds (causes UnicodeEncodeError in UTF-8 response).
+    try:
+        tmpl = templates.get_template(template)
+        html = tmpl.render({"request": request, **context})
+        html = html.encode("utf-8", errors="replace").decode("utf-8")
+        return HTMLResponse(content=html)
+    except Exception:
+        # Fallback to standard TemplateResponse (e.g. streaming templates)
+        return templates.TemplateResponse(request, template, context)  # type: ignore[return-value]

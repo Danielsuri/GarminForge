@@ -29,9 +29,14 @@ class AIProvider(ABC):
         ...
 
 
+def _sanitize(text: str) -> str:
+    """Remove lone surrogate characters that some models embed in responses."""
+    return text.encode("utf-8", errors="replace").decode("utf-8")
+
+
 def _extract_json(text: str) -> str:
     """Strip markdown code fences and extract the first valid JSON object."""
-    text = re.sub(r"```(?:json)?\s*", "", text).strip().rstrip("`").strip()
+    text = _sanitize(re.sub(r"```(?:json)?\s*", "", text).strip().rstrip("`").strip())
     for i, ch in enumerate(text):
         if ch in ("{", "["):
             depth = 0
