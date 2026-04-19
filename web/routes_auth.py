@@ -34,7 +34,7 @@ from pathlib import Path
 
 import httpx
 from authlib.integrations.starlette_client import OAuth
-from fastapi import APIRouter, Depends, Form, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Form, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
@@ -48,6 +48,7 @@ from web.auth_utils import (
 from web.db import get_db
 from web.models import User
 from web.rendering import render_template
+from web.routes_nutrition import _send_pending_push
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/auth")
@@ -207,6 +208,7 @@ async def login_forge_page(request: Request, db: Session = Depends(get_db)):
 @router.post("/login-forge")
 async def login_forge_submit(
     request: Request,
+    background_tasks: BackgroundTasks,
     email: str = Form(...),
     password: str = Form(...),
     db: Session = Depends(get_db),
@@ -221,6 +223,7 @@ async def login_forge_submit(
 
     maybe_migrate_file_token(user, db)
     login_session(request, user, db)
+    background_tasks.add_task(_send_pending_push, user, db)
     return RedirectResponse("/", status_code=303)
 
 
@@ -239,7 +242,9 @@ async def google_redirect(request: Request):
 
 
 @router.get("/google/callback")
-async def google_callback(request: Request, db: Session = Depends(get_db)):
+async def google_callback(
+    request: Request, background_tasks: BackgroundTasks, db: Session = Depends(get_db)
+):
     if not _ensure_google_registered():
         return RedirectResponse("/auth/login-forge", status_code=303)
 
@@ -279,6 +284,7 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
 
     maybe_migrate_file_token(user, db)
     login_session(request, user, db)
+    background_tasks.add_task(_send_pending_push, user, db)
     if not user.questionnaire_completed:
         return RedirectResponse("/onboarding", status_code=303)
     return RedirectResponse("/", status_code=303)
@@ -361,7 +367,9 @@ async def apple_redirect(request: Request):
 
 
 @router.post("/apple/callback")
-async def apple_callback(request: Request, db: Session = Depends(get_db)):
+async def apple_callback(
+    request: Request, background_tasks: BackgroundTasks, db: Session = Depends(get_db)
+):
     """Apple POSTs form data here (response_mode=form_post)."""
     form = await request.form()
     code: str = form.get("code", "")  # type: ignore[assignment]
@@ -459,6 +467,7 @@ async def apple_callback(request: Request, db: Session = Depends(get_db)):
 
     maybe_migrate_file_token(user, db)
     login_session(request, user, db)
+    background_tasks.add_task(_send_pending_push, user, db)
     if not user.questionnaire_completed:
         return RedirectResponse("/onboarding", status_code=303)
     return RedirectResponse("/", status_code=303)
