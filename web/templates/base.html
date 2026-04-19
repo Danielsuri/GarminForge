@@ -39,6 +39,10 @@
          class="koda-nav-link{% if active_page == 'progress' %} active{% endif %}">
         {{ t('nav_progress') }}
       </a>
+      <a href="/nutrition"
+         class="koda-nav-link{% if active_page == 'nutrition' %} active{% endif %}">
+        {{ t('nav_nutrition') }}
+      </a>
     </div>
     {% endif %}
 
@@ -73,6 +77,17 @@
             Connect a service
           </a>
         {% endif %}
+        {# ── Notification bell ── #}
+        <div style="position:relative" id="notif-bell-wrap">
+          <button onclick="toggleNotifDd()" style="background:none;border:none;cursor:pointer;font-size:18px;color:rgba(255,255,255,.6);position:relative;padding:4px;line-height:1" title="Notifications">
+            🔔
+            <span id="notif-badge" style="display:none;position:absolute;top:0;right:0;background:#dc2626;color:#fff;border-radius:50%;width:15px;height:15px;font-size:9px;font-weight:700;line-height:15px;text-align:center"></span>
+          </button>
+          <div id="notif-dd" style="display:none;position:absolute;right:0;top:36px;width:300px;background:#111827;border:1px solid rgba(255,255,255,.08);border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.5);z-index:999;overflow:hidden">
+            <div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px;font-weight:700;color:#fff">{{ t("notifications_title") }}</div>
+            <div id="notif-list" style="max-height:280px;overflow-y:auto"></div>
+          </div>
+        </div>
         <a href="{{ url_for('my_profile') }}" class="koda-avatar" title="{{ t('nav_profile') if t('nav_profile') else 'Profile' }}">
           {{ (forge_user.display_name or forge_user.email or 'K')[0]|upper }}
         </a>
@@ -94,6 +109,7 @@
     <a href="{{ url_for('my_plans') }}" class="koda-nav-link d-block mb-1">{{ t('nav_my_plans') }}</a>
     <a href="{{ url_for('list_programs') }}" class="koda-nav-link d-block mb-1">{{ t('nav_programs') }}</a>
     <a href="{{ url_for('my_progress') }}" class="koda-nav-link d-block mb-1">{{ t('nav_progress') }}</a>
+    <a href="/nutrition" class="koda-nav-link d-block mb-1">{{ t('nav_nutrition') }}</a>
     <a href="{{ url_for('my_profile') }}" class="koda-nav-link d-block mb-1">{{ t('nav_profile') }}</a>
     <a href="{{ url_for('logout') }}" class="koda-nav-link d-block mt-2" style="color:var(--text-muted)">{{ t('nav_logout') }}</a>
   </div>
@@ -147,6 +163,63 @@
       }
     });
   }
+</script>
+<script>
+(function(){
+  function loadCount(){
+    fetch('/notifications/unread-count').then(function(r){return r.json();}).then(function(d){
+      var b=document.getElementById('notif-badge');
+      if(!b) return;
+      if(d.count>0){b.textContent=d.count;b.style.display='block';}else{b.style.display='none';}
+    }).catch(function(){});
+  }
+  window.toggleNotifDd=function(){
+    var dd=document.getElementById('notif-dd');
+    if(!dd) return;
+    var open=dd.style.display!=='none';
+    dd.style.display=open?'none':'block';
+    if(!open){
+      fetch('/notifications/recent').then(function(r){return r.json();}).then(function(notifs){
+        var list=document.getElementById('notif-list');
+        if(!list) return;
+        while(list.firstChild){list.removeChild(list.firstChild);}
+        if(!notifs.length){
+          var empty=document.createElement('div');
+          empty.style.cssText='padding:16px;font-size:13px;color:rgba(255,255,255,.3);text-align:center';
+          empty.textContent='No notifications';
+          list.appendChild(empty);
+          return;
+        }
+        notifs.forEach(function(n){
+          var row=document.createElement('div');
+          row.style.cssText='padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;opacity:'+(n.read?0.5:1);
+          var bodyEl=document.createElement('div');
+          bodyEl.style.cssText='font-size:12px;font-weight:600;color:#fff;margin-bottom:2px';
+          bodyEl.textContent=n.body;
+          var dateEl=document.createElement('div');
+          dateEl.style.cssText='font-size:11px;color:rgba(255,255,255,.3)';
+          dateEl.textContent=new Date(n.scheduled_for).toLocaleDateString();
+          row.appendChild(bodyEl);
+          row.appendChild(dateEl);
+          row.addEventListener('click',function(){
+            fetch('/notifications/'+n.id+'/read',{method:'POST'});
+            row.style.opacity='0.4';
+            loadCount();
+          });
+          list.appendChild(row);
+        });
+      }).catch(function(){});
+    }
+  };
+  document.addEventListener('click',function(e){
+    var wrap=document.getElementById('notif-bell-wrap');
+    if(wrap&&!wrap.contains(e.target)){
+      var dd=document.getElementById('notif-dd');
+      if(dd) dd.style.display='none';
+    }
+  });
+  loadCount();
+})();
 </script>
 </body>
 </html>

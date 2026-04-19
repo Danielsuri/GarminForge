@@ -22,7 +22,8 @@ from sqlalchemy.orm import Session, joinedload
 
 from web.auth_utils import require_user
 from web.db import get_db
-from web.models import Program, ProgramSession, User
+from web.models import NutritionPlan, Program, ProgramSession, User
+from web.nutrition_generator import get_todays_meals, get_todays_reminder, last_sunday
 from web.program_generator import generate_program
 from web.rendering import render_template
 from web.workout_generator import EQUIPMENT_OPTIONS, GOALS, _LOCAL_VIDEO_MAP
@@ -365,6 +366,38 @@ async def session_preview(
     duration_minutes = int(garmin_payload.get("estimatedDurationInSecs", 2700)) // 60
 
     goal_cfg = GOALS.get(program.goal, {})
+
+    # ── Nutrition card context ──
+    from datetime import date as _date
+    from typing import Any as _Any
+
+    todays_meals: list[dict[str, _Any]] = []
+    todays_reminder: str | None = None
+    nutrition_status = "no_profile"
+
+    if user.nutrition_profile_json:
+        week_start = last_sunday(_date.today())
+        nutrition_plan = (
+            db.query(NutritionPlan).filter_by(user_id=user.id, week_start=week_start).first()
+        )
+        if nutrition_plan is None:
+            nutrition_plan = NutritionPlan(
+                user_id=user.id, week_start=week_start, status="generating"
+            )
+            db.add(nutrition_plan)
+            db.commit()
+            # NOTE: background_tasks is not available in this route — plan generation
+            # will be triggered when the user visits /nutrition directly.
+            nutrition_status = "generating"
+        elif nutrition_plan.status == "ready":
+            todays_meals = get_todays_meals(nutrition_plan)
+            todays_reminder = get_todays_reminder(nutrition_plan)
+            nutrition_status = "ready"
+        elif nutrition_plan.status == "generating":
+            nutrition_status = "generating"
+        else:
+            nutrition_status = "error"
+
     return render_template(
         "my_session_preview.html",
         request,
@@ -377,6 +410,9 @@ async def session_preview(
         goal_label=goal_cfg.get("label", program.goal),
         duration_minutes=duration_minutes,
         muscle_map_svg=_MUSCLE_MAP_SVG,
+        nutrition_status=nutrition_status,
+        todays_meals=todays_meals,
+        todays_reminder=todays_reminder,
     )
 
 
