@@ -973,24 +973,23 @@ document.getElementById('playBtn').addEventListener('click', () => {
           <div class="nw-lbl">{{ t("nutrition_step_meals") }}</div>
           <div class="nw-chips mb-4" id="nw-meals">
             {% for n in [2,3,4,5] %}
-            <button class="nw-chip{% if n==3 %} active{% endif %}" data-val="{{ n }}">{{ n }}{% if n==5 %}+{% endif %} meals</button>
+            <button class="nw-chip{% if n==3 %} active{% endif %}" data-val="{{ n }}">{{ n }}{% if n==5 %}+{% endif %} {{ t("nutrition_meals_suffix") }}</button>
             {% endfor %}
           </div>
           <div class="nw-lbl">{{ t("nutrition_step_cooking") }}</div>
           <div class="nw-rcards" id="nw-cooking">
-            <div class="nw-rcard active" data-val="medium"><div style="font-size:22px;margin-bottom:6px">🍳</div><div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:2px">Medium</div><div style="font-size:11px;color:rgba(255,255,255,.4)">20–45 min</div></div>
-            <div class="nw-rcard" data-val="quick"><div style="font-size:22px;margin-bottom:6px">⚡</div><div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:2px">Quick</div><div style="font-size:11px;color:rgba(255,255,255,.4)">&lt;20 min</div></div>
-            <div class="nw-rcard" data-val="elaborate"><div style="font-size:22px;margin-bottom:6px">👨‍🍳</div><div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:2px">Elaborate</div><div style="font-size:11px;color:rgba(255,255,255,.4)">45 min+</div></div>
-            <div class="nw-rcard" data-val="mixed"><div style="font-size:22px;margin-bottom:6px">🔀</div><div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:2px">Mixed</div><div style="font-size:11px;color:rgba(255,255,255,.4)">Varies</div></div>
+            {% for c in [('medium','🍳','20–45 min'),('quick','⚡','&lt;20 min'),('elaborate','👨‍🍳','45 min+'),('mixed','🔀','Varies')] %}
+            <div class="nw-rcard{% if c[0]=='medium' %} active{% endif %}" data-val="{{ c[0] }}"><div style="font-size:22px;margin-bottom:6px">{{ c[1] }}</div><div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:2px">{{ t("nutrition_cooking_" + c[0]) }}</div><div style="font-size:11px;color:rgba(255,255,255,.4)">{{ c[2] }}</div></div>
+            {% endfor %}
           </div>
         </div>
 
         <div class="nw-step p-4 d-none" data-step="2">
           <div class="nw-lbl">{{ t("nutrition_step_calories") }}</div>
           <div class="nw-rlist" id="nw-calorie">
-            <div class="nw-ritem" data-val="ideas"><span style="font-size:22px">💡</span><div><div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:2px">Just give me meal ideas</div><div style="font-size:11px;color:rgba(255,255,255,.4)">No calorie counts</div></div></div>
-            <div class="nw-ritem active" data-val="macros"><span style="font-size:22px">📊</span><div><div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:2px">Show macros per meal</div><div style="font-size:11px;color:rgba(255,255,255,.4)">Protein · Carbs · Fat</div></div></div>
-            <div class="nw-ritem" data-val="budget"><span style="font-size:22px">🎯</span><div><div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:2px">Full calorie budget</div><div style="font-size:11px;color:rgba(255,255,255,.4)">Daily targets for my goal</div></div></div>
+            {% for v,icon in [('ideas','💡'),('macros','📊'),('budget','🎯')] %}
+            <div class="nw-ritem{% if v=='macros' %} active{% endif %}" data-val="{{ v }}"><span style="font-size:22px">{{ icon }}</span><div><div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:2px">{{ t("nutrition_calorie_" + v + "_title") }}</div><div style="font-size:11px;color:rgba(255,255,255,.4)">{{ t("nutrition_calorie_" + v + "_desc") }}</div></div></div>
+            {% endfor %}
           </div>
         </div>
 
@@ -998,7 +997,7 @@ document.getElementById('playBtn').addEventListener('click', () => {
           <div class="nw-lbl">{{ t("nutrition_step_restrictions") }}</div>
           <div class="nw-chips" id="nw-allergies">
             {% for a in ['gluten','dairy','nuts','eggs','soy','shellfish','fish','sesame'] %}
-            <button class="nw-chip" data-val="{{ a }}">{{ a|capitalize }}</button>
+            <button class="nw-chip" data-val="{{ a }}">{{ t("nutrition_allergy_" + a) }}</button>
             {% endfor %}
             <button class="nw-chip" data-val="kosher" style="border-color:rgba(234,179,8,.3);color:#fbbf24">✡ {{ t("nutrition_kosher") }}</button>
           </div>
@@ -1019,11 +1018,11 @@ document.getElementById('playBtn').addEventListener('click', () => {
       </div>
 
       <div class="modal-footer border-0 px-4 pb-4 pt-2 justify-content-between">
-        <button class="btn btn-outline-secondary btn-sm" id="nw-back" style="display:none" onclick="nwPrev()">← Back</button>
+        <button class="btn btn-outline-secondary btn-sm" id="nw-back" style="display:none" onclick="nwPrev()">{{ t("nutrition_wizard_back") }}</button>
         <button class="btn btn-sm ms-auto" id="nw-next"
                 style="background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-weight:600;
                        padding:8px 22px;border-radius:8px;box-shadow:0 4px 14px rgba(124,58,237,.3)"
-                onclick="nwNext()">Next →</button>
+                onclick="nwNext()">{{ t("nutrition_wizard_next") }}</button>
       </div>
     </div>
   </div>
@@ -1056,7 +1055,7 @@ document.getElementById('playBtn').addEventListener('click', () => {
       d.style.background=i<_s?'#7c3aed':'rgba(255,255,255,.1)';
     });
     document.getElementById('nw-back').style.display=_s>1?'block':'none';
-    document.getElementById('nw-next').textContent=_s===4?'{{ t("nutrition_cta_generate") }} \u2728':'Next \u2192';
+    document.getElementById('nw-next').textContent=_s===4?'{{ t("nutrition_cta_generate") }} \u2728':'{{ t("nutrition_wizard_next") }}';
   }
   window.nwNext=function(){
     if(_s<4){
