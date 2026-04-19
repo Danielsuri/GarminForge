@@ -82,15 +82,25 @@ def _build_days_prompt(user: User) -> str:
     week_start = last_sunday(date.today())
     week_dates = [str(date.fromordinal(week_start.toordinal() + i)) for i in range(7)]
 
+    allergies: list[str] = profile.get("allergies", [])
     avoid_str = ", ".join(profile.get("avoid", [])) or "none"
     resist_str = ", ".join(profile.get("cant_resist", [])) or "none"
-    allergy_str = ", ".join(profile.get("allergies", [])) or "none"
+    allergy_str = ", ".join(a for a in allergies if a != "kosher") or "none"
     calorie_mode = profile.get("calorie_mode", "macros")
     calorie_instruction = {
         "ideas": "Do NOT include kcal or macros — omit those fields entirely.",
         "macros": "Include kcal and macros (protein_g, carbs_g, fat_g) for every meal.",
         "budget": "Include kcal and macros per meal plus daily totals after the meals array.",
     }.get(calorie_mode, "Include kcal and macros for every meal.")
+
+    kosher_instruction = ""
+    if "kosher" in allergies:
+        kosher_instruction = (
+            "\nKOSHER DIET (STRICT): Never suggest pork, bacon, ham, shellfish, shrimp, "
+            "lobster, crab, or any non-kosher meat. Never mix meat and dairy in the same meal "
+            "(e.g. no cheeseburger, no chicken parmesan, no butter with meat). "
+            "Wait at least one meal between meat and dairy meals."
+        )
 
     return f"""You are a professional nutritionist. Generate a 7-day meal plan as valid JSON.
 
@@ -108,7 +118,7 @@ User profile:
 - Favourite foods (include where appropriate): {resist_str}
 - Meals per day: {profile.get("meals_per_day", 3)}
 - Cooking time: {profile.get("cooking_time", "medium")}
-- Calorie tracking: {calorie_mode}. {calorie_instruction}
+- Calorie tracking: {calorie_mode}. {calorie_instruction}{kosher_instruction}
 
 Week dates (Sunday–Saturday): {", ".join(week_dates)}
 {_lang_instruction(lang)}

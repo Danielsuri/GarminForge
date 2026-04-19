@@ -1000,6 +1000,7 @@ document.getElementById('playBtn').addEventListener('click', () => {
             {% for a in ['gluten','dairy','nuts','eggs','soy','shellfish','fish','sesame'] %}
             <button class="nw-chip" data-val="{{ a }}">{{ a|capitalize }}</button>
             {% endfor %}
+            <button class="nw-chip" data-val="kosher" style="border-color:rgba(234,179,8,.3);color:#fbbf24">✡ {{ t("nutrition_kosher") }}</button>
           </div>
         </div>
 

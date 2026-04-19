@@ -433,6 +433,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "nutrition_card_generating": "Generating your personalised plan\u2026",
         "nutrition_card_full_plan_link": "Full plan \u2192",
         "nutrition_card_error": "Plan generation failed.",
+        "nutrition_kosher": "Kosher",
         # --- Navbar ---
         "nav_nutrition": "Nutrition",
         "session_more_exercises": "more exercises",
@@ -860,6 +861,7 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "nutrition_card_generating": "\u05de\u05d9\u05d9\u05e6\u05e8 \u05d0\u05ea \u05d4\u05ea\u05d5\u05db\u05e0\u05d9\u05ea \u05d4\u05d0\u05d9\u05e9\u05d9\u05ea \u05e9\u05dc\u05da\u2026",
         "nutrition_card_full_plan_link": "\u05ea\u05d5\u05db\u05e0\u05d9\u05ea \u05de\u05dc\u05d0\u05d4 \u2192",
         "nutrition_card_error": "\u05d9\u05e6\u05d9\u05e8\u05ea \u05d4\u05ea\u05d5\u05db\u05e0\u05d9\u05ea \u05e0\u05db\u05e9\u05dc\u05d4.",
+        "nutrition_kosher": "\u05db\u05e9\u05e8",
         # --- Navbar (he) ---
         "nav_nutrition": "\u05ea\u05d6\u05d5\u05e0\u05d4",
         "session_more_exercises": "\u05ea\u05e8\u05d2\u05d9\u05dc\u05d9\u05dd \u05e0\u05d5\u05e1\u05e4\u05d9\u05dd",
