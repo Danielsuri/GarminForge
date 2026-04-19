@@ -19,12 +19,16 @@ VALID_PLAN = json.dumps({
 })
 
 
-def test_huggingface_provider_returns_json() -> None:
-    mock_response = MagicMock()
-    mock_response.status_code = 200
-    mock_response.json.return_value = [{"generated_text": f"```json\n{VALID_PLAN}\n```"}]
+def _hf_ok_response(content: str) -> MagicMock:
+    """Build a mock httpx response matching the HF router (OpenAI-compatible) shape."""
+    mock = MagicMock()
+    mock.status_code = 200
+    mock.json.return_value = {"choices": [{"message": {"content": content}}]}
+    return mock
 
-    with patch("web.ai_provider.httpx.post", return_value=mock_response):
+
+def test_huggingface_provider_returns_json() -> None:
+    with patch("web.ai_provider.httpx.post", return_value=_hf_ok_response(f"```json\n{VALID_PLAN}\n```")):
         provider = HuggingFaceProvider(api_key="test-key", model="test-model")
         result = provider.complete("test prompt")
 
@@ -38,11 +42,8 @@ def test_huggingface_provider_retries_on_503() -> None:
     bad = MagicMock()
     bad.status_code = 503
     bad.text = "loading"
-    good = MagicMock()
-    good.status_code = 200
-    good.json.return_value = [{"generated_text": VALID_PLAN}]
 
-    with patch("web.ai_provider.httpx.post", side_effect=[bad, good]):
+    with patch("web.ai_provider.httpx.post", side_effect=[bad, _hf_ok_response(VALID_PLAN)]):
         with patch("web.ai_provider.time.sleep"):
             provider = HuggingFaceProvider(api_key="test-key", model="test-model")
             result = provider.complete("test prompt")

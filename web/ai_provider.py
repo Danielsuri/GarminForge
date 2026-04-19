@@ -47,29 +47,42 @@ def _extract_json(text: str) -> str:
     raise ValueError(f"No valid JSON in AI response: {text[:200]}")
 
 
+_HF_ROUTER_URL = "https://router.huggingface.co/v1/chat/completions"
+
+
 class HuggingFaceProvider(AIProvider):
-    def __init__(self, api_key: str, model: str = "mistralai/Mistral-7B-Instruct-v0.3") -> None:
+    """Uses the HuggingFace Inference Providers router (OpenAI-compatible).
+
+    New endpoint replacing the deprecated api-inference.huggingface.co serverless API.
+    Token must have "Make calls to Inference Providers" permission (fine-grained token).
+    Model can include a routing policy suffix: 'model:fastest' | 'model:cheapest' | 'model:preferred'.
+    """
+
+    def __init__(self, api_key: str, model: str = "mistralai/Mistral-7B-Instruct-v0.3:fastest") -> None:
         self._api_key = api_key
         self._model = model
-        self._url = f"https://api-inference.huggingface.co/models/{model}"
 
     def complete(self, prompt: str) -> str:
-        headers = {"Authorization": f"Bearer {self._api_key}"}
+        headers = {
+            "Authorization": f"Bearer {self._api_key}",
+            "Content-Type": "application/json",
+        }
         payload = {
-            "inputs": prompt,
-            "parameters": {"max_new_tokens": 2048, "temperature": 0.3, "return_full_text": False},
+            "model": self._model,
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": 2048,
+            "temperature": 0.3,
         }
         for attempt in range(_MAX_RETRIES):
-            resp = httpx.post(self._url, headers=headers, json=payload, timeout=60.0)
+            resp = httpx.post(_HF_ROUTER_URL, headers=headers, json=payload, timeout=60.0)
             if resp.status_code == 503:
                 logger.warning(
-                    "HuggingFace 503 (model loading), retry %d/%d", attempt + 1, _MAX_RETRIES
+                    "HuggingFace router 503, retry %d/%d", attempt + 1, _MAX_RETRIES
                 )
                 time.sleep(_RETRY_DELAY * (attempt + 1))
                 continue
             resp.raise_for_status()
-            data = resp.json()
-            raw: str = data[0]["generated_text"] if isinstance(data, list) else data["generated_text"]
+            raw: str = resp.json()["choices"][0]["message"]["content"]
             return _extract_json(raw)
         raise RuntimeError("HuggingFace provider failed after retries")
 
@@ -107,5 +120,5 @@ def get_ai_provider() -> AIProvider:
         return ClaudeProvider(api_key=os.environ.get("ANTHROPIC_API_KEY", ""))
     return HuggingFaceProvider(
         api_key=os.environ.get("HUGGINGFACE_API_KEY", ""),
-        model=os.environ.get("HUGGINGFACE_MODEL", "mistralai/Mistral-7B-Instruct-v0.3"),
+        model=os.environ.get("HUGGINGFACE_MODEL", "mistralai/Mistral-7B-Instruct-v0.3:fastest"),
     )
