@@ -44,6 +44,7 @@ def init_db() -> None:
     column already exists, so we swallow those exceptions.
     """
     from web.models import (  # noqa: F401
+        MealSuggestion,
         NutritionPlan,
         Notification,
         Program,

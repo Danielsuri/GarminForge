@@ -81,6 +81,9 @@ class User(Base):
     notifications: Mapped[list["Notification"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
+    meal_suggestions: Mapped[list["MealSuggestion"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
 
 
 class SavedPlan(Base):
@@ -233,3 +236,18 @@ class Notification(Base):
 
     user: Mapped["User"] = relationship(back_populates="notifications")
     nutrition_plan: Mapped["NutritionPlan"] = relationship(back_populates="notifications")
+
+
+class MealSuggestion(Base):
+    __tablename__ = "meal_suggestions"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
+    # "pending" | "approved" | "rejected"
+    meal_json: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+
+    user: Mapped["User"] = relationship(back_populates="meal_suggestions")
