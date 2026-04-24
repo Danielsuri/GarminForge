@@ -1,0 +1,2777 @@
+[
+  {
+    "id": "breakfast_001",
+    "type": "breakfast",
+    "name_en": "Shakshuka",
+    "name_he": "שקשוקה",
+    "kcal": 420,
+    "macros": {"protein_g": 22, "carbs_g": 18, "fat_g": 28},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "gluten-free"],
+    "ingredient_flags": ["contains_eggs", "contains_dairy"],
+    "ingredients": [
+      {"item_en": "Eggs", "item_he": "ביצים", "qty": "4", "category": "protein"},
+      {"item_en": "Canned tomatoes", "item_he": "עגבניות משומרות", "qty": "400g", "category": "pantry"},
+      {"item_en": "Red pepper", "item_he": "פלפל אדום", "qty": "1", "category": "vegetables"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Feta cheese", "item_he": "גבינת פטה", "qty": "60g", "category": "dairy_fats"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_002",
+    "type": "breakfast",
+    "name_en": "Israeli Salad with Labneh",
+    "name_he": "סלט ישראלי עם לבנה",
+    "kcal": 380,
+    "macros": {"protein_g": 16, "carbs_g": 22, "fat_g": 25},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "gluten-free"],
+    "ingredient_flags": ["contains_dairy"],
+    "ingredients": [
+      {"item_en": "Cucumber", "item_he": "מלפפון", "qty": "2", "category": "vegetables"},
+      {"item_en": "Tomato", "item_he": "עגבנייה", "qty": "2", "category": "vegetables"},
+      {"item_en": "Red onion", "item_he": "בצל סגול", "qty": "0.5", "category": "vegetables"},
+      {"item_en": "Labneh", "item_he": "לבנה", "qty": "150g", "category": "dairy_fats"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"},
+      {"item_en": "Lemon", "item_he": "לימון", "qty": "0.5", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_003",
+    "type": "breakfast",
+    "name_en": "Avocado Toast with Poached Egg",
+    "name_he": "טוסט אבוקדו עם ביצה עלומה",
+    "kcal": 450,
+    "macros": {"protein_g": 20, "carbs_g": 35, "fat_g": 25},
+    "cooking_time": "quick",
+    "positive_tags": ["vegetarian"],
+    "ingredient_flags": ["contains_eggs", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Whole grain bread", "item_he": "לחם מלא", "qty": "2 slices", "category": "pantry"},
+      {"item_en": "Avocado", "item_he": "אבוקדו", "qty": "1", "category": "vegetables"},
+      {"item_en": "Eggs", "item_he": "ביצים", "qty": "2", "category": "protein"},
+      {"item_en": "Lemon juice", "item_he": "מיץ לימון", "qty": "1 tbsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_004",
+    "type": "breakfast",
+    "name_en": "Greek Yogurt with Granola and Berries",
+    "name_he": "יוגורט יווני עם גרנולה ופירות יער",
+    "kcal": 410,
+    "macros": {"protein_g": 22, "carbs_g": 48, "fat_g": 14},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian"],
+    "ingredient_flags": ["contains_dairy", "contains_gluten", "contains_nuts"],
+    "ingredients": [
+      {"item_en": "Greek yogurt", "item_he": "יוגורט יווני", "qty": "200g", "category": "dairy_fats"},
+      {"item_en": "Granola", "item_he": "גרנולה", "qty": "50g", "category": "pantry"},
+      {"item_en": "Mixed berries", "item_he": "פירות יער", "qty": "100g", "category": "vegetables"},
+      {"item_en": "Honey", "item_he": "דבש", "qty": "1 tbsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_005",
+    "type": "breakfast",
+    "name_en": "Cottage Cheese with Vegetables",
+    "name_he": "קוטג׳ עם ירקות",
+    "kcal": 320,
+    "macros": {"protein_g": 24, "carbs_g": 18, "fat_g": 16},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "gluten-free"],
+    "ingredient_flags": ["contains_dairy"],
+    "ingredients": [
+      {"item_en": "Cottage cheese 5%", "item_he": "גבינת קוטג׳ 5%", "qty": "250g", "category": "dairy_fats"},
+      {"item_en": "Cucumber", "item_he": "מלפפון", "qty": "1", "category": "vegetables"},
+      {"item_en": "Cherry tomatoes", "item_he": "עגבניות שרי", "qty": "100g", "category": "vegetables"},
+      {"item_en": "Chives", "item_he": "עירית", "qty": "1 tbsp", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_006",
+    "type": "breakfast",
+    "name_en": "Mediterranean Omelette with Feta and Spinach",
+    "name_he": "חביתה ים-תיכונית עם פטה ותרד",
+    "kcal": 390,
+    "macros": {"protein_g": 26, "carbs_g": 6, "fat_g": 30},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "keto", "gluten-free"],
+    "ingredient_flags": ["contains_eggs", "contains_dairy"],
+    "ingredients": [
+      {"item_en": "Eggs", "item_he": "ביצים", "qty": "3", "category": "protein"},
+      {"item_en": "Baby spinach", "item_he": "עלי תרד בייבי", "qty": "50g", "category": "vegetables"},
+      {"item_en": "Feta cheese", "item_he": "גבינת פטה", "qty": "50g", "category": "dairy_fats"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "1 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_007",
+    "type": "breakfast",
+    "name_en": "Oatmeal with Banana and Almonds",
+    "name_he": "דייסת שיבולת שועל עם בננה ושקדים",
+    "kcal": 430,
+    "macros": {"protein_g": 14, "carbs_g": 62, "fat_g": 14},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian"],
+    "ingredient_flags": ["contains_dairy", "contains_nuts", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Rolled oats", "item_he": "שיבולת שועל", "qty": "60g", "category": "pantry"},
+      {"item_en": "Milk", "item_he": "חלב", "qty": "250ml", "category": "dairy_fats"},
+      {"item_en": "Banana", "item_he": "בננה", "qty": "1", "category": "vegetables"},
+      {"item_en": "Almonds", "item_he": "שקדים", "qty": "20g", "category": "dairy_fats"},
+      {"item_en": "Cinnamon", "item_he": "קינמון", "qty": "1 tsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_008",
+    "type": "breakfast",
+    "name_en": "Bourekas with Hard-Boiled Egg",
+    "name_he": "בורקס עם ביצה קשה",
+    "kcal": 520,
+    "macros": {"protein_g": 18, "carbs_g": 40, "fat_g": 32},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian"],
+    "ingredient_flags": ["contains_dairy", "contains_gluten", "contains_eggs"],
+    "ingredients": [
+      {"item_en": "Cheese bourekas", "item_he": "בורקס גבינה", "qty": "2", "category": "pantry"},
+      {"item_en": "Hard-boiled egg", "item_he": "ביצה קשה", "qty": "1", "category": "protein"},
+      {"item_en": "Cucumber", "item_he": "מלפפון", "qty": "1", "category": "vegetables"},
+      {"item_en": "Tomato", "item_he": "עגבנייה", "qty": "1", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_009",
+    "type": "breakfast",
+    "name_en": "Hummus with Pita and Vegetables",
+    "name_he": "חומוס עם פיתה וירקות",
+    "kcal": 480,
+    "macros": {"protein_g": 16, "carbs_g": 62, "fat_g": 20},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "dairy-free"],
+    "ingredient_flags": ["contains_gluten"],
+    "ingredients": [
+      {"item_en": "Hummus", "item_he": "חומוס", "qty": "150g", "category": "pantry"},
+      {"item_en": "Whole wheat pita", "item_he": "פיתה מחיטה מלאה", "qty": "1", "category": "pantry"},
+      {"item_en": "Cucumber", "item_he": "מלפפון", "qty": "1", "category": "vegetables"},
+      {"item_en": "Carrot", "item_he": "גזר", "qty": "1", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "1 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_010",
+    "type": "breakfast",
+    "name_en": "Smoked Salmon on Toast",
+    "name_he": "סלמון מעושן על טוסט",
+    "kcal": 420,
+    "macros": {"protein_g": 28, "carbs_g": 30, "fat_g": 20},
+    "cooking_time": "quick",
+    "positive_tags": [],
+    "ingredient_flags": ["contains_fish", "contains_dairy", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Smoked salmon", "item_he": "סלמון מעושן", "qty": "80g", "category": "protein"},
+      {"item_en": "Rye bread", "item_he": "לחם שיפון", "qty": "2 slices", "category": "pantry"},
+      {"item_en": "Cream cheese", "item_he": "גבינת שמנת", "qty": "40g", "category": "dairy_fats"},
+      {"item_en": "Red onion", "item_he": "בצל סגול", "qty": "0.25", "category": "vegetables"},
+      {"item_en": "Capers", "item_he": "צלפים", "qty": "1 tsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_011",
+    "type": "breakfast",
+    "name_en": "Chia Pudding with Mango",
+    "name_he": "פודינג צ׳יה עם מנגו",
+    "kcal": 340,
+    "macros": {"protein_g": 10, "carbs_g": 38, "fat_g": 16},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": [],
+    "ingredients": [
+      {"item_en": "Chia seeds", "item_he": "זרעי צ׳יה", "qty": "30g", "category": "pantry"},
+      {"item_en": "Coconut milk", "item_he": "חלב קוקוס", "qty": "250ml", "category": "pantry"},
+      {"item_en": "Mango", "item_he": "מנגו", "qty": "0.5", "category": "vegetables"},
+      {"item_en": "Maple syrup", "item_he": "סירופ מייפל", "qty": "1 tbsp", "category": "pantry"}
+    ],
+    "prep_note_en": "Soak chia seeds in coconut milk overnight in the fridge.",
+    "prep_note_he": "להשרות זרעי צ׳יה בחלב קוקוס במקרר למשך הלילה."
+  },
+  {
+    "id": "breakfast_012",
+    "type": "breakfast",
+    "name_en": "Malawach with Tomato Dip",
+    "name_he": "מלאווח עם מטבוחה",
+    "kcal": 580,
+    "macros": {"protein_g": 10, "carbs_g": 56, "fat_g": 34},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian"],
+    "ingredient_flags": ["contains_gluten", "contains_dairy"],
+    "ingredients": [
+      {"item_en": "Frozen malawach", "item_he": "מלאווח קפוא", "qty": "1", "category": "pantry"},
+      {"item_en": "Matbucha", "item_he": "מטבוחה", "qty": "100g", "category": "pantry"},
+      {"item_en": "Hard-boiled egg", "item_he": "ביצה קשה", "qty": "1", "category": "protein"}
+    ],
+    "prep_note_en": "Defrost malawach at room temperature for 20 minutes before cooking.",
+    "prep_note_he": "להפשיר מלאווח בטמפרטורת החדר למשך 20 דקות לפני הטיגון."
+  },
+  {
+    "id": "breakfast_013",
+    "type": "breakfast",
+    "name_en": "Jachnun with Egg and Tomato",
+    "name_he": "ג׳חנון עם ביצה ועגבנייה מרוסקת",
+    "kcal": 620,
+    "macros": {"protein_g": 14, "carbs_g": 68, "fat_g": 32},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "vegetarian"],
+    "ingredient_flags": ["contains_gluten", "contains_eggs"],
+    "ingredients": [
+      {"item_en": "Jachnun", "item_he": "ג׳חנון", "qty": "1", "category": "pantry"},
+      {"item_en": "Hard-boiled egg", "item_he": "ביצה קשה", "qty": "1", "category": "protein"},
+      {"item_en": "Grated tomato", "item_he": "עגבנייה מרוסקת", "qty": "1", "category": "vegetables"},
+      {"item_en": "Zhug", "item_he": "סחוג", "qty": "1 tsp", "category": "pantry"}
+    ],
+    "prep_note_en": "Bake jachnun overnight (8+ hours) at low heat.",
+    "prep_note_he": "לאפות ג׳חנון בלילה (8+ שעות) בחום נמוך."
+  },
+  {
+    "id": "breakfast_014",
+    "type": "breakfast",
+    "name_en": "Green Smoothie Bowl",
+    "name_he": "קערת סמודי ירוק",
+    "kcal": 360,
+    "macros": {"protein_g": 12, "carbs_g": 52, "fat_g": 12},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_nuts"],
+    "ingredients": [
+      {"item_en": "Spinach", "item_he": "תרד", "qty": "50g", "category": "vegetables"},
+      {"item_en": "Banana", "item_he": "בננה", "qty": "1", "category": "vegetables"},
+      {"item_en": "Almond milk", "item_he": "חלב שקדים", "qty": "200ml", "category": "pantry"},
+      {"item_en": "Almond butter", "item_he": "חמאת שקדים", "qty": "1 tbsp", "category": "dairy_fats"},
+      {"item_en": "Frozen berries", "item_he": "פירות יער קפואים", "qty": "80g", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_015",
+    "type": "breakfast",
+    "name_en": "Scrambled Eggs with Vegetables",
+    "name_he": "ביצים מקושקשות עם ירקות",
+    "kcal": 350,
+    "macros": {"protein_g": 22, "carbs_g": 10, "fat_g": 24},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "keto", "gluten-free"],
+    "ingredient_flags": ["contains_eggs", "contains_dairy"],
+    "ingredients": [
+      {"item_en": "Eggs", "item_he": "ביצים", "qty": "3", "category": "protein"},
+      {"item_en": "Bell pepper", "item_he": "פלפל", "qty": "0.5", "category": "vegetables"},
+      {"item_en": "Zucchini", "item_he": "קישוא", "qty": "0.5", "category": "vegetables"},
+      {"item_en": "Butter", "item_he": "חמאה", "qty": "1 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_016",
+    "type": "breakfast",
+    "name_en": "Pancakes with Maple Syrup",
+    "name_he": "פנקייק עם סירופ מייפל",
+    "kcal": 510,
+    "macros": {"protein_g": 14, "carbs_g": 72, "fat_g": 18},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian"],
+    "ingredient_flags": ["contains_gluten", "contains_dairy", "contains_eggs"],
+    "ingredients": [
+      {"item_en": "Flour", "item_he": "קמח", "qty": "120g", "category": "pantry"},
+      {"item_en": "Milk", "item_he": "חלב", "qty": "200ml", "category": "dairy_fats"},
+      {"item_en": "Eggs", "item_he": "ביצים", "qty": "2", "category": "protein"},
+      {"item_en": "Maple syrup", "item_he": "סירופ מייפל", "qty": "2 tbsp", "category": "pantry"},
+      {"item_en": "Butter", "item_he": "חמאה", "qty": "1 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_017",
+    "type": "breakfast",
+    "name_en": "Tuna Salad on Whole Wheat Bread",
+    "name_he": "סלט טונה על לחם מלא",
+    "kcal": 420,
+    "macros": {"protein_g": 28, "carbs_g": 32, "fat_g": 20},
+    "cooking_time": "quick",
+    "positive_tags": [],
+    "ingredient_flags": ["contains_fish", "contains_gluten", "contains_eggs"],
+    "ingredients": [
+      {"item_en": "Canned tuna", "item_he": "טונה משומרת", "qty": "1 can", "category": "protein"},
+      {"item_en": "Whole wheat bread", "item_he": "לחם מחיטה מלאה", "qty": "2 slices", "category": "pantry"},
+      {"item_en": "Mayonnaise", "item_he": "מיונז", "qty": "1 tbsp", "category": "pantry"},
+      {"item_en": "Pickles", "item_he": "חמוצים", "qty": "30g", "category": "vegetables"},
+      {"item_en": "Lettuce", "item_he": "חסה", "qty": "2 leaves", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_018",
+    "type": "breakfast",
+    "name_en": "Keto Egg Muffins",
+    "name_he": "מאפי ביצים קטוגניים",
+    "kcal": 330,
+    "macros": {"protein_g": 24, "carbs_g": 4, "fat_g": 24},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "keto", "gluten-free"],
+    "ingredient_flags": ["contains_eggs", "contains_dairy"],
+    "ingredients": [
+      {"item_en": "Eggs", "item_he": "ביצים", "qty": "4", "category": "protein"},
+      {"item_en": "Cheddar cheese", "item_he": "גבינת צ׳דר", "qty": "50g", "category": "dairy_fats"},
+      {"item_en": "Spinach", "item_he": "תרד", "qty": "40g", "category": "vegetables"},
+      {"item_en": "Cherry tomatoes", "item_he": "עגבניות שרי", "qty": "50g", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_019",
+    "type": "breakfast",
+    "name_en": "Peanut Butter Banana Toast",
+    "name_he": "טוסט חמאת בוטנים ובננה",
+    "kcal": 440,
+    "macros": {"protein_g": 14, "carbs_g": 58, "fat_g": 18},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "dairy-free"],
+    "ingredient_flags": ["contains_gluten", "contains_nuts"],
+    "ingredients": [
+      {"item_en": "Whole grain bread", "item_he": "לחם מלא", "qty": "2 slices", "category": "pantry"},
+      {"item_en": "Peanut butter", "item_he": "חמאת בוטנים", "qty": "2 tbsp", "category": "dairy_fats"},
+      {"item_en": "Banana", "item_he": "בננה", "qty": "1", "category": "vegetables"},
+      {"item_en": "Honey", "item_he": "דבש", "qty": "1 tsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_020",
+    "type": "breakfast",
+    "name_en": "Protein Smoothie",
+    "name_he": "שייק חלבון",
+    "kcal": 380,
+    "macros": {"protein_g": 32, "carbs_g": 42, "fat_g": 8},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "gluten-free"],
+    "ingredient_flags": ["contains_dairy"],
+    "ingredients": [
+      {"item_en": "Whey protein powder", "item_he": "אבקת חלבון", "qty": "30g", "category": "protein"},
+      {"item_en": "Banana", "item_he": "בננה", "qty": "1", "category": "vegetables"},
+      {"item_en": "Milk", "item_he": "חלב", "qty": "300ml", "category": "dairy_fats"},
+      {"item_en": "Berries", "item_he": "פירות יער", "qty": "80g", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_021",
+    "type": "breakfast",
+    "name_en": "Sabich Sandwich",
+    "name_he": "סביח",
+    "kcal": 560,
+    "macros": {"protein_g": 20, "carbs_g": 60, "fat_g": 28},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian"],
+    "ingredient_flags": ["contains_gluten", "contains_eggs"],
+    "ingredients": [
+      {"item_en": "Pita bread", "item_he": "פיתה", "qty": "1", "category": "pantry"},
+      {"item_en": "Fried eggplant", "item_he": "חציל מטוגן", "qty": "100g", "category": "vegetables"},
+      {"item_en": "Hard-boiled egg", "item_he": "ביצה קשה", "qty": "1", "category": "protein"},
+      {"item_en": "Hummus", "item_he": "חומוס", "qty": "2 tbsp", "category": "pantry"},
+      {"item_en": "Tahini", "item_he": "טחינה", "qty": "1 tbsp", "category": "pantry"},
+      {"item_en": "Amba", "item_he": "עמבה", "qty": "1 tbsp", "category": "pantry"},
+      {"item_en": "Israeli salad", "item_he": "סלט ישראלי", "qty": "80g", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_022",
+    "type": "breakfast",
+    "name_en": "Cream Cheese and Tomato Bagel",
+    "name_he": "בייגל עם גבינת שמנת ועגבנייה",
+    "kcal": 440,
+    "macros": {"protein_g": 14, "carbs_g": 58, "fat_g": 18},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian"],
+    "ingredient_flags": ["contains_dairy", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Bagel", "item_he": "בייגל", "qty": "1", "category": "pantry"},
+      {"item_en": "Cream cheese", "item_he": "גבינת שמנת", "qty": "50g", "category": "dairy_fats"},
+      {"item_en": "Tomato", "item_he": "עגבנייה", "qty": "1", "category": "vegetables"},
+      {"item_en": "Chives", "item_he": "עירית", "qty": "1 tbsp", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_023",
+    "type": "breakfast",
+    "name_en": "Turkish Menemen",
+    "name_he": "מנמן טורקי",
+    "kcal": 380,
+    "macros": {"protein_g": 20, "carbs_g": 14, "fat_g": 28},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "gluten-free"],
+    "ingredient_flags": ["contains_eggs"],
+    "ingredients": [
+      {"item_en": "Eggs", "item_he": "ביצים", "qty": "3", "category": "protein"},
+      {"item_en": "Green pepper", "item_he": "פלפל ירוק", "qty": "1", "category": "vegetables"},
+      {"item_en": "Tomato", "item_he": "עגבנייה", "qty": "2", "category": "vegetables"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "0.5", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_024",
+    "type": "breakfast",
+    "name_en": "Overnight Oats with Apple and Cinnamon",
+    "name_he": "שיבולת שועל בהשריה עם תפוח וקינמון",
+    "kcal": 380,
+    "macros": {"protein_g": 14, "carbs_g": 58, "fat_g": 10},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian"],
+    "ingredient_flags": ["contains_dairy", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Rolled oats", "item_he": "שיבולת שועל", "qty": "50g", "category": "pantry"},
+      {"item_en": "Milk", "item_he": "חלב", "qty": "200ml", "category": "dairy_fats"},
+      {"item_en": "Apple", "item_he": "תפוח", "qty": "1", "category": "vegetables"},
+      {"item_en": "Cinnamon", "item_he": "קינמון", "qty": "1 tsp", "category": "pantry"},
+      {"item_en": "Honey", "item_he": "דבש", "qty": "1 tbsp", "category": "pantry"}
+    ],
+    "prep_note_en": "Soak oats in milk overnight in the fridge.",
+    "prep_note_he": "להשרות שיבולת שועל בחלב במקרר למשך הלילה."
+  },
+  {
+    "id": "breakfast_025",
+    "type": "breakfast",
+    "name_en": "Tofu Scramble",
+    "name_he": "טופו מקושקש",
+    "kcal": 340,
+    "macros": {"protein_g": 24, "carbs_g": 14, "fat_g": 22},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_soy"],
+    "ingredients": [
+      {"item_en": "Firm tofu", "item_he": "טופו קשה", "qty": "200g", "category": "protein"},
+      {"item_en": "Turmeric", "item_he": "כורכום", "qty": "1 tsp", "category": "pantry"},
+      {"item_en": "Spinach", "item_he": "תרד", "qty": "50g", "category": "vegetables"},
+      {"item_en": "Cherry tomatoes", "item_he": "עגבניות שרי", "qty": "80g", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "1 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_026",
+    "type": "breakfast",
+    "name_en": "French Toast with Berries",
+    "name_he": "פרנץ׳ טוסט עם פירות יער",
+    "kcal": 470,
+    "macros": {"protein_g": 18, "carbs_g": 56, "fat_g": 18},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian"],
+    "ingredient_flags": ["contains_dairy", "contains_gluten", "contains_eggs"],
+    "ingredients": [
+      {"item_en": "Bread slices", "item_he": "פרוסות לחם", "qty": "3", "category": "pantry"},
+      {"item_en": "Eggs", "item_he": "ביצים", "qty": "2", "category": "protein"},
+      {"item_en": "Milk", "item_he": "חלב", "qty": "100ml", "category": "dairy_fats"},
+      {"item_en": "Berries", "item_he": "פירות יער", "qty": "100g", "category": "vegetables"},
+      {"item_en": "Maple syrup", "item_he": "סירופ מייפל", "qty": "1 tbsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_027",
+    "type": "breakfast",
+    "name_en": "Keto Avocado and Egg Bowl",
+    "name_he": "קערת אבוקדו וביצה קטוגנית",
+    "kcal": 480,
+    "macros": {"protein_g": 20, "carbs_g": 10, "fat_g": 40},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "keto", "gluten-free"],
+    "ingredient_flags": ["contains_eggs"],
+    "ingredients": [
+      {"item_en": "Avocado", "item_he": "אבוקדו", "qty": "1", "category": "vegetables"},
+      {"item_en": "Eggs", "item_he": "ביצים", "qty": "2", "category": "protein"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "1 tbsp", "category": "dairy_fats"},
+      {"item_en": "Lemon juice", "item_he": "מיץ לימון", "qty": "1 tsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_028",
+    "type": "breakfast",
+    "name_en": "Fruit Salad with Yogurt",
+    "name_he": "סלט פירות עם יוגורט",
+    "kcal": 310,
+    "macros": {"protein_g": 12, "carbs_g": 52, "fat_g": 8},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "gluten-free"],
+    "ingredient_flags": ["contains_dairy"],
+    "ingredients": [
+      {"item_en": "Apple", "item_he": "תפוח", "qty": "1", "category": "vegetables"},
+      {"item_en": "Banana", "item_he": "בננה", "qty": "1", "category": "vegetables"},
+      {"item_en": "Strawberries", "item_he": "תותים", "qty": "100g", "category": "vegetables"},
+      {"item_en": "Yogurt", "item_he": "יוגורט", "qty": "150g", "category": "dairy_fats"},
+      {"item_en": "Honey", "item_he": "דבש", "qty": "1 tsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_029",
+    "type": "breakfast",
+    "name_en": "Ful Medames with Pita",
+    "name_he": "פול מדמס עם פיתה",
+    "kcal": 460,
+    "macros": {"protein_g": 20, "carbs_g": 64, "fat_g": 14},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "dairy-free"],
+    "ingredient_flags": ["contains_gluten"],
+    "ingredients": [
+      {"item_en": "Cooked fava beans", "item_he": "פול מבושל", "qty": "250g", "category": "protein"},
+      {"item_en": "Garlic", "item_he": "שום", "qty": "2 cloves", "category": "vegetables"},
+      {"item_en": "Lemon", "item_he": "לימון", "qty": "1", "category": "pantry"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"},
+      {"item_en": "Pita", "item_he": "פיתה", "qty": "1", "category": "pantry"},
+      {"item_en": "Cumin", "item_he": "כמון", "qty": "1 tsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "breakfast_030",
+    "type": "breakfast",
+    "name_en": "Halloumi with Watermelon",
+    "name_he": "חלומי עם אבטיח",
+    "kcal": 390,
+    "macros": {"protein_g": 22, "carbs_g": 18, "fat_g": 26},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "gluten-free"],
+    "ingredient_flags": ["contains_dairy"],
+    "ingredients": [
+      {"item_en": "Halloumi cheese", "item_he": "גבינת חלומי", "qty": "120g", "category": "dairy_fats"},
+      {"item_en": "Watermelon", "item_he": "אבטיח", "qty": "250g", "category": "vegetables"},
+      {"item_en": "Mint", "item_he": "נענע", "qty": "5 leaves", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "1 tsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_001",
+    "type": "lunch",
+    "name_en": "Grilled Chicken with Tabbouleh",
+    "name_he": "חזה עוף בגריל עם טבולה",
+    "kcal": 520,
+    "macros": {"protein_g": 42, "carbs_g": 34, "fat_g": 20},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "dairy-free"],
+    "ingredient_flags": ["contains_meat", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Chicken breast", "item_he": "חזה עוף", "qty": "180g", "category": "protein"},
+      {"item_en": "Bulgur", "item_he": "בורגול", "qty": "60g", "category": "pantry"},
+      {"item_en": "Parsley", "item_he": "פטרוזיליה", "qty": "1 bunch", "category": "vegetables"},
+      {"item_en": "Tomato", "item_he": "עגבנייה", "qty": "1", "category": "vegetables"},
+      {"item_en": "Lemon", "item_he": "לימון", "qty": "0.5", "category": "pantry"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_002",
+    "type": "lunch",
+    "name_en": "Falafel Plate with Tahini",
+    "name_he": "צלחת פלאפל עם טחינה",
+    "kcal": 620,
+    "macros": {"protein_g": 22, "carbs_g": 62, "fat_g": 32},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "dairy-free"],
+    "ingredient_flags": ["contains_gluten"],
+    "ingredients": [
+      {"item_en": "Falafel balls", "item_he": "כדורי פלאפל", "qty": "6", "category": "protein"},
+      {"item_en": "Pita", "item_he": "פיתה", "qty": "1", "category": "pantry"},
+      {"item_en": "Tahini", "item_he": "טחינה", "qty": "3 tbsp", "category": "pantry"},
+      {"item_en": "Israeli salad", "item_he": "סלט ישראלי", "qty": "120g", "category": "vegetables"},
+      {"item_en": "Pickled vegetables", "item_he": "חמוצים", "qty": "50g", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_003",
+    "type": "lunch",
+    "name_en": "Chicken Shawarma Wrap",
+    "name_he": "לאפה שווארמה עוף",
+    "kcal": 680,
+    "macros": {"protein_g": 38, "carbs_g": 52, "fat_g": 32},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "dairy-free"],
+    "ingredient_flags": ["contains_meat", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Chicken thigh", "item_he": "ירך עוף", "qty": "180g", "category": "protein"},
+      {"item_en": "Laffa bread", "item_he": "לאפה", "qty": "1", "category": "pantry"},
+      {"item_en": "Tahini", "item_he": "טחינה", "qty": "2 tbsp", "category": "pantry"},
+      {"item_en": "Cabbage salad", "item_he": "סלט כרוב", "qty": "80g", "category": "vegetables"},
+      {"item_en": "Amba", "item_he": "עמבה", "qty": "1 tbsp", "category": "pantry"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "0.5", "category": "vegetables"}
+    ],
+    "prep_note_en": "Marinate chicken in shawarma spices for at least 2 hours.",
+    "prep_note_he": "להשרות את העוף בתערובת תבלינים לשווארמה לפחות שעתיים."
+  },
+  {
+    "id": "lunch_004",
+    "type": "lunch",
+    "name_en": "Greek Salad with Chicken",
+    "name_he": "סלט יווני עם עוף",
+    "kcal": 480,
+    "macros": {"protein_g": 38, "carbs_g": 16, "fat_g": 28},
+    "cooking_time": "quick",
+    "positive_tags": ["gluten-free"],
+    "ingredient_flags": ["contains_meat", "contains_dairy"],
+    "ingredients": [
+      {"item_en": "Grilled chicken", "item_he": "עוף צלוי", "qty": "150g", "category": "protein"},
+      {"item_en": "Feta cheese", "item_he": "גבינת פטה", "qty": "60g", "category": "dairy_fats"},
+      {"item_en": "Cucumber", "item_he": "מלפפון", "qty": "1", "category": "vegetables"},
+      {"item_en": "Tomato", "item_he": "עגבנייה", "qty": "1", "category": "vegetables"},
+      {"item_en": "Kalamata olives", "item_he": "זיתי קלמטה", "qty": "40g", "category": "dairy_fats"},
+      {"item_en": "Red onion", "item_he": "בצל סגול", "qty": "0.5", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_005",
+    "type": "lunch",
+    "name_en": "Mujaddara (Lentils and Rice)",
+    "name_he": "מג׳דרה (עדשים ואורז)",
+    "kcal": 520,
+    "macros": {"protein_g": 18, "carbs_g": 82, "fat_g": 14},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": [],
+    "ingredients": [
+      {"item_en": "Brown lentils", "item_he": "עדשים חומות", "qty": "100g", "category": "protein"},
+      {"item_en": "Basmati rice", "item_he": "אורז בסמטי", "qty": "80g", "category": "pantry"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "2", "category": "vegetables"},
+      {"item_en": "Cumin", "item_he": "כמון", "qty": "1 tsp", "category": "pantry"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_006",
+    "type": "lunch",
+    "name_en": "Grilled Salmon with Quinoa",
+    "name_he": "סלמון בגריל עם קינואה",
+    "kcal": 580,
+    "macros": {"protein_g": 38, "carbs_g": 40, "fat_g": 28},
+    "cooking_time": "medium",
+    "positive_tags": ["gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_fish"],
+    "ingredients": [
+      {"item_en": "Salmon fillet", "item_he": "פילה סלמון", "qty": "180g", "category": "protein"},
+      {"item_en": "Quinoa", "item_he": "קינואה", "qty": "70g", "category": "pantry"},
+      {"item_en": "Broccoli", "item_he": "ברוקולי", "qty": "150g", "category": "vegetables"},
+      {"item_en": "Lemon", "item_he": "לימון", "qty": "0.5", "category": "pantry"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "1 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_007",
+    "type": "lunch",
+    "name_en": "Moroccan Chicken Tagine",
+    "name_he": "טאג׳ין עוף מרוקאי",
+    "kcal": 550,
+    "macros": {"protein_g": 36, "carbs_g": 40, "fat_g": 24},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_meat"],
+    "ingredients": [
+      {"item_en": "Chicken thighs", "item_he": "ירכי עוף", "qty": "200g", "category": "protein"},
+      {"item_en": "Dried apricots", "item_he": "משמש מיובש", "qty": "40g", "category": "pantry"},
+      {"item_en": "Chickpeas", "item_he": "גרגרי חומוס", "qty": "100g", "category": "protein"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Cinnamon", "item_he": "קינמון", "qty": "1 tsp", "category": "pantry"},
+      {"item_en": "Ras el hanout", "item_he": "ראס אל חנות", "qty": "1 tbsp", "category": "pantry"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_008",
+    "type": "lunch",
+    "name_en": "Pasta Primavera",
+    "name_he": "פסטה פרימוורה",
+    "kcal": 560,
+    "macros": {"protein_g": 18, "carbs_g": 82, "fat_g": 18},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian"],
+    "ingredient_flags": ["contains_gluten", "contains_dairy"],
+    "ingredients": [
+      {"item_en": "Penne pasta", "item_he": "פסטה פנה", "qty": "100g", "category": "pantry"},
+      {"item_en": "Zucchini", "item_he": "קישוא", "qty": "1", "category": "vegetables"},
+      {"item_en": "Bell pepper", "item_he": "פלפל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Cherry tomatoes", "item_he": "עגבניות שרי", "qty": "150g", "category": "vegetables"},
+      {"item_en": "Parmesan", "item_he": "פרמזן", "qty": "30g", "category": "dairy_fats"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_009",
+    "type": "lunch",
+    "name_en": "Msabbaha (Warm Hummus with Chickpeas)",
+    "name_he": "מסבחה",
+    "kcal": 540,
+    "macros": {"protein_g": 18, "carbs_g": 68, "fat_g": 24},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "dairy-free"],
+    "ingredient_flags": ["contains_gluten"],
+    "ingredients": [
+      {"item_en": "Whole chickpeas", "item_he": "גרגרי חומוס", "qty": "200g", "category": "protein"},
+      {"item_en": "Tahini", "item_he": "טחינה", "qty": "3 tbsp", "category": "pantry"},
+      {"item_en": "Lemon", "item_he": "לימון", "qty": "1", "category": "pantry"},
+      {"item_en": "Garlic", "item_he": "שום", "qty": "2 cloves", "category": "vegetables"},
+      {"item_en": "Pita", "item_he": "פיתה", "qty": "1", "category": "pantry"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": "Soak dried chickpeas overnight if not using canned.",
+    "prep_note_he": "להשרות חומוס יבש לילה שלם אם לא משתמשים במשומר."
+  },
+  {
+    "id": "lunch_010",
+    "type": "lunch",
+    "name_en": "Beef Kebabs with Rice",
+    "name_he": "קבב בקר עם אורז",
+    "kcal": 680,
+    "macros": {"protein_g": 42, "carbs_g": 50, "fat_g": 32},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "dairy-free"],
+    "ingredient_flags": ["contains_meat"],
+    "ingredients": [
+      {"item_en": "Ground beef", "item_he": "בקר טחון", "qty": "200g", "category": "protein"},
+      {"item_en": "Basmati rice", "item_he": "אורז בסמטי", "qty": "80g", "category": "pantry"},
+      {"item_en": "Parsley", "item_he": "פטרוזיליה", "qty": "1 bunch", "category": "vegetables"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Garlic", "item_he": "שום", "qty": "2 cloves", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "1 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_011",
+    "type": "lunch",
+    "name_en": "Kubbeh Soup",
+    "name_he": "מרק קובה",
+    "kcal": 520,
+    "macros": {"protein_g": 30, "carbs_g": 58, "fat_g": 18},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "dairy-free"],
+    "ingredient_flags": ["contains_meat", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Semolina", "item_he": "סולת", "qty": "80g", "category": "pantry"},
+      {"item_en": "Ground beef", "item_he": "בקר טחון", "qty": "100g", "category": "protein"},
+      {"item_en": "Beets", "item_he": "סלק", "qty": "2", "category": "vegetables"},
+      {"item_en": "Celery", "item_he": "סלרי", "qty": "2 stalks", "category": "vegetables"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Lemon", "item_he": "לימון", "qty": "1", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_012",
+    "type": "lunch",
+    "name_en": "Tuna Nicoise Salad",
+    "name_he": "סלט ניסואז עם טונה",
+    "kcal": 460,
+    "macros": {"protein_g": 32, "carbs_g": 24, "fat_g": 26},
+    "cooking_time": "medium",
+    "positive_tags": ["gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_fish", "contains_eggs"],
+    "ingredients": [
+      {"item_en": "Canned tuna", "item_he": "טונה משומרת", "qty": "150g", "category": "protein"},
+      {"item_en": "Hard-boiled egg", "item_he": "ביצה קשה", "qty": "1", "category": "protein"},
+      {"item_en": "Green beans", "item_he": "שעועית ירוקה", "qty": "100g", "category": "vegetables"},
+      {"item_en": "Baby potatoes", "item_he": "תפוחי אדמה בייבי", "qty": "150g", "category": "vegetables"},
+      {"item_en": "Olives", "item_he": "זיתים", "qty": "50g", "category": "dairy_fats"},
+      {"item_en": "Cherry tomatoes", "item_he": "עגבניות שרי", "qty": "100g", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_013",
+    "type": "lunch",
+    "name_en": "Stuffed Bell Peppers with Rice and Beef",
+    "name_he": "פלפלים ממולאים באורז ובקר",
+    "kcal": 580,
+    "macros": {"protein_g": 32, "carbs_g": 58, "fat_g": 22},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_meat"],
+    "ingredients": [
+      {"item_en": "Bell peppers", "item_he": "פלפלים", "qty": "2", "category": "vegetables"},
+      {"item_en": "Ground beef", "item_he": "בקר טחון", "qty": "150g", "category": "protein"},
+      {"item_en": "Rice", "item_he": "אורז", "qty": "60g", "category": "pantry"},
+      {"item_en": "Tomato sauce", "item_he": "רסק עגבניות", "qty": "100g", "category": "pantry"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "1", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_014",
+    "type": "lunch",
+    "name_en": "Quinoa Buddha Bowl",
+    "name_he": "קערת קינואה בודהה",
+    "kcal": 520,
+    "macros": {"protein_g": 18, "carbs_g": 68, "fat_g": 20},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": [],
+    "ingredients": [
+      {"item_en": "Quinoa", "item_he": "קינואה", "qty": "80g", "category": "pantry"},
+      {"item_en": "Sweet potato", "item_he": "בטטה", "qty": "1", "category": "vegetables"},
+      {"item_en": "Chickpeas", "item_he": "גרגרי חומוס", "qty": "100g", "category": "protein"},
+      {"item_en": "Avocado", "item_he": "אבוקדו", "qty": "0.5", "category": "vegetables"},
+      {"item_en": "Tahini", "item_he": "טחינה", "qty": "1 tbsp", "category": "pantry"},
+      {"item_en": "Kale", "item_he": "קייל", "qty": "50g", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_015",
+    "type": "lunch",
+    "name_en": "Chicken Caesar Salad",
+    "name_he": "סלט קיסר עם עוף",
+    "kcal": 520,
+    "macros": {"protein_g": 38, "carbs_g": 20, "fat_g": 30},
+    "cooking_time": "medium",
+    "positive_tags": [],
+    "ingredient_flags": ["contains_meat", "contains_dairy", "contains_gluten", "contains_eggs", "contains_fish"],
+    "ingredients": [
+      {"item_en": "Chicken breast", "item_he": "חזה עוף", "qty": "150g", "category": "protein"},
+      {"item_en": "Romaine lettuce", "item_he": "חסה רומית", "qty": "150g", "category": "vegetables"},
+      {"item_en": "Parmesan", "item_he": "פרמזן", "qty": "30g", "category": "dairy_fats"},
+      {"item_en": "Croutons", "item_he": "קרוטונים", "qty": "30g", "category": "pantry"},
+      {"item_en": "Caesar dressing", "item_he": "רוטב קיסר", "qty": "2 tbsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_016",
+    "type": "lunch",
+    "name_en": "Lentil Soup with Pita",
+    "name_he": "מרק עדשים עם פיתה",
+    "kcal": 440,
+    "macros": {"protein_g": 20, "carbs_g": 66, "fat_g": 10},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "dairy-free"],
+    "ingredient_flags": ["contains_gluten"],
+    "ingredients": [
+      {"item_en": "Red lentils", "item_he": "עדשים כתומות", "qty": "120g", "category": "protein"},
+      {"item_en": "Carrot", "item_he": "גזר", "qty": "2", "category": "vegetables"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Celery", "item_he": "סלרי", "qty": "2 stalks", "category": "vegetables"},
+      {"item_en": "Cumin", "item_he": "כמון", "qty": "1 tsp", "category": "pantry"},
+      {"item_en": "Pita", "item_he": "פיתה", "qty": "1", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_017",
+    "type": "lunch",
+    "name_en": "Mediterranean Grilled Sea Bass",
+    "name_he": "לברק בגריל ים-תיכוני",
+    "kcal": 480,
+    "macros": {"protein_g": 42, "carbs_g": 16, "fat_g": 26},
+    "cooking_time": "medium",
+    "positive_tags": ["keto", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_fish"],
+    "ingredients": [
+      {"item_en": "Sea bass fillet", "item_he": "פילה לברק", "qty": "200g", "category": "protein"},
+      {"item_en": "Zucchini", "item_he": "קישוא", "qty": "1", "category": "vegetables"},
+      {"item_en": "Eggplant", "item_he": "חציל", "qty": "0.5", "category": "vegetables"},
+      {"item_en": "Cherry tomatoes", "item_he": "עגבניות שרי", "qty": "100g", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"},
+      {"item_en": "Lemon", "item_he": "לימון", "qty": "1", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_018",
+    "type": "lunch",
+    "name_en": "Stir-Fried Tofu with Vegetables",
+    "name_he": "טופו מוקפץ עם ירקות",
+    "kcal": 480,
+    "macros": {"protein_g": 26, "carbs_g": 42, "fat_g": 22},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "dairy-free"],
+    "ingredient_flags": ["contains_soy", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Firm tofu", "item_he": "טופו קשה", "qty": "200g", "category": "protein"},
+      {"item_en": "Rice noodles", "item_he": "אטריות אורז", "qty": "80g", "category": "pantry"},
+      {"item_en": "Broccoli", "item_he": "ברוקולי", "qty": "100g", "category": "vegetables"},
+      {"item_en": "Bell pepper", "item_he": "פלפל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Soy sauce", "item_he": "רוטב סויה", "qty": "2 tbsp", "category": "pantry"},
+      {"item_en": "Sesame oil", "item_he": "שמן שומשום", "qty": "1 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_019",
+    "type": "lunch",
+    "name_en": "Schnitzel with Mashed Potatoes",
+    "name_he": "שניצל עם פירה",
+    "kcal": 720,
+    "macros": {"protein_g": 42, "carbs_g": 58, "fat_g": 34},
+    "cooking_time": "medium",
+    "positive_tags": [],
+    "ingredient_flags": ["contains_meat", "contains_gluten", "contains_eggs", "contains_dairy"],
+    "ingredients": [
+      {"item_en": "Chicken breast", "item_he": "חזה עוף", "qty": "180g", "category": "protein"},
+      {"item_en": "Breadcrumbs", "item_he": "פירורי לחם", "qty": "50g", "category": "pantry"},
+      {"item_en": "Egg", "item_he": "ביצה", "qty": "1", "category": "protein"},
+      {"item_en": "Potatoes", "item_he": "תפוחי אדמה", "qty": "250g", "category": "vegetables"},
+      {"item_en": "Milk", "item_he": "חלב", "qty": "50ml", "category": "dairy_fats"},
+      {"item_en": "Butter", "item_he": "חמאה", "qty": "1 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_020",
+    "type": "lunch",
+    "name_en": "Cauliflower Steak with Tahini",
+    "name_he": "סטייק כרובית עם טחינה",
+    "kcal": 380,
+    "macros": {"protein_g": 14, "carbs_g": 28, "fat_g": 24},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "keto", "dairy-free"],
+    "ingredient_flags": [],
+    "ingredients": [
+      {"item_en": "Cauliflower", "item_he": "כרובית", "qty": "400g", "category": "vegetables"},
+      {"item_en": "Tahini", "item_he": "טחינה", "qty": "3 tbsp", "category": "pantry"},
+      {"item_en": "Lemon", "item_he": "לימון", "qty": "1", "category": "pantry"},
+      {"item_en": "Pomegranate seeds", "item_he": "גרגרי רימון", "qty": "30g", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_021",
+    "type": "lunch",
+    "name_en": "Spicy Shrimp Stir-Fry",
+    "name_he": "שרימפס חריף מוקפץ",
+    "kcal": 440,
+    "macros": {"protein_g": 32, "carbs_g": 34, "fat_g": 18},
+    "cooking_time": "quick",
+    "positive_tags": ["dairy-free"],
+    "ingredient_flags": ["contains_shellfish", "contains_soy", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Shrimp", "item_he": "שרימפס", "qty": "200g", "category": "protein"},
+      {"item_en": "Rice", "item_he": "אורז", "qty": "80g", "category": "pantry"},
+      {"item_en": "Garlic", "item_he": "שום", "qty": "3 cloves", "category": "vegetables"},
+      {"item_en": "Chili", "item_he": "פלפל חריף", "qty": "1", "category": "vegetables"},
+      {"item_en": "Soy sauce", "item_he": "רוטב סויה", "qty": "2 tbsp", "category": "pantry"},
+      {"item_en": "Bell pepper", "item_he": "פלפל", "qty": "1", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_022",
+    "type": "lunch",
+    "name_en": "Turkey Burger with Sweet Potato Fries",
+    "name_he": "המבורגר הודו עם צ׳יפס בטטה",
+    "kcal": 620,
+    "macros": {"protein_g": 38, "carbs_g": 58, "fat_g": 24},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "dairy-free"],
+    "ingredient_flags": ["contains_meat", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Ground turkey", "item_he": "הודו טחון", "qty": "180g", "category": "protein"},
+      {"item_en": "Burger bun", "item_he": "לחמנייה", "qty": "1", "category": "pantry"},
+      {"item_en": "Sweet potato", "item_he": "בטטה", "qty": "250g", "category": "vegetables"},
+      {"item_en": "Lettuce", "item_he": "חסה", "qty": "2 leaves", "category": "vegetables"},
+      {"item_en": "Tomato", "item_he": "עגבנייה", "qty": "1", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "1 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_023",
+    "type": "lunch",
+    "name_en": "Chickpea and Spinach Stew",
+    "name_he": "תבשיל חומוס ותרד",
+    "kcal": 420,
+    "macros": {"protein_g": 18, "carbs_g": 56, "fat_g": 16},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": [],
+    "ingredients": [
+      {"item_en": "Chickpeas", "item_he": "גרגרי חומוס", "qty": "250g", "category": "protein"},
+      {"item_en": "Spinach", "item_he": "תרד", "qty": "200g", "category": "vegetables"},
+      {"item_en": "Tomatoes", "item_he": "עגבניות", "qty": "2", "category": "vegetables"},
+      {"item_en": "Garlic", "item_he": "שום", "qty": "3 cloves", "category": "vegetables"},
+      {"item_en": "Cumin", "item_he": "כמון", "qty": "1 tsp", "category": "pantry"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_024",
+    "type": "lunch",
+    "name_en": "Grilled Halloumi Salad",
+    "name_he": "סלט חלומי בגריל",
+    "kcal": 480,
+    "macros": {"protein_g": 24, "carbs_g": 22, "fat_g": 32},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "gluten-free"],
+    "ingredient_flags": ["contains_dairy"],
+    "ingredients": [
+      {"item_en": "Halloumi cheese", "item_he": "גבינת חלומי", "qty": "150g", "category": "dairy_fats"},
+      {"item_en": "Mixed greens", "item_he": "עלים ירוקים מעורבים", "qty": "100g", "category": "vegetables"},
+      {"item_en": "Cherry tomatoes", "item_he": "עגבניות שרי", "qty": "100g", "category": "vegetables"},
+      {"item_en": "Cucumber", "item_he": "מלפפון", "qty": "1", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"},
+      {"item_en": "Balsamic vinegar", "item_he": "חומץ בלסמי", "qty": "1 tbsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_025",
+    "type": "lunch",
+    "name_en": "Beef Stir-Fry with Rice",
+    "name_he": "בקר מוקפץ עם אורז",
+    "kcal": 640,
+    "macros": {"protein_g": 38, "carbs_g": 58, "fat_g": 26},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "dairy-free"],
+    "ingredient_flags": ["contains_meat", "contains_soy", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Beef sirloin", "item_he": "סינטה בקר", "qty": "180g", "category": "protein"},
+      {"item_en": "Jasmine rice", "item_he": "אורז יסמין", "qty": "80g", "category": "pantry"},
+      {"item_en": "Broccoli", "item_he": "ברוקולי", "qty": "100g", "category": "vegetables"},
+      {"item_en": "Soy sauce", "item_he": "רוטב סויה", "qty": "2 tbsp", "category": "pantry"},
+      {"item_en": "Ginger", "item_he": "ג׳ינג׳ר", "qty": "1 tbsp", "category": "vegetables"},
+      {"item_en": "Sesame oil", "item_he": "שמן שומשום", "qty": "1 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_026",
+    "type": "lunch",
+    "name_en": "Vegetarian Lasagna",
+    "name_he": "לזניה צמחונית",
+    "kcal": 560,
+    "macros": {"protein_g": 24, "carbs_g": 62, "fat_g": 24},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "vegetarian"],
+    "ingredient_flags": ["contains_dairy", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Lasagna sheets", "item_he": "עלי לזניה", "qty": "100g", "category": "pantry"},
+      {"item_en": "Ricotta cheese", "item_he": "גבינת ריקוטה", "qty": "150g", "category": "dairy_fats"},
+      {"item_en": "Mozzarella", "item_he": "מוצרלה", "qty": "80g", "category": "dairy_fats"},
+      {"item_en": "Tomato sauce", "item_he": "רסק עגבניות", "qty": "200g", "category": "pantry"},
+      {"item_en": "Spinach", "item_he": "תרד", "qty": "150g", "category": "vegetables"},
+      {"item_en": "Zucchini", "item_he": "קישוא", "qty": "1", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_027",
+    "type": "lunch",
+    "name_en": "Chicken Couscous",
+    "name_he": "קוסקוס עם עוף",
+    "kcal": 580,
+    "macros": {"protein_g": 36, "carbs_g": 62, "fat_g": 20},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "dairy-free"],
+    "ingredient_flags": ["contains_meat", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Chicken thighs", "item_he": "ירכי עוף", "qty": "180g", "category": "protein"},
+      {"item_en": "Couscous", "item_he": "קוסקוס", "qty": "80g", "category": "pantry"},
+      {"item_en": "Carrots", "item_he": "גזר", "qty": "2", "category": "vegetables"},
+      {"item_en": "Zucchini", "item_he": "קישוא", "qty": "1", "category": "vegetables"},
+      {"item_en": "Chickpeas", "item_he": "גרגרי חומוס", "qty": "80g", "category": "protein"},
+      {"item_en": "Turmeric", "item_he": "כורכום", "qty": "1 tsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_028",
+    "type": "lunch",
+    "name_en": "Keto Chicken and Avocado Bowl",
+    "name_he": "קערת עוף ואבוקדו קטוגנית",
+    "kcal": 560,
+    "macros": {"protein_g": 40, "carbs_g": 10, "fat_g": 40},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "keto", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_meat"],
+    "ingredients": [
+      {"item_en": "Chicken breast", "item_he": "חזה עוף", "qty": "180g", "category": "protein"},
+      {"item_en": "Avocado", "item_he": "אבוקדו", "qty": "1", "category": "vegetables"},
+      {"item_en": "Mixed greens", "item_he": "עלים ירוקים", "qty": "80g", "category": "vegetables"},
+      {"item_en": "Cucumber", "item_he": "מלפפון", "qty": "1", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"},
+      {"item_en": "Lemon", "item_he": "לימון", "qty": "0.5", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_029",
+    "type": "lunch",
+    "name_en": "Tomato Basil Soup with Grilled Cheese",
+    "name_he": "מרק עגבניות עם טוסט גבינה",
+    "kcal": 540,
+    "macros": {"protein_g": 18, "carbs_g": 56, "fat_g": 26},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian"],
+    "ingredient_flags": ["contains_dairy", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Tomatoes", "item_he": "עגבניות", "qty": "500g", "category": "vegetables"},
+      {"item_en": "Basil", "item_he": "בזיליקום", "qty": "1 bunch", "category": "vegetables"},
+      {"item_en": "Bread", "item_he": "לחם", "qty": "2 slices", "category": "pantry"},
+      {"item_en": "Cheddar cheese", "item_he": "גבינת צ׳דר", "qty": "60g", "category": "dairy_fats"},
+      {"item_en": "Butter", "item_he": "חמאה", "qty": "1 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_030",
+    "type": "lunch",
+    "name_en": "Mexican Chicken Burrito Bowl",
+    "name_he": "קערת בוריטו מקסיקני עם עוף",
+    "kcal": 620,
+    "macros": {"protein_g": 38, "carbs_g": 62, "fat_g": 24},
+    "cooking_time": "medium",
+    "positive_tags": ["gluten-free"],
+    "ingredient_flags": ["contains_meat", "contains_dairy"],
+    "ingredients": [
+      {"item_en": "Chicken breast", "item_he": "חזה עוף", "qty": "150g", "category": "protein"},
+      {"item_en": "Brown rice", "item_he": "אורז מלא", "qty": "80g", "category": "pantry"},
+      {"item_en": "Black beans", "item_he": "שעועית שחורה", "qty": "100g", "category": "protein"},
+      {"item_en": "Corn", "item_he": "תירס", "qty": "50g", "category": "vegetables"},
+      {"item_en": "Avocado", "item_he": "אבוקדו", "qty": "0.5", "category": "vegetables"},
+      {"item_en": "Sour cream", "item_he": "שמנת חמוצה", "qty": "2 tbsp", "category": "dairy_fats"},
+      {"item_en": "Salsa", "item_he": "סלסה", "qty": "2 tbsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_031",
+    "type": "lunch",
+    "name_en": "Pita with Grilled Eggplant and Tahini",
+    "name_he": "פיתה עם חציל צלוי וטחינה",
+    "kcal": 520,
+    "macros": {"protein_g": 14, "carbs_g": 64, "fat_g": 24},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "dairy-free"],
+    "ingredient_flags": ["contains_gluten"],
+    "ingredients": [
+      {"item_en": "Pita", "item_he": "פיתה", "qty": "1", "category": "pantry"},
+      {"item_en": "Eggplant", "item_he": "חציל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Tahini", "item_he": "טחינה", "qty": "3 tbsp", "category": "pantry"},
+      {"item_en": "Israeli salad", "item_he": "סלט ישראלי", "qty": "100g", "category": "vegetables"},
+      {"item_en": "Zhug", "item_he": "סחוג", "qty": "1 tsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_032",
+    "type": "lunch",
+    "name_en": "Baked Cod with Herbs",
+    "name_he": "בקלה בתנור עם עשבי תיבול",
+    "kcal": 380,
+    "macros": {"protein_g": 36, "carbs_g": 14, "fat_g": 18},
+    "cooking_time": "medium",
+    "positive_tags": ["keto", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_fish"],
+    "ingredients": [
+      {"item_en": "Cod fillet", "item_he": "פילה בקלה", "qty": "200g", "category": "protein"},
+      {"item_en": "Asparagus", "item_he": "אספרגוס", "qty": "150g", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"},
+      {"item_en": "Lemon", "item_he": "לימון", "qty": "1", "category": "pantry"},
+      {"item_en": "Thyme", "item_he": "תימין", "qty": "1 tsp", "category": "pantry"},
+      {"item_en": "Garlic", "item_he": "שום", "qty": "2 cloves", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_033",
+    "type": "lunch",
+    "name_en": "Chicken Fajitas",
+    "name_he": "פחיטס עוף",
+    "kcal": 580,
+    "macros": {"protein_g": 38, "carbs_g": 56, "fat_g": 22},
+    "cooking_time": "medium",
+    "positive_tags": ["dairy-free"],
+    "ingredient_flags": ["contains_meat", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Chicken breast", "item_he": "חזה עוף", "qty": "180g", "category": "protein"},
+      {"item_en": "Flour tortillas", "item_he": "טורטיות", "qty": "2", "category": "pantry"},
+      {"item_en": "Bell peppers", "item_he": "פלפלים", "qty": "2", "category": "vegetables"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Lime", "item_he": "ליים", "qty": "1", "category": "pantry"},
+      {"item_en": "Cilantro", "item_he": "כוסברה", "qty": "1 bunch", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_034",
+    "type": "lunch",
+    "name_en": "Roasted Vegetable and Feta Wrap",
+    "name_he": "ראפ ירקות צלויים ופטה",
+    "kcal": 460,
+    "macros": {"protein_g": 16, "carbs_g": 56, "fat_g": 20},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian"],
+    "ingredient_flags": ["contains_dairy", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Tortilla wrap", "item_he": "טורטייה", "qty": "1", "category": "pantry"},
+      {"item_en": "Zucchini", "item_he": "קישוא", "qty": "1", "category": "vegetables"},
+      {"item_en": "Eggplant", "item_he": "חציל", "qty": "0.5", "category": "vegetables"},
+      {"item_en": "Feta cheese", "item_he": "גבינת פטה", "qty": "50g", "category": "dairy_fats"},
+      {"item_en": "Baby spinach", "item_he": "תרד בייבי", "qty": "40g", "category": "vegetables"},
+      {"item_en": "Pesto", "item_he": "פסטו", "qty": "1 tbsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_035",
+    "type": "lunch",
+    "name_en": "Kibbeh Balls with Salad",
+    "name_he": "כדורי קובה עם סלט",
+    "kcal": 560,
+    "macros": {"protein_g": 28, "carbs_g": 52, "fat_g": 24},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "dairy-free"],
+    "ingredient_flags": ["contains_meat", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Bulgur", "item_he": "בורגול", "qty": "80g", "category": "pantry"},
+      {"item_en": "Ground beef", "item_he": "בקר טחון", "qty": "150g", "category": "protein"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Pine nuts", "item_he": "צנוברים", "qty": "20g", "category": "dairy_fats"},
+      {"item_en": "Parsley", "item_he": "פטרוזיליה", "qty": "1 bunch", "category": "vegetables"},
+      {"item_en": "Lettuce", "item_he": "חסה", "qty": "80g", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_036",
+    "type": "lunch",
+    "name_en": "Pho Noodle Soup",
+    "name_he": "מרק פו",
+    "kcal": 480,
+    "macros": {"protein_g": 30, "carbs_g": 62, "fat_g": 10},
+    "cooking_time": "elaborate",
+    "positive_tags": ["dairy-free"],
+    "ingredient_flags": ["contains_meat", "contains_soy"],
+    "ingredients": [
+      {"item_en": "Beef slices", "item_he": "פרוסות בקר", "qty": "120g", "category": "protein"},
+      {"item_en": "Rice noodles", "item_he": "אטריות אורז", "qty": "80g", "category": "pantry"},
+      {"item_en": "Beef broth", "item_he": "ציר בקר", "qty": "500ml", "category": "pantry"},
+      {"item_en": "Bean sprouts", "item_he": "נבטי שעועית", "qty": "50g", "category": "vegetables"},
+      {"item_en": "Basil", "item_he": "בזיליקום", "qty": "5 leaves", "category": "vegetables"},
+      {"item_en": "Lime", "item_he": "ליים", "qty": "0.5", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_037",
+    "type": "lunch",
+    "name_en": "Spinach and Ricotta Stuffed Shells",
+    "name_he": "קונכיות פסטה במילוי תרד וריקוטה",
+    "kcal": 560,
+    "macros": {"protein_g": 26, "carbs_g": 62, "fat_g": 22},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "vegetarian"],
+    "ingredient_flags": ["contains_dairy", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Pasta shells", "item_he": "קונכיות פסטה", "qty": "100g", "category": "pantry"},
+      {"item_en": "Ricotta", "item_he": "ריקוטה", "qty": "200g", "category": "dairy_fats"},
+      {"item_en": "Spinach", "item_he": "תרד", "qty": "200g", "category": "vegetables"},
+      {"item_en": "Tomato sauce", "item_he": "רסק עגבניות", "qty": "150g", "category": "pantry"},
+      {"item_en": "Parmesan", "item_he": "פרמזן", "qty": "30g", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_038",
+    "type": "lunch",
+    "name_en": "Lamb Skewers with Salad",
+    "name_he": "שיפודי טלה עם סלט",
+    "kcal": 620,
+    "macros": {"protein_g": 38, "carbs_g": 18, "fat_g": 44},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "keto", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_meat"],
+    "ingredients": [
+      {"item_en": "Lamb cubes", "item_he": "בשר טלה בקוביות", "qty": "180g", "category": "protein"},
+      {"item_en": "Bell peppers", "item_he": "פלפלים", "qty": "1", "category": "vegetables"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Tomato", "item_he": "עגבנייה", "qty": "1", "category": "vegetables"},
+      {"item_en": "Cucumber", "item_he": "מלפפון", "qty": "1", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": "Marinate lamb in olive oil, garlic and spices for 1 hour.",
+    "prep_note_he": "להשרות את הטלה בשמן זית, שום ותבלינים למשך שעה."
+  },
+  {
+    "id": "lunch_039",
+    "type": "lunch",
+    "name_en": "Vegetable Sushi Bowl",
+    "name_he": "קערת סושי ירקות",
+    "kcal": 460,
+    "macros": {"protein_g": 12, "carbs_g": 76, "fat_g": 14},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_soy"],
+    "ingredients": [
+      {"item_en": "Sushi rice", "item_he": "אורז סושי", "qty": "100g", "category": "pantry"},
+      {"item_en": "Avocado", "item_he": "אבוקדו", "qty": "0.5", "category": "vegetables"},
+      {"item_en": "Cucumber", "item_he": "מלפפון", "qty": "1", "category": "vegetables"},
+      {"item_en": "Carrot", "item_he": "גזר", "qty": "1", "category": "vegetables"},
+      {"item_en": "Edamame", "item_he": "אדממה", "qty": "80g", "category": "protein"},
+      {"item_en": "Nori seaweed", "item_he": "אצות נורי", "qty": "2 sheets", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "lunch_040",
+    "type": "lunch",
+    "name_en": "Baked Stuffed Cabbage Rolls",
+    "name_he": "כרוב ממולא",
+    "kcal": 540,
+    "macros": {"protein_g": 30, "carbs_g": 52, "fat_g": 22},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "dairy-free"],
+    "ingredient_flags": ["contains_meat"],
+    "ingredients": [
+      {"item_en": "Cabbage leaves", "item_he": "עלי כרוב", "qty": "6", "category": "vegetables"},
+      {"item_en": "Ground beef", "item_he": "בקר טחון", "qty": "150g", "category": "protein"},
+      {"item_en": "Rice", "item_he": "אורז", "qty": "50g", "category": "pantry"},
+      {"item_en": "Tomato sauce", "item_he": "רסק עגבניות", "qty": "200g", "category": "pantry"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "1", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_001",
+    "type": "dinner",
+    "name_en": "Baked Salmon with Roasted Vegetables",
+    "name_he": "סלמון בתנור עם ירקות צלויים",
+    "kcal": 560,
+    "macros": {"protein_g": 40, "carbs_g": 26, "fat_g": 30},
+    "cooking_time": "medium",
+    "positive_tags": ["gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_fish"],
+    "ingredients": [
+      {"item_en": "Salmon fillet", "item_he": "פילה סלמון", "qty": "200g", "category": "protein"},
+      {"item_en": "Sweet potato", "item_he": "בטטה", "qty": "200g", "category": "vegetables"},
+      {"item_en": "Broccoli", "item_he": "ברוקולי", "qty": "150g", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"},
+      {"item_en": "Lemon", "item_he": "לימון", "qty": "0.5", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_002",
+    "type": "dinner",
+    "name_en": "Grilled Chicken Shawarma Plate",
+    "name_he": "צלחת שווארמה עוף בגריל",
+    "kcal": 620,
+    "macros": {"protein_g": 44, "carbs_g": 38, "fat_g": 28},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "dairy-free"],
+    "ingredient_flags": ["contains_meat", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Chicken thighs", "item_he": "ירכי עוף", "qty": "200g", "category": "protein"},
+      {"item_en": "Pita", "item_he": "פיתה", "qty": "1", "category": "pantry"},
+      {"item_en": "Hummus", "item_he": "חומוס", "qty": "80g", "category": "pantry"},
+      {"item_en": "Israeli salad", "item_he": "סלט ישראלי", "qty": "120g", "category": "vegetables"},
+      {"item_en": "Tahini", "item_he": "טחינה", "qty": "2 tbsp", "category": "pantry"}
+    ],
+    "prep_note_en": "Marinate chicken in shawarma spice mix for at least 2 hours.",
+    "prep_note_he": "להשרות את העוף בתערובת תבלינים לשווארמה לפחות שעתיים."
+  },
+  {
+    "id": "dinner_003",
+    "type": "dinner",
+    "name_en": "Vegetable Couscous",
+    "name_he": "קוסקוס ירקות",
+    "kcal": 480,
+    "macros": {"protein_g": 14, "carbs_g": 78, "fat_g": 14},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "dairy-free"],
+    "ingredient_flags": ["contains_gluten"],
+    "ingredients": [
+      {"item_en": "Couscous", "item_he": "קוסקוס", "qty": "100g", "category": "pantry"},
+      {"item_en": "Carrot", "item_he": "גזר", "qty": "2", "category": "vegetables"},
+      {"item_en": "Zucchini", "item_he": "קישוא", "qty": "1", "category": "vegetables"},
+      {"item_en": "Pumpkin", "item_he": "דלעת", "qty": "150g", "category": "vegetables"},
+      {"item_en": "Chickpeas", "item_he": "גרגרי חומוס", "qty": "80g", "category": "protein"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_004",
+    "type": "dinner",
+    "name_en": "Beef Stew with Root Vegetables",
+    "name_he": "תבשיל בקר עם ירקות שורש",
+    "kcal": 640,
+    "macros": {"protein_g": 42, "carbs_g": 42, "fat_g": 30},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_meat"],
+    "ingredients": [
+      {"item_en": "Beef cubes", "item_he": "בקר בקוביות", "qty": "200g", "category": "protein"},
+      {"item_en": "Carrots", "item_he": "גזר", "qty": "3", "category": "vegetables"},
+      {"item_en": "Potatoes", "item_he": "תפוחי אדמה", "qty": "200g", "category": "vegetables"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Tomato paste", "item_he": "רסק עגבניות", "qty": "2 tbsp", "category": "pantry"},
+      {"item_en": "Beef broth", "item_he": "ציר בקר", "qty": "500ml", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_005",
+    "type": "dinner",
+    "name_en": "Mediterranean Baked Chicken",
+    "name_he": "עוף אפוי ים-תיכוני",
+    "kcal": 540,
+    "macros": {"protein_g": 42, "carbs_g": 20, "fat_g": 30},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "keto", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_meat"],
+    "ingredients": [
+      {"item_en": "Chicken thighs", "item_he": "ירכי עוף", "qty": "200g", "category": "protein"},
+      {"item_en": "Cherry tomatoes", "item_he": "עגבניות שרי", "qty": "150g", "category": "vegetables"},
+      {"item_en": "Kalamata olives", "item_he": "זיתי קלמטה", "qty": "50g", "category": "dairy_fats"},
+      {"item_en": "Garlic", "item_he": "שום", "qty": "4 cloves", "category": "vegetables"},
+      {"item_en": "Oregano", "item_he": "אורגנו", "qty": "1 tbsp", "category": "pantry"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_006",
+    "type": "dinner",
+    "name_en": "Vegetable Stir-Fry with Noodles",
+    "name_he": "אטריות מוקפצות עם ירקות",
+    "kcal": 460,
+    "macros": {"protein_g": 14, "carbs_g": 72, "fat_g": 14},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "dairy-free"],
+    "ingredient_flags": ["contains_soy", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Egg noodles", "item_he": "אטריות ביצים", "qty": "100g", "category": "pantry"},
+      {"item_en": "Broccoli", "item_he": "ברוקולי", "qty": "100g", "category": "vegetables"},
+      {"item_en": "Carrot", "item_he": "גזר", "qty": "1", "category": "vegetables"},
+      {"item_en": "Bell pepper", "item_he": "פלפל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Soy sauce", "item_he": "רוטב סויה", "qty": "2 tbsp", "category": "pantry"},
+      {"item_en": "Sesame oil", "item_he": "שמן שומשום", "qty": "1 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_007",
+    "type": "dinner",
+    "name_en": "Grilled Branzino with Lemon",
+    "name_he": "לברק שלם בגריל עם לימון",
+    "kcal": 480,
+    "macros": {"protein_g": 46, "carbs_g": 10, "fat_g": 28},
+    "cooking_time": "medium",
+    "positive_tags": ["keto", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_fish"],
+    "ingredients": [
+      {"item_en": "Whole branzino", "item_he": "לברק שלם", "qty": "400g", "category": "protein"},
+      {"item_en": "Lemon", "item_he": "לימון", "qty": "1", "category": "pantry"},
+      {"item_en": "Parsley", "item_he": "פטרוזיליה", "qty": "1 bunch", "category": "vegetables"},
+      {"item_en": "Garlic", "item_he": "שום", "qty": "3 cloves", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_008",
+    "type": "dinner",
+    "name_en": "Spaghetti Bolognese",
+    "name_he": "ספגטי בולונז",
+    "kcal": 660,
+    "macros": {"protein_g": 34, "carbs_g": 78, "fat_g": 22},
+    "cooking_time": "medium",
+    "positive_tags": ["dairy-free"],
+    "ingredient_flags": ["contains_meat", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Spaghetti", "item_he": "ספגטי", "qty": "100g", "category": "pantry"},
+      {"item_en": "Ground beef", "item_he": "בקר טחון", "qty": "150g", "category": "protein"},
+      {"item_en": "Tomato sauce", "item_he": "רסק עגבניות", "qty": "200g", "category": "pantry"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Carrot", "item_he": "גזר", "qty": "1", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "1 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_009",
+    "type": "dinner",
+    "name_en": "Keto Zucchini Lasagna",
+    "name_he": "לזניית קישואים קטוגנית",
+    "kcal": 540,
+    "macros": {"protein_g": 38, "carbs_g": 14, "fat_g": 38},
+    "cooking_time": "elaborate",
+    "positive_tags": ["keto", "gluten-free"],
+    "ingredient_flags": ["contains_meat", "contains_dairy"],
+    "ingredients": [
+      {"item_en": "Zucchini", "item_he": "קישוא", "qty": "3", "category": "vegetables"},
+      {"item_en": "Ground beef", "item_he": "בקר טחון", "qty": "200g", "category": "protein"},
+      {"item_en": "Ricotta", "item_he": "ריקוטה", "qty": "150g", "category": "dairy_fats"},
+      {"item_en": "Mozzarella", "item_he": "מוצרלה", "qty": "80g", "category": "dairy_fats"},
+      {"item_en": "Tomato sauce", "item_he": "רסק עגבניות", "qty": "150g", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_010",
+    "type": "dinner",
+    "name_en": "Vegan Pad Thai",
+    "name_he": "פאד תאי טבעוני",
+    "kcal": 520,
+    "macros": {"protein_g": 18, "carbs_g": 74, "fat_g": 18},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "dairy-free"],
+    "ingredient_flags": ["contains_soy", "contains_nuts"],
+    "ingredients": [
+      {"item_en": "Rice noodles", "item_he": "אטריות אורז", "qty": "100g", "category": "pantry"},
+      {"item_en": "Firm tofu", "item_he": "טופו קשה", "qty": "150g", "category": "protein"},
+      {"item_en": "Bean sprouts", "item_he": "נבטי שעועית", "qty": "80g", "category": "vegetables"},
+      {"item_en": "Peanuts", "item_he": "בוטנים", "qty": "20g", "category": "dairy_fats"},
+      {"item_en": "Lime", "item_he": "ליים", "qty": "0.5", "category": "pantry"},
+      {"item_en": "Tamarind paste", "item_he": "ממרח תמרינדי", "qty": "1 tbsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_011",
+    "type": "dinner",
+    "name_en": "Roast Chicken with Potatoes",
+    "name_he": "עוף שלם בתנור עם תפוחי אדמה",
+    "kcal": 680,
+    "macros": {"protein_g": 46, "carbs_g": 42, "fat_g": 34},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_meat"],
+    "ingredients": [
+      {"item_en": "Chicken quarters", "item_he": "רבעי עוף", "qty": "250g", "category": "protein"},
+      {"item_en": "Baby potatoes", "item_he": "תפוחי אדמה בייבי", "qty": "250g", "category": "vegetables"},
+      {"item_en": "Garlic", "item_he": "שום", "qty": "6 cloves", "category": "vegetables"},
+      {"item_en": "Rosemary", "item_he": "רוזמרין", "qty": "2 sprigs", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"},
+      {"item_en": "Lemon", "item_he": "לימון", "qty": "1", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_012",
+    "type": "dinner",
+    "name_en": "Eggplant Parmesan",
+    "name_he": "חציל פרמזן",
+    "kcal": 540,
+    "macros": {"protein_g": 22, "carbs_g": 48, "fat_g": 30},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "vegetarian"],
+    "ingredient_flags": ["contains_dairy", "contains_gluten", "contains_eggs"],
+    "ingredients": [
+      {"item_en": "Eggplant", "item_he": "חציל", "qty": "2", "category": "vegetables"},
+      {"item_en": "Mozzarella", "item_he": "מוצרלה", "qty": "120g", "category": "dairy_fats"},
+      {"item_en": "Parmesan", "item_he": "פרמזן", "qty": "40g", "category": "dairy_fats"},
+      {"item_en": "Tomato sauce", "item_he": "רסק עגבניות", "qty": "250g", "category": "pantry"},
+      {"item_en": "Breadcrumbs", "item_he": "פירורי לחם", "qty": "40g", "category": "pantry"},
+      {"item_en": "Egg", "item_he": "ביצה", "qty": "1", "category": "protein"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_013",
+    "type": "dinner",
+    "name_en": "Miso Glazed Salmon",
+    "name_he": "סלמון בזיגוג מיסו",
+    "kcal": 520,
+    "macros": {"protein_g": 38, "carbs_g": 28, "fat_g": 26},
+    "cooking_time": "medium",
+    "positive_tags": ["dairy-free"],
+    "ingredient_flags": ["contains_fish", "contains_soy"],
+    "ingredients": [
+      {"item_en": "Salmon fillet", "item_he": "פילה סלמון", "qty": "180g", "category": "protein"},
+      {"item_en": "White miso paste", "item_he": "מחית מיסו לבנה", "qty": "2 tbsp", "category": "pantry"},
+      {"item_en": "Brown rice", "item_he": "אורז מלא", "qty": "70g", "category": "pantry"},
+      {"item_en": "Bok choy", "item_he": "בוק צ׳וי", "qty": "100g", "category": "vegetables"},
+      {"item_en": "Ginger", "item_he": "ג׳ינג׳ר", "qty": "1 tbsp", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_014",
+    "type": "dinner",
+    "name_en": "Stuffed Zucchini with Rice",
+    "name_he": "קישואים ממולאים באורז",
+    "kcal": 460,
+    "macros": {"protein_g": 18, "carbs_g": 64, "fat_g": 14},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "vegetarian", "gluten-free"],
+    "ingredient_flags": ["contains_dairy"],
+    "ingredients": [
+      {"item_en": "Zucchini", "item_he": "קישוא", "qty": "4", "category": "vegetables"},
+      {"item_en": "Rice", "item_he": "אורז", "qty": "80g", "category": "pantry"},
+      {"item_en": "Feta cheese", "item_he": "גבינת פטה", "qty": "60g", "category": "dairy_fats"},
+      {"item_en": "Dill", "item_he": "שמיר", "qty": "1 bunch", "category": "vegetables"},
+      {"item_en": "Tomato sauce", "item_he": "רסק עגבניות", "qty": "150g", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_015",
+    "type": "dinner",
+    "name_en": "Moussaka",
+    "name_he": "מוסקה",
+    "kcal": 620,
+    "macros": {"protein_g": 32, "carbs_g": 42, "fat_g": 34},
+    "cooking_time": "elaborate",
+    "positive_tags": [],
+    "ingredient_flags": ["contains_meat", "contains_dairy", "contains_gluten", "contains_eggs"],
+    "ingredients": [
+      {"item_en": "Eggplant", "item_he": "חציל", "qty": "2", "category": "vegetables"},
+      {"item_en": "Ground lamb", "item_he": "טלה טחון", "qty": "200g", "category": "protein"},
+      {"item_en": "Potatoes", "item_he": "תפוחי אדמה", "qty": "200g", "category": "vegetables"},
+      {"item_en": "Bechamel sauce", "item_he": "רוטב בשמל", "qty": "200g", "category": "pantry"},
+      {"item_en": "Tomatoes", "item_he": "עגבניות", "qty": "2", "category": "vegetables"},
+      {"item_en": "Cinnamon", "item_he": "קינמון", "qty": "1 tsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_016",
+    "type": "dinner",
+    "name_en": "Chicken Tikka Masala",
+    "name_he": "עוף טיקה מסאלה",
+    "kcal": 640,
+    "macros": {"protein_g": 40, "carbs_g": 52, "fat_g": 30},
+    "cooking_time": "elaborate",
+    "positive_tags": ["gluten-free"],
+    "ingredient_flags": ["contains_meat", "contains_dairy"],
+    "ingredients": [
+      {"item_en": "Chicken breast", "item_he": "חזה עוף", "qty": "180g", "category": "protein"},
+      {"item_en": "Basmati rice", "item_he": "אורז בסמטי", "qty": "80g", "category": "pantry"},
+      {"item_en": "Cream", "item_he": "שמנת", "qty": "80ml", "category": "dairy_fats"},
+      {"item_en": "Tomato puree", "item_he": "מחית עגבניות", "qty": "150g", "category": "pantry"},
+      {"item_en": "Garam masala", "item_he": "גראם מסאלה", "qty": "1 tbsp", "category": "pantry"},
+      {"item_en": "Yogurt", "item_he": "יוגורט", "qty": "80g", "category": "dairy_fats"}
+    ],
+    "prep_note_en": "Marinate chicken in yogurt and spices for at least 1 hour.",
+    "prep_note_he": "להשרות את העוף ביוגורט ותבלינים לפחות שעה."
+  },
+  {
+    "id": "dinner_017",
+    "type": "dinner",
+    "name_en": "Vegan Chili",
+    "name_he": "צ׳ילי טבעוני",
+    "kcal": 480,
+    "macros": {"protein_g": 22, "carbs_g": 74, "fat_g": 10},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": [],
+    "ingredients": [
+      {"item_en": "Red kidney beans", "item_he": "שעועית אדומה", "qty": "200g", "category": "protein"},
+      {"item_en": "Black beans", "item_he": "שעועית שחורה", "qty": "150g", "category": "protein"},
+      {"item_en": "Tomatoes", "item_he": "עגבניות", "qty": "3", "category": "vegetables"},
+      {"item_en": "Bell pepper", "item_he": "פלפל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Chili powder", "item_he": "אבקת צ׳ילי", "qty": "1 tbsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_018",
+    "type": "dinner",
+    "name_en": "Fish and Chips",
+    "name_he": "פיש אנד צ׳יפס",
+    "kcal": 720,
+    "macros": {"protein_g": 32, "carbs_g": 72, "fat_g": 32},
+    "cooking_time": "medium",
+    "positive_tags": ["dairy-free"],
+    "ingredient_flags": ["contains_fish", "contains_gluten", "contains_eggs"],
+    "ingredients": [
+      {"item_en": "Cod fillet", "item_he": "פילה בקלה", "qty": "180g", "category": "protein"},
+      {"item_en": "Potatoes", "item_he": "תפוחי אדמה", "qty": "300g", "category": "vegetables"},
+      {"item_en": "Flour", "item_he": "קמח", "qty": "50g", "category": "pantry"},
+      {"item_en": "Egg", "item_he": "ביצה", "qty": "1", "category": "protein"},
+      {"item_en": "Vegetable oil", "item_he": "שמן צמחי", "qty": "3 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_019",
+    "type": "dinner",
+    "name_en": "Stuffed Sweet Potatoes",
+    "name_he": "בטטות ממולאות",
+    "kcal": 460,
+    "macros": {"protein_g": 14, "carbs_g": 72, "fat_g": 16},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": [],
+    "ingredients": [
+      {"item_en": "Sweet potatoes", "item_he": "בטטות", "qty": "2", "category": "vegetables"},
+      {"item_en": "Black beans", "item_he": "שעועית שחורה", "qty": "100g", "category": "protein"},
+      {"item_en": "Corn", "item_he": "תירס", "qty": "50g", "category": "vegetables"},
+      {"item_en": "Avocado", "item_he": "אבוקדו", "qty": "0.5", "category": "vegetables"},
+      {"item_en": "Tahini", "item_he": "טחינה", "qty": "2 tbsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_020",
+    "type": "dinner",
+    "name_en": "Grilled Lamb Chops with Chimichurri",
+    "name_he": "צלעות טלה בגריל עם צ׳ימיצ׳ורי",
+    "kcal": 620,
+    "macros": {"protein_g": 40, "carbs_g": 8, "fat_g": 48},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "keto", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_meat"],
+    "ingredients": [
+      {"item_en": "Lamb chops", "item_he": "צלעות טלה", "qty": "200g", "category": "protein"},
+      {"item_en": "Parsley", "item_he": "פטרוזיליה", "qty": "1 bunch", "category": "vegetables"},
+      {"item_en": "Garlic", "item_he": "שום", "qty": "4 cloves", "category": "vegetables"},
+      {"item_en": "Red wine vinegar", "item_he": "חומץ יין אדום", "qty": "1 tbsp", "category": "pantry"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "3 tbsp", "category": "dairy_fats"},
+      {"item_en": "Arugula", "item_he": "רוקט", "qty": "60g", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_021",
+    "type": "dinner",
+    "name_en": "Mushroom Risotto",
+    "name_he": "ריזוטו פטריות",
+    "kcal": 580,
+    "macros": {"protein_g": 16, "carbs_g": 78, "fat_g": 22},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "vegetarian", "gluten-free"],
+    "ingredient_flags": ["contains_dairy"],
+    "ingredients": [
+      {"item_en": "Arborio rice", "item_he": "אורז ארבוריו", "qty": "100g", "category": "pantry"},
+      {"item_en": "Mixed mushrooms", "item_he": "פטריות מעורבות", "qty": "200g", "category": "vegetables"},
+      {"item_en": "Parmesan", "item_he": "פרמזן", "qty": "40g", "category": "dairy_fats"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Vegetable broth", "item_he": "ציר ירקות", "qty": "500ml", "category": "pantry"},
+      {"item_en": "Butter", "item_he": "חמאה", "qty": "1 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_022",
+    "type": "dinner",
+    "name_en": "Keto Chicken Thighs with Cauliflower Mash",
+    "name_he": "ירכי עוף עם פירה כרובית קטוגני",
+    "kcal": 580,
+    "macros": {"protein_g": 40, "carbs_g": 12, "fat_g": 40},
+    "cooking_time": "medium",
+    "positive_tags": ["keto", "gluten-free"],
+    "ingredient_flags": ["contains_meat", "contains_dairy"],
+    "ingredients": [
+      {"item_en": "Chicken thighs", "item_he": "ירכי עוף", "qty": "200g", "category": "protein"},
+      {"item_en": "Cauliflower", "item_he": "כרובית", "qty": "400g", "category": "vegetables"},
+      {"item_en": "Butter", "item_he": "חמאה", "qty": "2 tbsp", "category": "dairy_fats"},
+      {"item_en": "Heavy cream", "item_he": "שמנת מתוקה", "qty": "50ml", "category": "dairy_fats"},
+      {"item_en": "Garlic", "item_he": "שום", "qty": "3 cloves", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_023",
+    "type": "dinner",
+    "name_en": "Ratatouille with Polenta",
+    "name_he": "רטטוי עם פולנטה",
+    "kcal": 440,
+    "macros": {"protein_g": 10, "carbs_g": 62, "fat_g": 18},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": [],
+    "ingredients": [
+      {"item_en": "Eggplant", "item_he": "חציל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Zucchini", "item_he": "קישוא", "qty": "2", "category": "vegetables"},
+      {"item_en": "Tomatoes", "item_he": "עגבניות", "qty": "3", "category": "vegetables"},
+      {"item_en": "Bell pepper", "item_he": "פלפל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Polenta", "item_he": "פולנטה", "qty": "80g", "category": "pantry"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "3 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_024",
+    "type": "dinner",
+    "name_en": "Teriyaki Chicken Bowl",
+    "name_he": "קערת עוף טריאקי",
+    "kcal": 620,
+    "macros": {"protein_g": 38, "carbs_g": 72, "fat_g": 20},
+    "cooking_time": "medium",
+    "positive_tags": ["dairy-free"],
+    "ingredient_flags": ["contains_meat", "contains_soy", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Chicken thigh", "item_he": "ירך עוף", "qty": "180g", "category": "protein"},
+      {"item_en": "Brown rice", "item_he": "אורז מלא", "qty": "100g", "category": "pantry"},
+      {"item_en": "Teriyaki sauce", "item_he": "רוטב טריאקי", "qty": "3 tbsp", "category": "pantry"},
+      {"item_en": "Broccoli", "item_he": "ברוקולי", "qty": "100g", "category": "vegetables"},
+      {"item_en": "Edamame", "item_he": "אדממה", "qty": "50g", "category": "protein"},
+      {"item_en": "Sesame seeds", "item_he": "שומשום", "qty": "1 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_025",
+    "type": "dinner",
+    "name_en": "Persian Saffron Chicken",
+    "name_he": "עוף פרסי בזעפרן",
+    "kcal": 560,
+    "macros": {"protein_g": 42, "carbs_g": 48, "fat_g": 20},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_meat"],
+    "ingredients": [
+      {"item_en": "Chicken thighs", "item_he": "ירכי עוף", "qty": "200g", "category": "protein"},
+      {"item_en": "Basmati rice", "item_he": "אורז בסמטי", "qty": "80g", "category": "pantry"},
+      {"item_en": "Saffron", "item_he": "זעפרן", "qty": "1 pinch", "category": "pantry"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Dried barberries", "item_he": "זרש מיובש", "qty": "20g", "category": "pantry"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_026",
+    "type": "dinner",
+    "name_en": "Vegetable Tagine with Couscous",
+    "name_he": "טאג׳ין ירקות עם קוסקוס",
+    "kcal": 480,
+    "macros": {"protein_g": 16, "carbs_g": 78, "fat_g": 14},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "dairy-free"],
+    "ingredient_flags": ["contains_gluten"],
+    "ingredients": [
+      {"item_en": "Couscous", "item_he": "קוסקוס", "qty": "80g", "category": "pantry"},
+      {"item_en": "Sweet potato", "item_he": "בטטה", "qty": "150g", "category": "vegetables"},
+      {"item_en": "Chickpeas", "item_he": "גרגרי חומוס", "qty": "150g", "category": "protein"},
+      {"item_en": "Carrot", "item_he": "גזר", "qty": "2", "category": "vegetables"},
+      {"item_en": "Dried apricots", "item_he": "משמש מיובש", "qty": "30g", "category": "pantry"},
+      {"item_en": "Ras el hanout", "item_he": "ראס אל חנות", "qty": "1 tbsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_027",
+    "type": "dinner",
+    "name_en": "Pan-Seared Tuna Steak",
+    "name_he": "סטייק טונה מושחם במחבת",
+    "kcal": 440,
+    "macros": {"protein_g": 44, "carbs_g": 24, "fat_g": 18},
+    "cooking_time": "quick",
+    "positive_tags": ["dairy-free"],
+    "ingredient_flags": ["contains_fish", "contains_soy"],
+    "ingredients": [
+      {"item_en": "Tuna steak", "item_he": "סטייק טונה", "qty": "200g", "category": "protein"},
+      {"item_en": "Quinoa", "item_he": "קינואה", "qty": "60g", "category": "pantry"},
+      {"item_en": "Baby spinach", "item_he": "תרד בייבי", "qty": "80g", "category": "vegetables"},
+      {"item_en": "Soy sauce", "item_he": "רוטב סויה", "qty": "1 tbsp", "category": "pantry"},
+      {"item_en": "Sesame oil", "item_he": "שמן שומשום", "qty": "1 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_028",
+    "type": "dinner",
+    "name_en": "Vegetarian Shepherd's Pie",
+    "name_he": "פאי רועים צמחוני",
+    "kcal": 500,
+    "macros": {"protein_g": 18, "carbs_g": 72, "fat_g": 16},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "vegetarian", "gluten-free"],
+    "ingredient_flags": ["contains_dairy"],
+    "ingredients": [
+      {"item_en": "Lentils", "item_he": "עדשים", "qty": "150g", "category": "protein"},
+      {"item_en": "Potatoes", "item_he": "תפוחי אדמה", "qty": "300g", "category": "vegetables"},
+      {"item_en": "Carrots", "item_he": "גזר", "qty": "2", "category": "vegetables"},
+      {"item_en": "Peas", "item_he": "אפונה", "qty": "100g", "category": "vegetables"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Butter", "item_he": "חמאה", "qty": "2 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_029",
+    "type": "dinner",
+    "name_en": "Turkey Meatballs in Tomato Sauce",
+    "name_he": "קציצות הודו ברוטב עגבניות",
+    "kcal": 560,
+    "macros": {"protein_g": 38, "carbs_g": 52, "fat_g": 22},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "dairy-free"],
+    "ingredient_flags": ["contains_meat", "contains_gluten", "contains_eggs"],
+    "ingredients": [
+      {"item_en": "Ground turkey", "item_he": "הודו טחון", "qty": "200g", "category": "protein"},
+      {"item_en": "Spaghetti", "item_he": "ספגטי", "qty": "80g", "category": "pantry"},
+      {"item_en": "Tomato sauce", "item_he": "רסק עגבניות", "qty": "200g", "category": "pantry"},
+      {"item_en": "Breadcrumbs", "item_he": "פירורי לחם", "qty": "30g", "category": "pantry"},
+      {"item_en": "Egg", "item_he": "ביצה", "qty": "1", "category": "protein"},
+      {"item_en": "Basil", "item_he": "בזיליקום", "qty": "5 leaves", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_030",
+    "type": "dinner",
+    "name_en": "Butternut Squash Soup with Bread",
+    "name_he": "מרק דלעת עם לחם",
+    "kcal": 380,
+    "macros": {"protein_g": 10, "carbs_g": 58, "fat_g": 14},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian"],
+    "ingredient_flags": ["contains_dairy", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Butternut squash", "item_he": "דלעת ערמונים", "qty": "400g", "category": "vegetables"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Vegetable broth", "item_he": "ציר ירקות", "qty": "500ml", "category": "pantry"},
+      {"item_en": "Cream", "item_he": "שמנת", "qty": "50ml", "category": "dairy_fats"},
+      {"item_en": "Sourdough bread", "item_he": "לחם מחמצת", "qty": "2 slices", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_031",
+    "type": "dinner",
+    "name_en": "Grilled Steak with Asparagus",
+    "name_he": "סטייק עם אספרגוס",
+    "kcal": 640,
+    "macros": {"protein_g": 44, "carbs_g": 12, "fat_g": 46},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "keto", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_meat"],
+    "ingredients": [
+      {"item_en": "Ribeye steak", "item_he": "סטייק אנטריקוט", "qty": "200g", "category": "protein"},
+      {"item_en": "Asparagus", "item_he": "אספרגוס", "qty": "200g", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"},
+      {"item_en": "Garlic", "item_he": "שום", "qty": "2 cloves", "category": "vegetables"},
+      {"item_en": "Rosemary", "item_he": "רוזמרין", "qty": "2 sprigs", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_032",
+    "type": "dinner",
+    "name_en": "Chickpea Curry with Rice",
+    "name_he": "קארי חומוס עם אורז",
+    "kcal": 520,
+    "macros": {"protein_g": 18, "carbs_g": 82, "fat_g": 14},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": [],
+    "ingredients": [
+      {"item_en": "Chickpeas", "item_he": "גרגרי חומוס", "qty": "250g", "category": "protein"},
+      {"item_en": "Basmati rice", "item_he": "אורז בסמטי", "qty": "80g", "category": "pantry"},
+      {"item_en": "Coconut milk", "item_he": "חלב קוקוס", "qty": "200ml", "category": "pantry"},
+      {"item_en": "Tomatoes", "item_he": "עגבניות", "qty": "2", "category": "vegetables"},
+      {"item_en": "Curry powder", "item_he": "אבקת קארי", "qty": "1 tbsp", "category": "pantry"},
+      {"item_en": "Spinach", "item_he": "תרד", "qty": "100g", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_033",
+    "type": "dinner",
+    "name_en": "Greek Gyros Plate",
+    "name_he": "צלחת גירוס יווני",
+    "kcal": 680,
+    "macros": {"protein_g": 38, "carbs_g": 56, "fat_g": 32},
+    "cooking_time": "medium",
+    "positive_tags": [],
+    "ingredient_flags": ["contains_meat", "contains_dairy", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Pork-free gyros (chicken)", "item_he": "גירוס עוף", "qty": "180g", "category": "protein"},
+      {"item_en": "Pita", "item_he": "פיתה", "qty": "1", "category": "pantry"},
+      {"item_en": "Tzatziki", "item_he": "צזיקי", "qty": "80g", "category": "dairy_fats"},
+      {"item_en": "Tomato", "item_he": "עגבנייה", "qty": "1", "category": "vegetables"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "0.5", "category": "vegetables"},
+      {"item_en": "French fries", "item_he": "צ׳יפס", "qty": "100g", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_034",
+    "type": "dinner",
+    "name_en": "Baked Tilapia with Herbs",
+    "name_he": "טילפיה בתנור עם עשבי תיבול",
+    "kcal": 420,
+    "macros": {"protein_g": 38, "carbs_g": 26, "fat_g": 18},
+    "cooking_time": "medium",
+    "positive_tags": ["gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_fish"],
+    "ingredients": [
+      {"item_en": "Tilapia fillet", "item_he": "פילה טילפיה", "qty": "200g", "category": "protein"},
+      {"item_en": "Rice", "item_he": "אורז", "qty": "70g", "category": "pantry"},
+      {"item_en": "Green beans", "item_he": "שעועית ירוקה", "qty": "120g", "category": "vegetables"},
+      {"item_en": "Lemon", "item_he": "לימון", "qty": "1", "category": "pantry"},
+      {"item_en": "Dill", "item_he": "שמיר", "qty": "1 bunch", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_035",
+    "type": "dinner",
+    "name_en": "Vegan Burrito Bowl",
+    "name_he": "קערת בוריטו טבעונית",
+    "kcal": 520,
+    "macros": {"protein_g": 18, "carbs_g": 74, "fat_g": 18},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": [],
+    "ingredients": [
+      {"item_en": "Brown rice", "item_he": "אורז מלא", "qty": "100g", "category": "pantry"},
+      {"item_en": "Black beans", "item_he": "שעועית שחורה", "qty": "150g", "category": "protein"},
+      {"item_en": "Corn", "item_he": "תירס", "qty": "60g", "category": "vegetables"},
+      {"item_en": "Avocado", "item_he": "אבוקדו", "qty": "0.5", "category": "vegetables"},
+      {"item_en": "Salsa", "item_he": "סלסה", "qty": "3 tbsp", "category": "pantry"},
+      {"item_en": "Lime", "item_he": "ליים", "qty": "0.5", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_036",
+    "type": "dinner",
+    "name_en": "Chicken Piccata",
+    "name_he": "עוף פיקטה",
+    "kcal": 560,
+    "macros": {"protein_g": 40, "carbs_g": 32, "fat_g": 28},
+    "cooking_time": "medium",
+    "positive_tags": [],
+    "ingredient_flags": ["contains_meat", "contains_dairy", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Chicken breast", "item_he": "חזה עוף", "qty": "180g", "category": "protein"},
+      {"item_en": "Pasta", "item_he": "פסטה", "qty": "80g", "category": "pantry"},
+      {"item_en": "Capers", "item_he": "צלפים", "qty": "2 tbsp", "category": "pantry"},
+      {"item_en": "Lemon", "item_he": "לימון", "qty": "1", "category": "pantry"},
+      {"item_en": "Butter", "item_he": "חמאה", "qty": "2 tbsp", "category": "dairy_fats"},
+      {"item_en": "Parsley", "item_he": "פטרוזיליה", "qty": "1 bunch", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_037",
+    "type": "dinner",
+    "name_en": "Eggplant and Chickpea Stew",
+    "name_he": "תבשיל חציל וחומוס",
+    "kcal": 440,
+    "macros": {"protein_g": 14, "carbs_g": 58, "fat_g": 18},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": [],
+    "ingredients": [
+      {"item_en": "Eggplant", "item_he": "חציל", "qty": "2", "category": "vegetables"},
+      {"item_en": "Chickpeas", "item_he": "גרגרי חומוס", "qty": "200g", "category": "protein"},
+      {"item_en": "Tomatoes", "item_he": "עגבניות", "qty": "2", "category": "vegetables"},
+      {"item_en": "Onion", "item_he": "בצל", "qty": "1", "category": "vegetables"},
+      {"item_en": "Pine nuts", "item_he": "צנוברים", "qty": "20g", "category": "dairy_fats"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_038",
+    "type": "dinner",
+    "name_en": "Baked Ziti",
+    "name_he": "זיטי בתנור",
+    "kcal": 640,
+    "macros": {"protein_g": 26, "carbs_g": 82, "fat_g": 22},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "vegetarian"],
+    "ingredient_flags": ["contains_dairy", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Ziti pasta", "item_he": "פסטה זיטי", "qty": "120g", "category": "pantry"},
+      {"item_en": "Marinara sauce", "item_he": "רוטב מרינרה", "qty": "200g", "category": "pantry"},
+      {"item_en": "Ricotta", "item_he": "ריקוטה", "qty": "100g", "category": "dairy_fats"},
+      {"item_en": "Mozzarella", "item_he": "מוצרלה", "qty": "80g", "category": "dairy_fats"},
+      {"item_en": "Parmesan", "item_he": "פרמזן", "qty": "30g", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_039",
+    "type": "dinner",
+    "name_en": "Stuffed Portobello Mushrooms",
+    "name_he": "פטריות פורטובלו ממולאות",
+    "kcal": 420,
+    "macros": {"protein_g": 18, "carbs_g": 32, "fat_g": 24},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "gluten-free"],
+    "ingredient_flags": ["contains_dairy"],
+    "ingredients": [
+      {"item_en": "Portobello mushrooms", "item_he": "פטריות פורטובלו", "qty": "4", "category": "vegetables"},
+      {"item_en": "Quinoa", "item_he": "קינואה", "qty": "60g", "category": "pantry"},
+      {"item_en": "Goat cheese", "item_he": "גבינת עיזים", "qty": "80g", "category": "dairy_fats"},
+      {"item_en": "Spinach", "item_he": "תרד", "qty": "100g", "category": "vegetables"},
+      {"item_en": "Garlic", "item_he": "שום", "qty": "2 cloves", "category": "vegetables"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "2 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "dinner_040",
+    "type": "dinner",
+    "name_en": "Beef Bourguignon",
+    "name_he": "בקר בורגיניון",
+    "kcal": 720,
+    "macros": {"protein_g": 44, "carbs_g": 32, "fat_g": 44},
+    "cooking_time": "elaborate",
+    "positive_tags": ["kosher", "dairy-free"],
+    "ingredient_flags": ["contains_meat"],
+    "ingredients": [
+      {"item_en": "Beef chuck", "item_he": "צלעות בקר", "qty": "250g", "category": "protein"},
+      {"item_en": "Red wine", "item_he": "יין אדום", "qty": "200ml", "category": "pantry"},
+      {"item_en": "Carrots", "item_he": "גזר", "qty": "2", "category": "vegetables"},
+      {"item_en": "Pearl onions", "item_he": "בצלצלי שאלוט", "qty": "100g", "category": "vegetables"},
+      {"item_en": "Mushrooms", "item_he": "פטריות", "qty": "150g", "category": "vegetables"},
+      {"item_en": "Beef broth", "item_he": "ציר בקר", "qty": "300ml", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_001",
+    "type": "snack",
+    "name_en": "Hummus with Carrots",
+    "name_he": "חומוס עם גזרים",
+    "kcal": 220,
+    "macros": {"protein_g": 8, "carbs_g": 22, "fat_g": 12},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": [],
+    "ingredients": [
+      {"item_en": "Hummus", "item_he": "חומוס", "qty": "80g", "category": "pantry"},
+      {"item_en": "Baby carrots", "item_he": "גזר בייבי", "qty": "120g", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_002",
+    "type": "snack",
+    "name_en": "Greek Yogurt with Honey",
+    "name_he": "יוגורט יווני עם דבש",
+    "kcal": 180,
+    "macros": {"protein_g": 14, "carbs_g": 22, "fat_g": 4},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "gluten-free"],
+    "ingredient_flags": ["contains_dairy"],
+    "ingredients": [
+      {"item_en": "Greek yogurt", "item_he": "יוגורט יווני", "qty": "150g", "category": "dairy_fats"},
+      {"item_en": "Honey", "item_he": "דבש", "qty": "1 tbsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_003",
+    "type": "snack",
+    "name_en": "Apple with Almond Butter",
+    "name_he": "תפוח עם חמאת שקדים",
+    "kcal": 230,
+    "macros": {"protein_g": 6, "carbs_g": 30, "fat_g": 12},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_nuts"],
+    "ingredients": [
+      {"item_en": "Apple", "item_he": "תפוח", "qty": "1", "category": "vegetables"},
+      {"item_en": "Almond butter", "item_he": "חמאת שקדים", "qty": "1 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_004",
+    "type": "snack",
+    "name_en": "Mixed Nuts",
+    "name_he": "אגוזים מעורבים",
+    "kcal": 280,
+    "macros": {"protein_g": 10, "carbs_g": 10, "fat_g": 24},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "keto", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_nuts"],
+    "ingredients": [
+      {"item_en": "Almonds", "item_he": "שקדים", "qty": "20g", "category": "dairy_fats"},
+      {"item_en": "Walnuts", "item_he": "אגוזי מלך", "qty": "20g", "category": "dairy_fats"},
+      {"item_en": "Cashews", "item_he": "קשיו", "qty": "20g", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_005",
+    "type": "snack",
+    "name_en": "Bamba",
+    "name_he": "במבה",
+    "kcal": 160,
+    "macros": {"protein_g": 4, "carbs_g": 14, "fat_g": 10},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "dairy-free"],
+    "ingredient_flags": ["contains_nuts"],
+    "ingredients": [
+      {"item_en": "Bamba", "item_he": "במבה", "qty": "30g", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_006",
+    "type": "snack",
+    "name_en": "Cottage Cheese with Peach",
+    "name_he": "קוטג׳ עם אפרסק",
+    "kcal": 180,
+    "macros": {"protein_g": 16, "carbs_g": 16, "fat_g": 6},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "gluten-free"],
+    "ingredient_flags": ["contains_dairy"],
+    "ingredients": [
+      {"item_en": "Cottage cheese 5%", "item_he": "קוטג׳ 5%", "qty": "150g", "category": "dairy_fats"},
+      {"item_en": "Peach", "item_he": "אפרסק", "qty": "1", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_007",
+    "type": "snack",
+    "name_en": "Rice Cakes with Avocado",
+    "name_he": "פריכיות אורז עם אבוקדו",
+    "kcal": 210,
+    "macros": {"protein_g": 4, "carbs_g": 26, "fat_g": 12},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": [],
+    "ingredients": [
+      {"item_en": "Rice cakes", "item_he": "פריכיות אורז", "qty": "3", "category": "pantry"},
+      {"item_en": "Avocado", "item_he": "אבוקדו", "qty": "0.5", "category": "vegetables"},
+      {"item_en": "Lemon juice", "item_he": "מיץ לימון", "qty": "1 tsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_008",
+    "type": "snack",
+    "name_en": "Protein Bar",
+    "name_he": "חטיף חלבון",
+    "kcal": 240,
+    "macros": {"protein_g": 20, "carbs_g": 24, "fat_g": 8},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian"],
+    "ingredient_flags": ["contains_dairy", "contains_nuts", "contains_soy"],
+    "ingredients": [
+      {"item_en": "Protein bar", "item_he": "חטיף חלבון", "qty": "1", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_009",
+    "type": "snack",
+    "name_en": "Edamame with Sea Salt",
+    "name_he": "אדממה עם מלח ים",
+    "kcal": 180,
+    "macros": {"protein_g": 16, "carbs_g": 14, "fat_g": 8},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_soy"],
+    "ingredients": [
+      {"item_en": "Edamame in pods", "item_he": "אדממה בתרמילים", "qty": "150g", "category": "protein"},
+      {"item_en": "Sea salt", "item_he": "מלח ים", "qty": "1 tsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_010",
+    "type": "snack",
+    "name_en": "Labneh with Za'atar",
+    "name_he": "לבנה עם זעתר",
+    "kcal": 220,
+    "macros": {"protein_g": 10, "carbs_g": 6, "fat_g": 18},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "keto", "gluten-free"],
+    "ingredient_flags": ["contains_dairy"],
+    "ingredients": [
+      {"item_en": "Labneh", "item_he": "לבנה", "qty": "100g", "category": "dairy_fats"},
+      {"item_en": "Za'atar", "item_he": "זעתר", "qty": "1 tbsp", "category": "pantry"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "1 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_011",
+    "type": "snack",
+    "name_en": "Dark Chocolate Square",
+    "name_he": "קוביית שוקולד מריר",
+    "kcal": 120,
+    "macros": {"protein_g": 2, "carbs_g": 12, "fat_g": 8},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian"],
+    "ingredient_flags": ["contains_dairy"],
+    "ingredients": [
+      {"item_en": "Dark chocolate 70%", "item_he": "שוקולד מריר 70%", "qty": "20g", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_012",
+    "type": "snack",
+    "name_en": "Tuna Salad on Crackers",
+    "name_he": "סלט טונה על קרקרים",
+    "kcal": 260,
+    "macros": {"protein_g": 18, "carbs_g": 22, "fat_g": 10},
+    "cooking_time": "quick",
+    "positive_tags": [],
+    "ingredient_flags": ["contains_fish", "contains_gluten", "contains_eggs"],
+    "ingredients": [
+      {"item_en": "Canned tuna", "item_he": "טונה משומרת", "qty": "80g", "category": "protein"},
+      {"item_en": "Crackers", "item_he": "קרקרים", "qty": "6", "category": "pantry"},
+      {"item_en": "Mayonnaise", "item_he": "מיונז", "qty": "1 tsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_013",
+    "type": "snack",
+    "name_en": "Banana with Peanut Butter",
+    "name_he": "בננה עם חמאת בוטנים",
+    "kcal": 260,
+    "macros": {"protein_g": 8, "carbs_g": 32, "fat_g": 12},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_nuts"],
+    "ingredients": [
+      {"item_en": "Banana", "item_he": "בננה", "qty": "1", "category": "vegetables"},
+      {"item_en": "Peanut butter", "item_he": "חמאת בוטנים", "qty": "1 tbsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_014",
+    "type": "snack",
+    "name_en": "Stuffed Dates with Nuts",
+    "name_he": "תמרים ממולאים באגוזים",
+    "kcal": 220,
+    "macros": {"protein_g": 4, "carbs_g": 38, "fat_g": 8},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_nuts"],
+    "ingredients": [
+      {"item_en": "Medjool dates", "item_he": "תמרים מג׳הול", "qty": "4", "category": "pantry"},
+      {"item_en": "Almonds", "item_he": "שקדים", "qty": "15g", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_015",
+    "type": "snack",
+    "name_en": "Hard-Boiled Eggs",
+    "name_he": "ביצים קשות",
+    "kcal": 160,
+    "macros": {"protein_g": 14, "carbs_g": 2, "fat_g": 10},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "keto", "gluten-free"],
+    "ingredient_flags": ["contains_eggs"],
+    "ingredients": [
+      {"item_en": "Eggs", "item_he": "ביצים", "qty": "2", "category": "protein"},
+      {"item_en": "Salt", "item_he": "מלח", "qty": "1 pinch", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_016",
+    "type": "snack",
+    "name_en": "Roasted Chickpeas",
+    "name_he": "גרגרי חומוס קלויים",
+    "kcal": 180,
+    "macros": {"protein_g": 8, "carbs_g": 22, "fat_g": 8},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": [],
+    "ingredients": [
+      {"item_en": "Chickpeas", "item_he": "גרגרי חומוס", "qty": "100g", "category": "protein"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "1 tbsp", "category": "dairy_fats"},
+      {"item_en": "Paprika", "item_he": "פפריקה", "qty": "1 tsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_017",
+    "type": "snack",
+    "name_en": "Smoothie with Berries",
+    "name_he": "שייק עם פירות יער",
+    "kcal": 220,
+    "macros": {"protein_g": 8, "carbs_g": 38, "fat_g": 4},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "gluten-free"],
+    "ingredient_flags": ["contains_dairy"],
+    "ingredients": [
+      {"item_en": "Mixed berries", "item_he": "פירות יער", "qty": "150g", "category": "vegetables"},
+      {"item_en": "Milk", "item_he": "חלב", "qty": "200ml", "category": "dairy_fats"},
+      {"item_en": "Banana", "item_he": "בננה", "qty": "0.5", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_018",
+    "type": "snack",
+    "name_en": "Popcorn",
+    "name_he": "פופקורן",
+    "kcal": 160,
+    "macros": {"protein_g": 4, "carbs_g": 22, "fat_g": 6},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": [],
+    "ingredients": [
+      {"item_en": "Popcorn kernels", "item_he": "גרעיני פופקורן", "qty": "30g", "category": "pantry"},
+      {"item_en": "Olive oil", "item_he": "שמן זית", "qty": "1 tsp", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_019",
+    "type": "snack",
+    "name_en": "Cheese and Olives Plate",
+    "name_he": "צלחת גבינות וזיתים",
+    "kcal": 280,
+    "macros": {"protein_g": 14, "carbs_g": 4, "fat_g": 24},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "keto", "gluten-free"],
+    "ingredient_flags": ["contains_dairy"],
+    "ingredients": [
+      {"item_en": "Feta cheese", "item_he": "גבינת פטה", "qty": "60g", "category": "dairy_fats"},
+      {"item_en": "Kalamata olives", "item_he": "זיתי קלמטה", "qty": "40g", "category": "dairy_fats"},
+      {"item_en": "Cherry tomatoes", "item_he": "עגבניות שרי", "qty": "80g", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_020",
+    "type": "snack",
+    "name_en": "Trail Mix",
+    "name_he": "תערובת גרנולה",
+    "kcal": 260,
+    "macros": {"protein_g": 6, "carbs_g": 30, "fat_g": 14},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": ["contains_nuts"],
+    "ingredients": [
+      {"item_en": "Almonds", "item_he": "שקדים", "qty": "15g", "category": "dairy_fats"},
+      {"item_en": "Dried cranberries", "item_he": "חמוציות מיובשות", "qty": "20g", "category": "pantry"},
+      {"item_en": "Pumpkin seeds", "item_he": "גרעיני דלעת", "qty": "15g", "category": "dairy_fats"},
+      {"item_en": "Dark chocolate chips", "item_he": "שוקולד צ׳יפס מריר", "qty": "10g", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_021",
+    "type": "snack",
+    "name_en": "Tahini Cookies",
+    "name_he": "עוגיות טחינה",
+    "kcal": 240,
+    "macros": {"protein_g": 6, "carbs_g": 26, "fat_g": 14},
+    "cooking_time": "medium",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "dairy-free"],
+    "ingredient_flags": ["contains_gluten"],
+    "ingredients": [
+      {"item_en": "Tahini cookies", "item_he": "עוגיות טחינה", "qty": "3", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_022",
+    "type": "snack",
+    "name_en": "Veggie Sticks with Tzatziki",
+    "name_he": "מקלות ירקות עם צזיקי",
+    "kcal": 160,
+    "macros": {"protein_g": 6, "carbs_g": 14, "fat_g": 8},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "gluten-free"],
+    "ingredient_flags": ["contains_dairy"],
+    "ingredients": [
+      {"item_en": "Cucumber", "item_he": "מלפפון", "qty": "1", "category": "vegetables"},
+      {"item_en": "Carrot", "item_he": "גזר", "qty": "1", "category": "vegetables"},
+      {"item_en": "Bell pepper", "item_he": "פלפל", "qty": "0.5", "category": "vegetables"},
+      {"item_en": "Tzatziki", "item_he": "צזיקי", "qty": "60g", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_023",
+    "type": "snack",
+    "name_en": "Chia Seed Pudding",
+    "name_he": "פודינג צ׳יה",
+    "kcal": 220,
+    "macros": {"protein_g": 6, "carbs_g": 26, "fat_g": 10},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": [],
+    "ingredients": [
+      {"item_en": "Chia seeds", "item_he": "זרעי צ׳יה", "qty": "20g", "category": "pantry"},
+      {"item_en": "Almond milk", "item_he": "חלב שקדים", "qty": "200ml", "category": "pantry"},
+      {"item_en": "Maple syrup", "item_he": "סירופ מייפל", "qty": "1 tsp", "category": "pantry"}
+    ],
+    "prep_note_en": "Soak chia seeds overnight in almond milk.",
+    "prep_note_he": "להשרות זרעי צ׳יה בחלב שקדים למשך הלילה."
+  },
+  {
+    "id": "snack_024",
+    "type": "snack",
+    "name_en": "Turkey and Cheese Roll-Ups",
+    "name_he": "רולים של הודו וגבינה",
+    "kcal": 220,
+    "macros": {"protein_g": 20, "carbs_g": 4, "fat_g": 14},
+    "cooking_time": "quick",
+    "positive_tags": ["keto", "gluten-free"],
+    "ingredient_flags": ["contains_meat", "contains_dairy"],
+    "ingredients": [
+      {"item_en": "Turkey slices", "item_he": "פרוסות הודו", "qty": "80g", "category": "protein"},
+      {"item_en": "Cheddar cheese slices", "item_he": "פרוסות צ׳דר", "qty": "40g", "category": "dairy_fats"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_025",
+    "type": "snack",
+    "name_en": "Fruit Salad",
+    "name_he": "סלט פירות",
+    "kcal": 140,
+    "macros": {"protein_g": 2, "carbs_g": 34, "fat_g": 1},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+    "ingredient_flags": [],
+    "ingredients": [
+      {"item_en": "Apple", "item_he": "תפוח", "qty": "0.5", "category": "vegetables"},
+      {"item_en": "Pear", "item_he": "אגס", "qty": "0.5", "category": "vegetables"},
+      {"item_en": "Grapes", "item_he": "ענבים", "qty": "80g", "category": "vegetables"},
+      {"item_en": "Strawberries", "item_he": "תותים", "qty": "60g", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_026",
+    "type": "snack",
+    "name_en": "Pretzels with Mustard",
+    "name_he": "בייגלה עם חרדל",
+    "kcal": 180,
+    "macros": {"protein_g": 4, "carbs_g": 32, "fat_g": 4},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "dairy-free"],
+    "ingredient_flags": ["contains_gluten"],
+    "ingredients": [
+      {"item_en": "Pretzels", "item_he": "בייגלה", "qty": "40g", "category": "pantry"},
+      {"item_en": "Mustard", "item_he": "חרדל", "qty": "1 tbsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_027",
+    "type": "snack",
+    "name_en": "Avocado with Everything Bagel Seasoning",
+    "name_he": "אבוקדו עם תבלין בייגל",
+    "kcal": 240,
+    "macros": {"protein_g": 4, "carbs_g": 14, "fat_g": 20},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "keto", "gluten-free", "dairy-free"],
+    "ingredient_flags": [],
+    "ingredients": [
+      {"item_en": "Avocado", "item_he": "אבוקדו", "qty": "1", "category": "vegetables"},
+      {"item_en": "Everything bagel seasoning", "item_he": "תבלין בייגל", "qty": "1 tbsp", "category": "pantry"},
+      {"item_en": "Lemon juice", "item_he": "מיץ לימון", "qty": "1 tsp", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_028",
+    "type": "snack",
+    "name_en": "Energy Balls",
+    "name_he": "כדורי אנרגיה",
+    "kcal": 260,
+    "macros": {"protein_g": 6, "carbs_g": 34, "fat_g": 12},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "dairy-free"],
+    "ingredient_flags": ["contains_nuts", "contains_gluten"],
+    "ingredients": [
+      {"item_en": "Rolled oats", "item_he": "שיבולת שועל", "qty": "30g", "category": "pantry"},
+      {"item_en": "Peanut butter", "item_he": "חמאת בוטנים", "qty": "1 tbsp", "category": "dairy_fats"},
+      {"item_en": "Honey", "item_he": "דבש", "qty": "1 tbsp", "category": "pantry"},
+      {"item_en": "Dark chocolate chips", "item_he": "שוקולד צ׳יפס מריר", "qty": "10g", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_029",
+    "type": "snack",
+    "name_en": "Pita Chips with Baba Ghanoush",
+    "name_he": "פיתה פריכה עם חציל בטחינה",
+    "kcal": 260,
+    "macros": {"protein_g": 6, "carbs_g": 30, "fat_g": 14},
+    "cooking_time": "quick",
+    "positive_tags": ["kosher", "vegetarian", "vegan", "dairy-free"],
+    "ingredient_flags": ["contains_gluten"],
+    "ingredients": [
+      {"item_en": "Pita chips", "item_he": "פיתה פריכה", "qty": "40g", "category": "pantry"},
+      {"item_en": "Baba ghanoush", "item_he": "חציל בטחינה", "qty": "80g", "category": "pantry"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  },
+  {
+    "id": "snack_030",
+    "type": "snack",
+    "name_en": "Cucumber and Salmon Bites",
+    "name_he": "ביסים של מלפפון וסלמון",
+    "kcal": 180,
+    "macros": {"protein_g": 14, "carbs_g": 4, "fat_g": 12},
+    "cooking_time": "quick",
+    "positive_tags": ["keto", "gluten-free"],
+    "ingredient_flags": ["contains_fish", "contains_dairy"],
+    "ingredients": [
+      {"item_en": "Cucumber", "item_he": "מלפפון", "qty": "1", "category": "vegetables"},
+      {"item_en": "Smoked salmon", "item_he": "סלמון מעושן", "qty": "50g", "category": "protein"},
+      {"item_en": "Cream cheese", "item_he": "גבינת שמנת", "qty": "30g", "category": "dairy_fats"},
+      {"item_en": "Dill", "item_he": "שמיר", "qty": "1 tsp", "category": "vegetables"}
+    ],
+    "prep_note_en": null,
+    "prep_note_he": null
+  }
+]
