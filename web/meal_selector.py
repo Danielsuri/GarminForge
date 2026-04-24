@@ -35,11 +35,7 @@ _ALLERGY_FLAGS: dict[str, str] = {
     "soy": "contains_soy",
     "shellfish": "contains_shellfish",
     "fish": "contains_fish",
-    "sesame": "contains_sesame",
 }
-
-_COOKING_ORDER = {"quick": 0, "medium": 1, "elaborate": 2}
-
 
 def load_pool() -> list[dict[str, Any]]:
     """Load meal pool from JSON, caching after first load."""
@@ -54,7 +50,13 @@ def filter_pool(
     allergies: list[str],
     cooking_time: str,
 ) -> list[dict[str, Any]]:
-    """Return meals eligible for this user profile."""
+    """Return meals eligible for this user profile.
+
+    Cooking-time filter: only ``"quick"`` is a hard constraint (non-quick meals
+    are excluded).  ``"medium"`` and ``"elaborate"`` accept all cooking times —
+    this is intentional so that users who can cook medium/elaborate dishes still
+    see quick-prep options alongside longer ones.
+    """
     kosher = "kosher" in allergies
 
     # Flags to exclude based on non-kosher allergies
@@ -195,4 +197,4 @@ def extract_reminders(
                 reminders.append({"day": reminder_day, "text": note})
                 break  # one reminder per day
 
-    return reminders[:max_reminders]
+    return reminders
