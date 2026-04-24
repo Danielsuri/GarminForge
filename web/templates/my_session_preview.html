@@ -363,7 +363,7 @@
                 <div style="width:7px;height:7px;border-radius:50%;background:{{ dot_colors.get(meal.type, '#a78bfa') }};flex-shrink:0"></div>
                 <div style="flex:1;min-width:0">
                   <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.3)">{{ t("meal_" + meal.type) }}</div>
-                  <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ meal.name }}</div>
+                  <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ (meal.name_he if lang == "he" else meal.name_en) or meal.name }}</div>
                 </div>
                 {% if meal.get('kcal') %}<div style="font-size:11px;color:rgba(255,255,255,.3);white-space:nowrap">{{ meal.kcal }} kcal</div>{% endif %}
               </div>

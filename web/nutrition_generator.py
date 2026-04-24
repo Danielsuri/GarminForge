@@ -105,6 +105,8 @@ def _build_plan_json(
             meals_out.append({
                 "type": meal.get("type", ""),
                 "name": meal.get(name_key, meal.get("name_en", "")),
+                "name_en": meal.get("name_en", ""),
+                "name_he": meal.get("name_he", ""),
                 "kcal": meal.get("kcal"),
                 "macros": meal.get("macros"),
             })
