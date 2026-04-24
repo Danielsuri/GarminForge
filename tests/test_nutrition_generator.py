@@ -221,3 +221,50 @@ def test_get_todays_reminder(db: Session) -> None:
     db.commit()
     assert get_todays_reminder(plan, today=date(2026, 4, 11)) == "Defrost salmon"
     assert get_todays_reminder(plan, today=date(2026, 4, 12)) is None
+
+
+def test_generate_includes_pending_suggestion(db: Session) -> None:
+    from web.models import MealSuggestion
+
+    user = _make_user(db)
+
+    # A custom meal not in the static pool
+    custom_meal = {
+        "id": "suggestion_abc12345",
+        "type": "breakfast",
+        "name_en": "Custom oatmeal",
+        "name_he": "שיבולת מותאמת",
+        "kcal": 350,
+        "macros": {"protein_g": 10, "carbs_g": 60, "fat_g": 8},
+        "cooking_time": "quick",
+        "positive_tags": ["vegan", "kosher"],
+        "ingredient_flags": ["contains_gluten"],
+        "ingredients": [
+            {"item_en": "Oats", "item_he": "שיבולת", "qty": "80g", "category": "pantry"}
+        ],
+        "prep_note_en": None,
+        "prep_note_he": None,
+    }
+    db.add(MealSuggestion(user_id=user.id, meal_json=json.dumps(custom_meal)))
+    db.commit()
+
+    # Selection response picks the custom meal
+    selection = json.dumps({
+        "days": [{"date": "2026-04-12", "meals": [
+            {"type": "breakfast", "meal_id": "suggestion_abc12345"},
+        ]}]
+    })
+
+    mock_provider = MagicMock()
+    mock_provider.complete.return_value = selection
+    with patch("web.nutrition_generator.get_ai_provider", return_value=mock_provider):
+        with patch("web.nutrition_generator.load_pool", return_value=POOL_FIXTURE):
+            with patch("web.nutrition_generator.date") as md:
+                md.today.return_value = date(2026, 4, 18)
+                md.fromisoformat = date.fromisoformat
+                md.fromordinal = date.fromordinal
+                plan = generate_weekly_plan(user, db)
+
+    data = json.loads(plan.plan_json)
+    names = [m["name"] for m in data["days"][0]["meals"]]
+    assert "Custom oatmeal" in names

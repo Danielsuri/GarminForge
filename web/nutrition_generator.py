@@ -136,7 +136,7 @@ def generate_weekly_plan(user: User, db: Session) -> NutritionPlan:
     db.refresh(plan)
 
     try:
-        profile, _, goals, _, lang = _user_context(user)
+        profile, diet, goals, health, lang = _user_context(user)
         eligible = _get_eligible_meals(user, db)
 
         week_dates = [
@@ -145,7 +145,7 @@ def generate_weekly_plan(user: User, db: Session) -> NutritionPlan:
 
         prompt = build_selection_prompt(
             eligible=eligible,
-            goals=goals,
+            goals=goals + diet + health,
             meals_per_day=profile.get("meals_per_day", 3),
             week_dates=week_dates,
         )
