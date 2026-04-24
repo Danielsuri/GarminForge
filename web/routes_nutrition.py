@@ -24,7 +24,7 @@ from sqlalchemy.orm import Session
 
 from web.auth_utils import require_user
 from web.db import get_db
-from web.models import Notification, NutritionPlan, User
+from web.models import MealSuggestion, Notification, NutritionPlan, User
 from web.nutrition_generator import generate_weekly_plan, last_sunday
 from web.rendering import render_template
 
@@ -43,6 +43,14 @@ class NutritionProfileBody(BaseModel):
 
 class PushSubscriptionBody(BaseModel):
     subscription: dict[str, Any]
+
+
+class SuggestMealBody(BaseModel):
+    description: str
+
+
+class ConfirmSuggestionBody(BaseModel):
+    meal_json: dict[str, Any]
 
 
 def _send_pending_push(user: User, db: Session) -> None:
@@ -244,3 +252,71 @@ async def mark_read(
     notif.read_at = datetime.utcnow()
     db.commit()
     return JSONResponse({"status": "ok"})
+
+
+_ENRICH_PROMPT = """\
+Given this meal description, return a single JSON object with exactly these fields:
+name_en, name_he, type (breakfast|lunch|dinner|snack),
+kcal (integer), macros ({{protein_g, carbs_g, fat_g}} integers),
+cooking_time (quick|medium|elaborate),
+positive_tags (array, subset of: kosher/vegetarian/vegan/keto/gluten-free/dairy-free),
+ingredient_flags (array, subset of: contains_meat/contains_dairy/contains_pork/\
+contains_shellfish/contains_gluten/contains_eggs/contains_nuts/contains_soy/contains_fish),
+ingredients (array of {{item_en, item_he, qty, category}}),
+prep_note_en (string or null), prep_note_he (string or null).
+
+No explanation. Raw JSON only.
+Meal description: "{user_input}" """
+
+
+@router.post("/nutrition/suggest")
+async def suggest_meal(
+    body: SuggestMealBody,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> JSONResponse:
+    """Enrich a natural-language meal description via Claude and return structured JSON."""
+    user = require_user(request, db)
+    if user is None:
+        raise HTTPException(status_code=401)
+    if not body.description.strip():
+        raise HTTPException(status_code=400, detail="description is required")
+
+    from web.ai_provider import get_ai_provider
+
+    prompt = _ENRICH_PROMPT.format(user_input=body.description.replace('"', "'"))
+    try:
+        raw = get_ai_provider().complete(prompt)
+        meal_data = json.loads(raw)
+    except Exception as exc:
+        logger.error("Meal enrichment failed: %s", exc)
+        raise HTTPException(status_code=502, detail="AI enrichment failed")
+
+    # Assign a temporary ID (will be replaced at graduation)
+    import uuid as _uuid_mod
+
+    meal_data["id"] = f"suggestion_{_uuid_mod.uuid4().hex[:8]}"
+    meal_data["type"] = meal_data.get("type", "dinner")
+
+    return JSONResponse(meal_data)
+
+
+@router.post("/nutrition/suggest/confirm")
+async def confirm_suggestion(
+    body: ConfirmSuggestionBody,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> JSONResponse:
+    """Save a confirmed meal suggestion as a pending MealSuggestion row."""
+    user = require_user(request, db)
+    if user is None:
+        raise HTTPException(status_code=401)
+
+    suggestion = MealSuggestion(
+        user_id=user.id,
+        status="pending",
+        meal_json=json.dumps(body.meal_json),
+    )
+    db.add(suggestion)
+    db.commit()
+    return JSONResponse({"status": "ok", "id": suggestion.id})
