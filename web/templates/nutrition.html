@@ -14,20 +14,25 @@
     </div>
   </div>
 
-  <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.3);margin-bottom:24px">
-    ✨ {{ t("nutrition_last_generated") }}: {{ plan.generated_at.strftime("%b %d, %Y at %H:%M") if plan.generated_at else "—" }}
-    <div class="ms-auto d-flex gap-2">
-      <button data-bs-toggle="modal" data-bs-target="#nutritionWizardModal"
-              style="padding:4px 12px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:rgba(255,255,255,.5);cursor:pointer">
-        ⚙ {{ t("nutrition_edit_prefs") }}
-      </button>
-      <form action="/nutrition/regenerate" method="POST">
-        <button type="submit" style="padding:4px 12px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid rgba(124,58,237,.3);background:rgba(124,58,237,.1);color:#a78bfa;cursor:pointer">
-          {{ t("nutrition_regenerate") }}
+    <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,.3);margin-bottom:24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      ✨ {{ t("nutrition_last_generated") }}: {{ plan.generated_at.strftime("%b %d, %Y at %H:%M") if plan.generated_at else "—" }}
+      <div class="ms-auto d-flex gap-2">
+        <button data-bs-toggle="modal" data-bs-target="#nutritionWizardModal"
+                style="padding:4px 12px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:rgba(255,255,255,.5);cursor:pointer">
+          ⚙ {{ t("nutrition_edit_prefs") }}
         </button>
-      </form>
+        <button type="button"
+                data-bs-toggle="modal" data-bs-target="#suggestMealModal"
+                style="padding:4px 12px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid rgba(16,163,74,.3);background:rgba(16,163,74,.1);color:#4ade80;cursor:pointer">
+          + {{ t("nutrition_suggest_btn") }}
+        </button>
+        <form action="/nutrition/regenerate" method="POST" style="display:inline">
+          <button type="submit" style="padding:4px 12px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid rgba(124,58,237,.3);background:rgba(124,58,237,.1);color:#a78bfa;cursor:pointer">
+            {{ t("nutrition_regenerate") }}
+          </button>
+        </form>
+      </div>
     </div>
-  </div>
 
   {% if plan.status == "generating" %}
     <meta http-equiv="refresh" content="4">
@@ -407,6 +412,119 @@ if('serviceWorker' in navigator && 'PushManager' in navigator){
       .catch(function(){btn.disabled=false;btn.textContent='Try again';});
   }
   _upd();
+})();
+</script>
+
+{# ── Meal Suggestion Modal ── #}
+<div class="modal fade" id="suggestMealModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:520px">
+    <div class="modal-content border-0"
+         style="background:#111827;border-radius:20px;overflow:hidden;
+                box-shadow:0 32px 80px rgba(0,0,0,.6),0 0 0 1px rgba(16,163,74,.15)">
+
+      <div style="background:linear-gradient(135deg,#052e16,#111827);
+                  border-bottom:1px solid rgba(255,255,255,.06);padding:24px 28px 20px">
+        <div class="d-flex align-items-center justify-content-between">
+          <div style="font-size:18px;font-weight:700;color:#fff">🌿 {{ t("nutrition_suggest_modal_title") }}</div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+      </div>
+
+      <div class="modal-body p-4">
+        {# Step 1: description input #}
+        <div id="suggest-step-1">
+          <textarea id="suggest-desc" rows="3"
+            style="width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+                   border-radius:10px;padding:12px;color:#fff;font-size:13px;resize:none;outline:none"
+            placeholder="{{ t('nutrition_suggest_placeholder') }}"></textarea>
+          <div class="mt-3 d-flex justify-content-end">
+            <button onclick="suggestEnrich()"
+                    style="padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;
+                           background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border:none;cursor:pointer">
+              {{ t("nutrition_suggest_enrich_btn") }} ✨
+            </button>
+          </div>
+        </div>
+
+        {# Step 2: review enriched meal #}
+        <div id="suggest-step-2" style="display:none">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+                      color:#4ade80;margin-bottom:12px">Review &amp; confirm</div>
+          <div id="suggest-preview"
+               style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
+                      border-radius:10px;padding:14px;font-size:12px;color:rgba(255,255,255,.7);
+                      white-space:pre-wrap;font-family:monospace;max-height:300px;overflow-y:auto"></div>
+          <div id="suggest-msg" style="display:none;margin-top:10px;font-size:12px"></div>
+          <div class="mt-3 d-flex gap-2 justify-content-end">
+            <button onclick="document.getElementById('suggest-step-2').style.display='none';document.getElementById('suggest-step-1').style.display='block'"
+                    style="padding:6px 14px;border-radius:8px;font-size:12px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.5);cursor:pointer">
+              ← Edit
+            </button>
+            <button onclick="suggestConfirm()"
+                    style="padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;
+                           background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border:none;cursor:pointer">
+              {{ t("nutrition_suggest_confirm_btn") }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  let _enrichedMeal = null;
+
+  window.suggestEnrich = async function() {
+    const desc = document.getElementById('suggest-desc').value.trim();
+    if (!desc) return;
+    const btn = document.querySelector('#suggest-step-1 button');
+    btn.disabled = true;
+    btn.textContent = '{{ t("nutrition_card_generating") }}'.replace('…','') + '…';
+    try {
+      const r = await fetch('/nutrition/suggest', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({description: desc}),
+      });
+      if (!r.ok) throw new Error('API error');
+      _enrichedMeal = await r.json();
+      document.getElementById('suggest-preview').textContent = JSON.stringify(_enrichedMeal, null, 2);
+      document.getElementById('suggest-step-1').style.display = 'none';
+      document.getElementById('suggest-step-2').style.display = 'block';
+    } catch {
+      btn.disabled = false;
+      btn.textContent = '{{ t("nutrition_suggest_enrich_btn") }} ✨';
+      alert('{{ t("nutrition_suggest_error") }}');
+    }
+  };
+
+  window.suggestConfirm = async function() {
+    if (!_enrichedMeal) return;
+    const btn = document.querySelector('#suggest-step-2 button:last-child');
+    btn.disabled = true;
+    btn.textContent = '{{ t("nutrition_card_generating") }}'.replace('…','') + '…';
+    const msg = document.getElementById('suggest-msg');
+    try {
+      const r = await fetch('/nutrition/suggest/confirm', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({meal_json: _enrichedMeal}),
+      });
+      if (!r.ok) throw new Error('API error');
+      msg.style.display = 'block';
+      msg.style.color = '#4ade80';
+      msg.textContent = '{{ t("nutrition_suggest_success") }}';
+      btn.style.display = 'none';
+    } catch {
+      btn.disabled = false;
+      btn.textContent = '{{ t("nutrition_suggest_confirm_btn") }}';
+      msg.style.display = 'block';
+      msg.style.color = '#f87171';
+      msg.textContent = '{{ t("nutrition_suggest_error") }}';
+    }
+  };
 })();
 </script>
 {% endblock %}

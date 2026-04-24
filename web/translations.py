@@ -461,6 +461,14 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "nutrition_edit_prefs": "Edit preferences",
         # --- Navbar ---
         "nav_nutrition": "Nutrition",
+        # --- Meal suggestion ---
+        "nutrition_suggest_btn": "Suggest a meal",
+        "nutrition_suggest_modal_title": "Suggest a meal",
+        "nutrition_suggest_placeholder": "Describe the meal in any language, e.g. \"Greek yogurt with honey and walnuts\"",
+        "nutrition_suggest_enrich_btn": "Enrich with AI",
+        "nutrition_suggest_confirm_btn": "Add to my pool",
+        "nutrition_suggest_success": "Meal added! It will appear in your next generated plan.",
+        "nutrition_suggest_error": "Could not enrich meal. Please try again.",
         "session_more_exercises": "more exercises",
         "session_connect_session": "Connect your Garmin account to upload this session.",
         "session_rest_before": "Rest ",
@@ -914,6 +922,14 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         "nutrition_edit_prefs": "\u05e2\u05e8\u05d9\u05db\u05ea \u05d4\u05e2\u05d3\u05e4\u05d5\u05ea",
         # --- Navbar (he) ---
         "nav_nutrition": "\u05ea\u05d6\u05d5\u05e0\u05d4",
+        # --- Meal suggestion (he) ---
+        "nutrition_suggest_btn": "הצע ארוחה",
+        "nutrition_suggest_modal_title": "הצע ארוחה",
+        "nutrition_suggest_placeholder": "תאר את הארוחה בכל שפה, למשל: \"יוגורט יווני עם דבש ואגוזים\"",
+        "nutrition_suggest_enrich_btn": "הרחב עם AI",
+        "nutrition_suggest_confirm_btn": "הוסף לבריכה שלי",
+        "nutrition_suggest_success": "הארוחה נוספה! היא תופיע בתוכנית הבאה שלך.",
+        "nutrition_suggest_error": "לא ניתן להרחיב ארוחה. אנא נסה שוב.",
         "session_more_exercises": "\u05ea\u05e8\u05d2\u05d9\u05dc\u05d9\u05dd \u05e0\u05d5\u05e1\u05e4\u05d9\u05dd",
         "session_connect_session": "\u05d7\u05d1\u05e8 \u05d0\u05ea \u05d7\u05e9\u05d1\u05d5\u05df Garmin \u05e9\u05dc\u05da \u05dc\u05d4\u05e2\u05dc\u05d0\u05ea \u05d4\u05d0\u05d9\u05de\u05d5\u05df.",
         "session_rest_before": "\u05de\u05e0\u05d5\u05d7\u05d4 ",
