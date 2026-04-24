@@ -14,6 +14,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import uuid
 from datetime import date, datetime
 from typing import Any
 
@@ -22,6 +23,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from web.ai_provider import get_ai_provider
 from web.auth_utils import require_user
 from web.db import get_db
 from web.models import MealSuggestion, Notification, NutritionPlan, User
@@ -282,21 +284,20 @@ async def suggest_meal(
     if not body.description.strip():
         raise HTTPException(status_code=400, detail="description is required")
 
-    from web.ai_provider import get_ai_provider
-
     prompt = _ENRICH_PROMPT.format(user_input=body.description.replace('"', "'"))
     try:
         raw = get_ai_provider().complete(prompt)
-        meal_data = json.loads(raw)
+        meal_data: dict[str, Any] = json.loads(raw)
+        if not isinstance(meal_data, dict):
+            raise ValueError(f"Expected JSON object, got {type(meal_data).__name__}")
+        _required = {"name_en", "name_he", "kcal", "macros", "ingredients"}
+        if not _required.issubset(meal_data):
+            raise ValueError(f"AI response missing fields: {_required - meal_data.keys()}")
+        meal_data["id"] = f"suggestion_{uuid.uuid4().hex[:8]}"
+        meal_data.setdefault("type", "dinner")
     except Exception as exc:
         logger.error("Meal enrichment failed: %s", exc)
         raise HTTPException(status_code=502, detail="AI enrichment failed")
-
-    # Assign a temporary ID (will be replaced at graduation)
-    import uuid as _uuid_mod
-
-    meal_data["id"] = f"suggestion_{_uuid_mod.uuid4().hex[:8]}"
-    meal_data["type"] = meal_data.get("type", "dinner")
 
     return JSONResponse(meal_data)
 
