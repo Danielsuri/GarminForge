@@ -17,6 +17,7 @@ Run from the repo root. Requires the app DB to be accessible.
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -77,6 +78,20 @@ def main() -> None:
                 skipped_count += 1
                 continue
 
+            REQUIRED_KEYS = {
+                "type", "name_en", "name_he", "kcal", "macros",
+                "cooking_time", "positive_tags", "ingredient_flags",
+                "ingredients", "prep_note_en", "prep_note_he",
+            }
+            missing_keys = REQUIRED_KEYS - set(meal.keys())
+            if missing_keys:
+                print(f"WARNING: meal is missing required fields: {missing_keys}")
+                print("Proceed anyway? [y/N]: ", end="")
+                if input().strip().lower() != "y":
+                    print("[-] Skipped (missing fields).")
+                    skipped_count += 1
+                    continue
+
             print("\nMeal JSON:")
             print(json.dumps(meal, ensure_ascii=False, indent=2))
             print()
@@ -92,22 +107,25 @@ def main() -> None:
                 new_id = _next_id(pool, meal_type)
                 meal["id"] = new_id
                 pool.append(meal)
-                POOL_PATH.write_text(
+                # Write atomically: temp file + os.replace, then commit DB
+                tmp = POOL_PATH.with_suffix(".json.tmp")
+                tmp.write_text(
                     json.dumps(pool, ensure_ascii=False, indent=2), encoding="utf-8"
                 )
+                os.replace(tmp, POOL_PATH)
                 suggestion.status = "approved"
                 db.commit()
-                print(f"✅ Approved as {new_id}, appended to meal_pool.json")
+                print(f"[OK] Approved as {new_id}, appended to meal_pool.json")
                 approved_count += 1
 
             elif choice == "r":
                 suggestion.status = "rejected"
                 db.commit()
-                print("❌ Rejected.")
+                print("[X] Rejected.")
                 rejected_count += 1
 
             else:
-                print("⏭ Skipped.")
+                print("[-] Skipped.")
                 skipped_count += 1
 
         print("\n" + "=" * 60)
