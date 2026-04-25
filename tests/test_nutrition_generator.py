@@ -268,3 +268,29 @@ def test_generate_includes_pending_suggestion(db: Session) -> None:
     data = json.loads(plan.plan_json)
     names = [m["name"] for m in data["days"][0]["meals"]]
     assert "Custom oatmeal" in names
+
+
+def test_build_plan_json_includes_meal_id() -> None:
+    from web.nutrition_generator import _build_plan_json
+
+    resolved = {
+        "days": [
+            {
+                "date": "2026-04-27",
+                "meals": [
+                    {
+                        "id": "breakfast_001",
+                        "type": "breakfast",
+                        "name_en": "Oatmeal",
+                        "name_he": "שיבולת",
+                        "kcal": 300,
+                        "macros": {"protein_g": 10, "carbs_g": 50, "fat_g": 5},
+                        "ingredients": [],
+                    }
+                ],
+            }
+        ]
+    }
+    result = _build_plan_json(resolved, lang="en")
+    meal = result["days"][0]["meals"][0]
+    assert meal["id"] == "breakfast_001"

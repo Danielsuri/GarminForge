@@ -103,6 +103,7 @@ def _build_plan_json(
         meals_out = []
         for meal in day.get("meals", []):
             meals_out.append({
+                "id": meal.get("id", ""),
                 "type": meal.get("type", ""),
                 "name": meal.get(name_key, meal.get("name_en", "")),
                 "name_en": meal.get("name_en", ""),
