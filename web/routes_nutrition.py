@@ -23,10 +23,11 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from web.ai_provider import get_ai_provider
+from web.ai_provider import _extract_json, get_ai_provider
 from web.auth_utils import require_user
 from web.db import get_db
-from web.models import MealSuggestion, Notification, NutritionPlan, User
+from web.meal_selector import load_pool
+from web.models import MealSuggestion, Notification, NutritionPlan, RecipeCache, User
 from web.nutrition_generator import generate_weekly_plan, last_sunday
 from web.rendering import render_template
 
@@ -271,6 +272,32 @@ No explanation. Raw JSON only.
 Meal description: "{user_input}" """
 
 
+_RECIPE_PROMPT = """\
+You are a professional chef. Given this meal, write a complete recipe in two languages.
+
+Meal: {name_en} ({name_he})
+Ingredients: {ingredients}
+
+Return ONLY valid JSON with exactly these two top-level keys:
+{{
+  "recipe_en": {{
+    "servings": <integer>,
+    "prep_time_min": <integer>,
+    "cook_time_min": <integer>,
+    "steps": ["<step in English>"],
+    "tips": ["<tip in English>"]
+  }},
+  "recipe_he": {{
+    "servings": <integer>,
+    "prep_time_min": <integer>,
+    "cook_time_min": <integer>,
+    "steps": ["<step in Hebrew>"],
+    "tips": ["<tip in Hebrew>"]
+  }}
+}}
+No markdown. No explanation."""
+
+
 @router.post("/nutrition/suggest")
 async def suggest_meal(
     body: SuggestMealBody,
@@ -321,3 +348,84 @@ async def confirm_suggestion(
     db.add(suggestion)
     db.commit()
     return JSONResponse({"status": "ok", "id": suggestion.id})
+
+
+@router.get("/nutrition/meals/{meal_id}/recipe")
+async def get_meal_recipe(
+    meal_id: str,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> JSONResponse:
+    """Return a bilingual recipe card. Generates via AI on first request; cached thereafter."""
+    user = require_user(request, db)
+    if user is None:
+        raise HTTPException(status_code=401)
+
+    cached = db.query(RecipeCache).filter_by(meal_id=meal_id).first()
+    if cached:
+        return JSONResponse({
+            "recipe_en": json.loads(cached.recipe_en),
+            "recipe_he": json.loads(cached.recipe_he),
+        })
+
+    # Resolve meal: check pool first, then all MealSuggestion rows
+    pool = load_pool()
+    pool_by_id = {m["id"]: m for m in pool}
+    meal: dict[str, Any] | None = pool_by_id.get(meal_id)
+
+    if meal is None:
+        for suggestion in db.query(MealSuggestion).filter_by(user_id=user.id).all():
+            try:
+                candidate = json.loads(suggestion.meal_json)
+                if candidate.get("id") == meal_id:
+                    meal = candidate
+                    break
+            except Exception:
+                continue
+
+    if meal is None:
+        raise HTTPException(status_code=404, detail="meal not found")
+
+    ingredients = ", ".join(
+        ing.get("item_en", "")
+        for ing in meal.get("ingredients", [])
+        if ing.get("item_en")
+    )
+    prompt = _RECIPE_PROMPT.format(
+        name_en=meal.get("name_en", ""),
+        name_he=meal.get("name_he", ""),
+        ingredients=ingredients,
+    )
+
+    try:
+        raw = get_ai_provider().complete(prompt)
+        recipe_data: dict[str, Any] = json.loads(_extract_json(raw))
+        recipe_en = recipe_data["recipe_en"]
+        recipe_he = recipe_data["recipe_he"]
+        _required = {"servings", "prep_time_min", "cook_time_min", "steps", "tips"}
+        for lang_recipe in (recipe_en, recipe_he):
+            if not _required.issubset(lang_recipe):
+                raise ValueError(f"Recipe missing fields: {_required - lang_recipe.keys()}")
+    except Exception as exc:
+        logger.error("Recipe generation failed for meal %r: %s", meal_id, exc)
+        raise HTTPException(status_code=502, detail="recipe_unavailable")
+
+    try:
+        cache_row = RecipeCache(
+            meal_id=meal_id,
+            recipe_en=json.dumps(recipe_en, ensure_ascii=False),
+            recipe_he=json.dumps(recipe_he, ensure_ascii=False),
+        )
+        db.add(cache_row)
+        db.commit()
+    except Exception:
+        db.rollback()
+        cached = db.query(RecipeCache).filter_by(meal_id=meal_id).first()
+        if cached:
+            return JSONResponse({
+                "recipe_en": json.loads(cached.recipe_en),
+                "recipe_he": json.loads(cached.recipe_he),
+            })
+        raise HTTPException(status_code=502, detail="recipe_unavailable")
+
+    return JSONResponse({"recipe_en": recipe_en, "recipe_he": recipe_he})

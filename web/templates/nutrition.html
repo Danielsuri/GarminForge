@@ -72,6 +72,7 @@
                 {% endif %}
               </div>
               {% if meal.get('kcal') %}<div style="font-size:11px;color:rgba(255,255,255,.3);white-space:nowrap">{{ meal.kcal }} kcal</div>{% endif %}
+              {% if meal.get('id') %}<button onclick="openRecipe({{ meal.id|tojson }}, {{ ((meal.name_he if lang == 'he' else meal.name_en) or meal.name)|tojson }})" style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#a78bfa;cursor:pointer;white-space:nowrap;flex-shrink:0">📋 {{ t("recipe_btn") }}</button>{% endif %}
             </div>
             {% endfor %}
           </div>
@@ -415,6 +416,53 @@ if('serviceWorker' in navigator && 'PushManager' in navigator){
 })();
 </script>
 
+{# ── Recipe Modal ── #}
+<div class="modal fade" id="recipeMealModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:520px">
+    <div class="modal-content border-0"
+         style="background:#111827;border-radius:20px;overflow:hidden;
+                box-shadow:0 32px 80px rgba(0,0,0,.6),0 0 0 1px rgba(124,58,237,.15)">
+
+      <div style="background:linear-gradient(135deg,#1e1b4b,#111827);
+                  border-bottom:1px solid rgba(255,255,255,.06);padding:24px 28px 20px">
+        <div class="d-flex align-items-center justify-content-between">
+          <div id="recipe-modal-title" style="font-size:18px;font-weight:700;color:#fff">📋 {{ t("recipe_modal_title") }}</div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+      </div>
+
+      <div class="modal-body p-4" style="max-height:70vh;overflow-y:auto">
+        <div id="recipe-loading" style="text-align:center;padding:40px 0;color:rgba(255,255,255,.4);font-size:14px">
+          <div class="spinner-border spinner-border-sm text-light mb-3" role="status"></div>
+          <div>{{ t("recipe_loading") }}</div>
+        </div>
+        <div id="recipe-content" style="display:none">
+          <div id="recipe-meta"
+               style="display:flex;gap:24px;justify-content:center;padding:16px;
+                      background:rgba(255,255,255,.04);border-radius:12px;margin-bottom:20px"></div>
+          <div id="recipe-steps-section" style="margin-bottom:20px">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+                        color:rgba(255,255,255,.4);margin-bottom:10px">{{ t("recipe_steps") }}</div>
+            <ol id="recipe-steps-list" style="margin:0;padding-left:20px"></ol>
+          </div>
+          <div id="recipe-tips-section">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+                        color:rgba(255,255,255,.4);margin-bottom:10px">{{ t("recipe_tips") }}</div>
+            <ul id="recipe-tips-list" style="margin:0;padding-left:20px"></ul>
+          </div>
+        </div>
+        <div id="recipe-error" style="display:none;text-align:center;padding:32px 0">
+          <div style="color:rgba(255,255,255,.4);margin-bottom:16px;font-size:14px">{{ t("recipe_error") }}</div>
+          <button onclick="retryRecipe()"
+                  style="padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;
+                         background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.4);
+                         color:#a78bfa;cursor:pointer">{{ t("recipe_retry_btn") }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 {# ── Meal Suggestion Modal ── #}
 <div class="modal fade" id="suggestMealModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" style="max-width:520px">
@@ -540,6 +588,106 @@ if('serviceWorker' in navigator && 'PushManager' in navigator){
       confirmBtn.textContent = '{{ t("nutrition_suggest_confirm_btn") }}';
     }
   });
+})();
+</script>
+
+<script>
+(function () {
+  const _pageLang = '{{ lang }}';
+  const _recipeCache = new Map();
+  let _currentRecipeMealId = null;
+
+  const _labels = {
+    prep:     '{{ t("recipe_prep_time") }}',
+    cook:     '{{ t("recipe_cook_time") }}',
+    servings: '{{ t("recipe_servings") }}',
+  };
+
+  window.openRecipe = function (mealId, mealName) {
+    _currentRecipeMealId = mealId;
+    document.getElementById('recipe-modal-title').textContent = '\u{1F4CB} ' + mealName;
+    document.getElementById('recipe-loading').style.display = 'block';
+    document.getElementById('recipe-content').style.display = 'none';
+    document.getElementById('recipe-error').style.display = 'none';
+
+    const modal = new bootstrap.Modal(document.getElementById('recipeMealModal'));
+    modal.show();
+
+    if (_recipeCache.has(mealId)) {
+      _renderRecipe(_recipeCache.get(mealId));
+      return;
+    }
+
+    fetch('/nutrition/meals/' + encodeURIComponent(mealId) + '/recipe')
+      .then(function (r) {
+        if (!r.ok) throw new Error('status ' + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        _recipeCache.set(mealId, data);
+        _renderRecipe(data);
+      })
+      .catch(function () {
+        document.getElementById('recipe-loading').style.display = 'none';
+        document.getElementById('recipe-error').style.display = 'block';
+      });
+  };
+
+  window.retryRecipe = function () {
+    if (!_currentRecipeMealId) return;
+    _recipeCache.delete(_currentRecipeMealId);
+    const titleEl = document.getElementById('recipe-modal-title');
+    const name = titleEl.textContent.replace('\u{1F4CB} ', '');
+    window.openRecipe(_currentRecipeMealId, name);
+  };
+
+  function _renderRecipe(data) {
+    const recipe = _pageLang === 'he' ? data.recipe_he : data.recipe_en;
+
+    const meta = document.getElementById('recipe-meta');
+    meta.textContent = '';
+    [
+      [_labels.servings, String(recipe.servings)],
+      [_labels.prep,     recipe.prep_time_min + ' min'],
+      [_labels.cook,     recipe.cook_time_min + ' min'],
+    ].forEach(function (pair) {
+      const wrap = document.createElement('span');
+      wrap.style.cssText = 'display:inline-flex;flex-direction:column;align-items:center;gap:3px';
+      const lbl = document.createElement('span');
+      lbl.style.cssText = 'font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.05em';
+      lbl.textContent = pair[0];
+      const val = document.createElement('span');
+      val.style.cssText = 'font-size:16px;font-weight:700;color:#fff';
+      val.textContent = pair[1];
+      wrap.appendChild(lbl);
+      wrap.appendChild(val);
+      meta.appendChild(wrap);
+    });
+
+    const stepsList = document.getElementById('recipe-steps-list');
+    stepsList.textContent = '';
+    (recipe.steps || []).forEach(function (step) {
+      const li = document.createElement('li');
+      li.style.cssText = 'margin-bottom:10px;color:rgba(255,255,255,.8);font-size:14px;line-height:1.5';
+      li.textContent = step;
+      stepsList.appendChild(li);
+    });
+
+    const tipsList = document.getElementById('recipe-tips-list');
+    tipsList.textContent = '';
+    (recipe.tips || []).forEach(function (tip) {
+      const li = document.createElement('li');
+      li.style.cssText = 'margin-bottom:6px;color:rgba(255,255,255,.5);font-size:13px';
+      li.textContent = tip;
+      tipsList.appendChild(li);
+    });
+
+    const tipsSection = document.getElementById('recipe-tips-section');
+    tipsSection.style.display = (recipe.tips && recipe.tips.length) ? 'block' : 'none';
+
+    document.getElementById('recipe-loading').style.display = 'none';
+    document.getElementById('recipe-content').style.display = 'block';
+  }
 })();
 </script>
 {% endblock %}
