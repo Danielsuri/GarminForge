@@ -78,3 +78,26 @@ def test_user_nutrition_profile(db: Session) -> None:
     db.commit()
     db.refresh(user)
     assert json.loads(user.nutrition_profile_json)["meals_per_day"] == 3
+
+
+def test_recipe_cache_created(db: Session) -> None:
+    from web.models import RecipeCache
+    recipe_blob = json.dumps({"servings": 2, "prep_time_min": 5, "cook_time_min": 15, "steps": ["s1"], "tips": []})
+    cache = RecipeCache(meal_id="breakfast_001", recipe_en=recipe_blob, recipe_he=recipe_blob)
+    db.add(cache)
+    db.commit()
+    db.refresh(cache)
+    assert cache.id is not None
+    assert cache.meal_id == "breakfast_001"
+
+
+def test_recipe_cache_meal_id_unique(db: Session) -> None:
+    from sqlalchemy.exc import IntegrityError
+    from web.models import RecipeCache
+    blob = json.dumps({"servings": 1, "prep_time_min": 1, "cook_time_min": 1, "steps": [], "tips": []})
+    db.add(RecipeCache(meal_id="dup_001", recipe_en=blob, recipe_he=blob))
+    db.commit()
+    db.add(RecipeCache(meal_id="dup_001", recipe_en=blob, recipe_he=blob))
+    with pytest.raises(IntegrityError):
+        db.commit()
+    db.rollback()

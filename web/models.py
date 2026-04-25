@@ -251,3 +251,13 @@ class MealSuggestion(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
 
     user: Mapped["User"] = relationship(back_populates="meal_suggestions")
+
+
+class RecipeCache(Base):
+    __tablename__ = "recipe_cache"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
+    meal_id: Mapped[str] = mapped_column(String(100), unique=True, index=True, nullable=False)
+    recipe_en: Mapped[str] = mapped_column(Text, nullable=False)
+    recipe_he: Mapped[str] = mapped_column(Text, nullable=False)
+    generated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())

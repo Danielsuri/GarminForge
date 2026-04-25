@@ -49,6 +49,7 @@ def init_db() -> None:
         Notification,
         Program,
         ProgramSession,
+        RecipeCache,
         SavedPlan,
         User,
         WorkoutSession,
