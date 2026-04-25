@@ -72,7 +72,7 @@
                 {% endif %}
               </div>
               {% if meal.get('kcal') %}<div style="font-size:11px;color:rgba(255,255,255,.3);white-space:nowrap">{{ meal.kcal }} kcal</div>{% endif %}
-              {% if meal.get('id') %}<button onclick="openRecipe({{ meal.id|tojson }}, {{ ((meal.name_he if lang == 'he' else meal.name_en) or meal.name)|tojson }})" style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#a78bfa;cursor:pointer;white-space:nowrap;flex-shrink:0">📋 {{ t("recipe_btn") }}</button>{% endif %}
+              {% if meal.get('id') %}<button data-meal-id="{{ meal.id }}" data-meal-name="{{ (meal.name_he if lang == 'he' else meal.name_en) or meal.name }}" onclick="openRecipe(this.dataset.mealId, this.dataset.mealName)" style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#a78bfa;cursor:pointer;white-space:nowrap;flex-shrink:0">📋 {{ t("recipe_btn") }}</button>{% endif %}
             </div>
             {% endfor %}
           </div>
