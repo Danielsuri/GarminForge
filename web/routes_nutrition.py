@@ -23,7 +23,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from web.ai_provider import get_ai_provider
+from web.ai_provider import _extract_json, get_ai_provider
 from web.auth_utils import require_user
 from web.db import get_db
 from web.meal_selector import load_pool
@@ -399,7 +399,7 @@ async def get_meal_recipe(
 
     try:
         raw = get_ai_provider().complete(prompt)
-        recipe_data: dict[str, Any] = json.loads(raw)
+        recipe_data: dict[str, Any] = json.loads(_extract_json(raw))
         recipe_en = recipe_data["recipe_en"]
         recipe_he = recipe_data["recipe_he"]
         _required = {"servings", "prep_time_min", "cook_time_min", "steps", "tips"}
