@@ -12,7 +12,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from web.db import Base, get_db
-from web.models import RecipeCache, User
+from web.models import MealSuggestion, RecipeCache, User
 
 VALID_RECIPE_RESPONSE = {
     "recipe_en": {
@@ -138,3 +138,26 @@ def test_recipe_returns_404_for_unknown_meal(app_with_db):
         r = client.get("/nutrition/meals/nonexistent_999/recipe")
 
     assert r.status_code == 404
+
+
+def test_recipe_falls_back_to_user_suggestion(app_with_db):
+    """Meal not in pool but found in a MealSuggestion belonging to the logged-in user."""
+    client, db, user = app_with_db
+
+    suggestion_meal = {**POOL_MEAL, "id": "suggestion_abc123"}
+    suggestion = MealSuggestion(
+        user_id=user.id,
+        meal_json=json.dumps(suggestion_meal),
+        status="pending",
+    )
+    db.add(suggestion)
+    db.commit()
+
+    with patch("web.routes_nutrition.load_pool", return_value=[]):
+        with patch("web.routes_nutrition.get_ai_provider") as mock_ai:
+            mock_ai.return_value.complete.return_value = json.dumps(VALID_RECIPE_RESPONSE)
+            r = client.get("/nutrition/meals/suggestion_abc123/recipe")
+
+    assert r.status_code == 200
+    data = r.json()
+    assert data["recipe_en"]["servings"] == 2

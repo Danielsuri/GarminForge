@@ -26,8 +26,8 @@ from sqlalchemy.orm import Session
 from web.ai_provider import get_ai_provider
 from web.auth_utils import require_user
 from web.db import get_db
-from web.models import MealSuggestion, Notification, NutritionPlan, RecipeCache, User
 from web.meal_selector import load_pool
+from web.models import MealSuggestion, Notification, NutritionPlan, RecipeCache, User
 from web.nutrition_generator import generate_weekly_plan, last_sunday
 from web.rendering import render_template
 
@@ -374,7 +374,7 @@ async def get_meal_recipe(
     meal: dict[str, Any] | None = pool_by_id.get(meal_id)
 
     if meal is None:
-        for suggestion in db.query(MealSuggestion).all():
+        for suggestion in db.query(MealSuggestion).filter_by(user_id=user.id).all():
             try:
                 candidate = json.loads(suggestion.meal_json)
                 if candidate.get("id") == meal_id:
